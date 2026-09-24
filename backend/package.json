@@ -30,6 +30,7 @@
     "@medusajs/medusa": "2.19.0",
     "@medusajs/notification-sendgrid": "2.19.0",
     "@medusajs/payment-stripe": "2.19.0",
+    "@medusajs/ui": "4.2.1",
     "@medusajs/workflow-engine-redis": "2.19.0",
     "@react-email/components": "^1.0.1",
     "@rokmohar/medusa-plugin-meilisearch": "2.0.0",
