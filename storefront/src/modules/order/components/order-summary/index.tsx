@@ -1,4 +1,5 @@
 import { convertToLocale } from "@lib/util/money"
+import PromotionDeltas from "@modules/common/components/promotion-deltas"
 import { HttpTypes } from "@medusajs/types"
 
 type OrderSummaryProps = {
@@ -32,6 +33,11 @@ const OrderSummary = ({ order }: OrderSummaryProps) => {
               <span>- {getAmount(order.discount_total)}</span>
             </div>
           )}
+          <PromotionDeltas
+            items={order.items}
+            promotionsApplied={order.discount_total > 0}
+            currency_code={order.currency_code}
+          />
           {order.gift_card_total > 0 && (
             <div className="flex items-center justify-between">
               <span>Discount</span>
