@@ -3,6 +3,7 @@
 import { convertToLocale } from "@lib/util/money"
 import { InformationCircleSolid } from "@medusajs/icons"
 import { Tooltip } from "@medusajs/ui"
+import PromotionDeltas from "@modules/common/components/promotion-deltas"
 import React from "react"
 
 type CartTotalsProps = {
@@ -14,6 +15,8 @@ type CartTotalsProps = {
     discount_total?: number | null
     gift_card_total?: number | null
     currency_code: string
+    items?: { adjustments?: { code?: string | null; amount?: number | null }[] | null }[] | null
+    promotions?: unknown[] | null
   }
 }
 
@@ -52,6 +55,11 @@ const CartTotals: React.FC<CartTotalsProps> = ({ totals }) => {
             </span>
           </div>
         )}
+        <PromotionDeltas
+          items={totals.items}
+          promotionsApplied={(totals.promotions?.length ?? 0) > 0}
+          currency_code={currency_code}
+        />
         <div className="flex items-center justify-between">
           <span>Shipping</span>
           <span data-testid="cart-shipping" data-value={shipping_total || 0}>
