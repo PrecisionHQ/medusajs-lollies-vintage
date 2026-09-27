@@ -20,6 +20,11 @@ import {
   POLAR_SERVER,
   POLAR_PRODUCT_ID,
   POLAR_SUCCESS_URL,
+  DODO_PAYMENTS_API_KEY,
+  DODO_WEBHOOK_SECRET,
+  DODO_ENVIRONMENT,
+  DODO_PRODUCT_ID,
+  DODO_RETURN_URL,
   WORKER_MODE,
   S3_FILE_URL,
   S3_ACCESS_KEY_ID,
@@ -148,7 +153,7 @@ const medusaConfig = {
     // Payment providers register only when their keys are present, so the
     // checkout stays on manual payment until one is configured. Each entry
     // below is stubbed (empty env) until keys are provided.
-    ...((STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET) || (POLAR_ACCESS_TOKEN && POLAR_PRODUCT_ID && POLAR_SUCCESS_URL) ? [{
+    ...((STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET) || (POLAR_ACCESS_TOKEN && POLAR_PRODUCT_ID && POLAR_SUCCESS_URL) || (DODO_PAYMENTS_API_KEY && DODO_PRODUCT_ID && DODO_RETURN_URL) ? [{
       key: Modules.PAYMENT,
       resolve: '@medusajs/payment',
       options: {
@@ -170,6 +175,17 @@ const medusaConfig = {
               server: POLAR_SERVER,
               productId: POLAR_PRODUCT_ID,
               successUrl: POLAR_SUCCESS_URL,
+            },
+          }] : []),
+          ...(DODO_PAYMENTS_API_KEY && DODO_PRODUCT_ID && DODO_RETURN_URL ? [{
+            resolve: './src/modules/dodo',
+            id: 'dodo',
+            options: {
+              apiKey: DODO_PAYMENTS_API_KEY,
+              webhookSecret: DODO_WEBHOOK_SECRET,
+              environment: DODO_ENVIRONMENT,
+              productId: DODO_PRODUCT_ID,
+              returnUrl: DODO_RETURN_URL,
             },
           }] : []),
         ],
