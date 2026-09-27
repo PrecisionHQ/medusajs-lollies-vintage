@@ -1,4 +1,9 @@
-import { defineProductSearchIndex } from '@rokmohar/medusa-plugin-meilisearch/indexes'
+import { search } from '@medusajs/utils'
+import {
+  defineProductSearchIndex,
+  PRODUCT_GRAPH_FIELDS,
+  productSearchSchema,
+} from '@rokmohar/medusa-plugin-meilisearch/indexes'
 
 /**
  * Declares the `products` search index.
@@ -9,10 +14,35 @@ import { defineProductSearchIndex } from '@rokmohar/medusa-plugin-meilisearch/in
  * events keep it current. There is no indexing code to run and no startup
  * sync job to wait for.
  *
- * The factory default indexes published products with the standard schema
- * (id, title, handle, thumbnail, description, collection, categories, tags,
- * variants and so on), which already covers what the storefront's search
- * results render. Extend it with `fields: search.define({ ... })` and
- * `graph_fields` if a store adds attributes it wants searchable.
+ * On top of the factory default (id, title, handle, thumbnail, description,
+ * collection, categories, tags, variants) this adds variant OPTIONS
+ * (Size, Color, ...) so shoppers can search by color and other option
+ * values, and filter/facet on them. The option-bearing attributes are:
+ * - searchable: option values match text queries ("black" finds Black
+ *   variants even when the variant title convention changes).
+ * - filterable: `variants.options.value` supports Meili filters, which the
+ *   storefront (or API consumers) can use for faceted browsing later.
+ *
+ * After changing this file, redeploy and run a full reindex:
+ *   POST /admin/meilisearch/sync
+ * Settings (searchable/filterable lists) are re-applied by the sync.
  */
-export default defineProductSearchIndex()
+const baseSchema = productSearchSchema()
+
+export default defineProductSearchIndex({
+  graph_fields: [...PRODUCT_GRAPH_FIELDS, 'variants.options.value'],
+  fields: search.define({
+    ...baseSchema,
+    variants: search.object({
+      id: search.keyword().filterable(),
+      title: search.text().searchable({ weight: 2 }),
+      sku: search.text().searchable({ weight: 4 }).filterable(),
+      barcode: search.keyword().filterable(),
+      options: search
+        .object({
+          value: search.text().searchable().filterable(),
+        })
+        .array(),
+    }),
+  }),
+})
