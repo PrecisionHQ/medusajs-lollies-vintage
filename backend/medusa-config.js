@@ -86,6 +86,10 @@ const medusaConfig = {
       resolve: './src/modules/wishlist',
     },
     {
+      // PR-08: bundle definitions (discounts live on buyget promotions). No options.
+      resolve: './src/modules/bundle',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {

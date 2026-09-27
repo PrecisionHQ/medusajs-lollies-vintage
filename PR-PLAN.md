@@ -57,11 +57,12 @@ page + nav link.
 **Accept**: add/remove/move-to-cart round-trips; visible in account.
 **Test**: QA full journey. **Depends on**: nothing.
 
-### PR-08 — Bundles
-**Scope**: bundle Product type + `BundleComponent` (bundle variant → component variant × qty); cart workflow
-expands bundle into component lines (components carry stock); admin composer with margin preview + sale-cannibalization
-alert; bundle PDP section (contents, savings callout).
-**Accept**: bundle bought → components decrement, margin alert fires on conflicting sale.
+### PR-08 — Bundles (buy-get promotions, NOT fixed-price SKU)
+**Scope**: bundle = automatic buyget promotion (native in 2.19) + Bundle/BundleComponent rows for composition;
+admin composer with live margin health (flags when component sales eat the saving); PDP "Complete the set"
+rail with add-all. Definition changes go delete + recreate. Fixed-price SKU + cart expansion was rejected:
+expanding lines in cart.updated fights per-line tax, adjustments and the top-up correction.
+**Accept**: full set in cart → discount auto-applies; margin warning fires on conflicting sale.
 **Test**: QA buy + inventory check. **Depends on**: nothing.
 
 ### PR-09 — Preorder
