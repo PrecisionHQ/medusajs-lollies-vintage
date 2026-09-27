@@ -78,6 +78,10 @@ const medusaConfig = {
       resolve: './src/modules/marketing',
     },
     {
+      // PR-04: product reviews. No options.
+      resolve: './src/modules/reviews',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {
