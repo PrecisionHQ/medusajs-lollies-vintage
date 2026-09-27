@@ -3,6 +3,7 @@ import { getCollectionsList } from "@lib/data/collections"
 import { Text, clx } from "@medusajs/ui"
 
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import CookieSettings from "@modules/common/components/cookie-settings"
 import MedusaCTA from "@modules/layout/components/medusa-cta"
 import { getStoreName } from "@lib/util/env"
 
@@ -146,7 +147,8 @@ export default async function Footer() {
         </div>
         <div className="flex w-full mb-16 justify-between text-ui-fg-muted">
           <Text className="txt-compact-small">
-            © {new Date().getFullYear()} {getStoreName()}. All rights reserved.
+            © {new Date().getFullYear()} {getStoreName()}. All rights reserved. ·{" "}
+            <CookieSettings />
           </Text>
           <MedusaCTA />
         </div>

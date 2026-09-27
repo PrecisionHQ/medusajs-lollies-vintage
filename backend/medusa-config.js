@@ -78,6 +78,26 @@ const medusaConfig = {
       resolve: './src/modules/marketing',
     },
     {
+      // PR-04: product reviews. No options.
+      resolve: './src/modules/reviews',
+    },
+    {
+      // PR-07: customer wishlists. No options.
+      resolve: './src/modules/wishlist',
+    },
+    {
+      // PR-08: bundle definitions (discounts live on buyget promotions). No options.
+      resolve: './src/modules/bundle',
+    },
+    {
+      // PR-13: loyalty earn & burn. No options.
+      resolve: './src/modules/loyalty',
+    },
+    {
+      // PR-15: URL redirects + 404 log. No options.
+      resolve: './src/modules/redirects',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {

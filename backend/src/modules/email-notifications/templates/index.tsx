@@ -4,12 +4,20 @@ import { InviteUserEmail, INVITE_USER, isInviteUserData } from './invite-user'
 import { OrderPlacedTemplate, ORDER_PLACED, isOrderPlacedTemplateData } from './order-placed'
 import { ResetPasswordEmail, RESET_PASSWORD, isResetPasswordData } from './reset-password'
 import { CartAbandonedEmail, CART_ABANDONED, isCartAbandonedData } from './cart-abandoned'
+import { ReviewRequestEmail, REVIEW_REQUEST, isReviewRequestData } from './review-request'
+import { WinbackEmail, WINBACK, isWinbackData } from './winback'
+import { WelcomeEmail, WELCOME, isWelcomeData } from './welcome'
+import { BackInStockEmail, BACK_IN_STOCK, isBackInStockData } from './back-in-stock'
 
 export const EmailTemplates = {
   INVITE_USER,
   ORDER_PLACED,
   RESET_PASSWORD,
-  CART_ABANDONED
+  CART_ABANDONED,
+  REVIEW_REQUEST,
+  WINBACK,
+  WELCOME,
+  BACK_IN_STOCK
 } as const
 
 export type EmailTemplateType = keyof typeof EmailTemplates
@@ -52,6 +60,42 @@ export function generateEmailTemplate(templateKey: string, data: unknown): React
       }
       return <CartAbandonedEmail {...data} />
 
+    case EmailTemplates.REVIEW_REQUEST:
+      if (!isReviewRequestData(data)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Invalid data for template "${EmailTemplates.REVIEW_REQUEST}"`
+        )
+      }
+      return <ReviewRequestEmail {...data} />
+
+    case EmailTemplates.WINBACK:
+      if (!isWinbackData(data)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Invalid data for template "${EmailTemplates.WINBACK}"`
+        )
+      }
+      return <WinbackEmail {...data} />
+
+    case EmailTemplates.WELCOME:
+      if (!isWelcomeData(data)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Invalid data for template "${EmailTemplates.WELCOME}"`
+        )
+      }
+      return <WelcomeEmail {...data} />
+
+    case EmailTemplates.BACK_IN_STOCK:
+      if (!isBackInStockData(data)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Invalid data for template "${EmailTemplates.BACK_IN_STOCK}"`
+        )
+      }
+      return <BackInStockEmail {...data} />
+
     default:
       throw new MedusaError(
         MedusaError.Types.INVALID_DATA,
@@ -60,4 +104,4 @@ export function generateEmailTemplate(templateKey: string, data: unknown): React
   }
 }
 
-export { InviteUserEmail, OrderPlacedTemplate, ResetPasswordEmail, CartAbandonedEmail }
+export { InviteUserEmail, OrderPlacedTemplate, ResetPasswordEmail, CartAbandonedEmail, ReviewRequestEmail, WinbackEmail, WelcomeEmail, BackInStockEmail }

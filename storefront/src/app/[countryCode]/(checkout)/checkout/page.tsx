@@ -4,6 +4,8 @@ import { notFound } from "next/navigation"
 import Wrapper from "@modules/checkout/components/payment-wrapper"
 import CheckoutForm from "@modules/checkout/templates/checkout-form"
 import CheckoutSummary from "@modules/checkout/templates/checkout-summary"
+import TrackView from "@modules/common/components/track-view"
+import PreorderNotice from "@modules/cart/components/preorder-notice"
 import { enrichLineItems, retrieveCart } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
 import { getCustomer } from "@lib/data/customer"
@@ -32,7 +34,16 @@ export default async function Checkout() {
 
   return (
     <div className="grid grid-cols-1 small:grid-cols-[1fr_416px] content-container gap-x-40 py-12">
+      <TrackView
+        event="checkout_started"
+        properties={{ item_count: cart?.items?.length ?? 0 }}
+      />
       <Wrapper cart={cart}>
+        <PreorderNotice
+          variantIds={(cart?.items ?? [])
+            .map((i) => i.variant_id)
+            .filter((v): v is string => !!v)}
+        />
         <CheckoutForm cart={cart} customer={customer} />
       </Wrapper>
       <CheckoutSummary cart={cart} />

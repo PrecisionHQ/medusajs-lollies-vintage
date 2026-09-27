@@ -71,13 +71,17 @@ export async function getOrSetCart(countryCode: string) {
     await revalidateCacheTag("carts")
   }
 
+  // PR-16 — Region lock. A cart belongs to exactly one region: the one it
+  // was created in. Switching country abandons the old cart and starts a
+  // fresh one instead of migrating it, so shipping/tax/currency/promo terms
+  // can never be arbitraged by changing location mid-shop. (The old cart is
+  // left to expire server-side; deleting it here would race in-flight
+  // checkout requests.)
   if (cart && cart?.region_id !== region.id) {
-    await sdk.store.cart.update(
-      cart.id,
-      { region_id: region.id },
-      {},
-      await getAuthHeaders()
-    )
+    await removeCartId()
+    const cartResp = await sdk.store.cart.create({ region_id: region.id })
+    cart = cartResp.cart
+    await setCartId(cart.id)
     await revalidateCacheTag("carts")
   }
 
@@ -398,10 +402,25 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
   )
 }
 
-export async function placeOrder() {
+export async function placeOrder(expectedRegionId?: string) {
   const cartId = await getCartId()
   if (!cartId) {
     throw new Error("No existing cart found when placing an order")
+  }
+
+  // PR-16 — Region lock, last line of defense. The checkout page renders
+  // totals for one region; if the live cart's region differs (location
+  // switched mid-checkout in another tab, stale page), refuse rather than
+  // charge under the wrong shipping/tax/currency terms.
+  if (expectedRegionId) {
+    const liveCart = await retrieveCart().catch(() => null)
+    if (liveCart && liveCart.region_id !== expectedRegionId) {
+      await removeCartId()
+      await revalidateCacheTag("carts")
+      throw new Error(
+        "Your location changed during checkout, so this cart was reset. Please review your new totals and try again."
+      )
+    }
   }
 
   const cartRes = await sdk.store.cart
@@ -439,8 +458,13 @@ export async function updateRegion(countryCode: string, currentPath: string) {
     throw new Error(`Region not found for country code: ${countryCode}`)
   }
 
+  // PR-16 — Region lock. Switching country abandons the cart instead of
+  // migrating it: the items were priced/shipped/taxed under the old region,
+  // and carrying them over is exactly the arbitrage vector. The shopper
+  // starts empty in the new region.
   if (cartId) {
-    await updateCart({ region_id: region.id })
+    await removeCartId()
+    await revalidateCacheTag("carts")
   }
 
   // Prices, availability and the cart total are all region-dependent, so

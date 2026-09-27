@@ -5,6 +5,8 @@ import ProductActions from "@modules/products/components/product-actions"
 import ProductTabs from "@modules/products/components/product-tabs"
 import RelatedProducts from "@modules/products/components/related-products"
 import ProductInfo from "@modules/products/templates/product-info"
+import TrackView from "@modules/common/components/track-view"
+import BundleSection from "@modules/products/components/bundle-section"
 import SkeletonRelatedProducts from "@modules/skeletons/templates/skeleton-related-products"
 import { notFound } from "next/navigation"
 import ProductActionsWrapper from "./product-actions-wrapper"
@@ -27,6 +29,10 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
 
   return (
     <>
+      <TrackView
+        event="product_viewed"
+        properties={{ product_id: product.id, handle: product.handle }}
+      />
       <div
         className="content-container flex flex-col small:flex-row small:items-start py-6 relative"
         data-testid="product-container"
@@ -60,6 +66,7 @@ const ProductTemplate: React.FC<ProductTemplateProps> = ({
           <RelatedProducts product={product} countryCode={countryCode} />
         </Suspense>
       </div>
+      {product.id ? <BundleSection productId={product.id} /> : null}
     </>
   )
 }
