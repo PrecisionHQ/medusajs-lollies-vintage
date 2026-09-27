@@ -17,6 +17,7 @@
     "seed": "medusa exec ./src/scripts/seed.ts",
     "ib": "init-backend",
     "migrate": "medusa db:migrate && medusa db:sync-links",
+    "test": "vitest run",
     "start": "init-backend && npm run migrate && cd .medusa/server && medusa start --verbose",
     "dev": "medusa develop",
     "email:dev": "email dev --dir=./src/modules/email-notifications/templates --port=3002"
@@ -54,7 +55,8 @@
     "@types/react-dom": "^18.3.7",
     "react-email": "^5.1.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "3"
   },
   "pnpm": {
     "overrides": {

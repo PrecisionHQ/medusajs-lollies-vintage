@@ -5,6 +5,12 @@ import type {
 } from "@medusajs/framework/types"
 import { Modules } from "@medusajs/framework/utils"
 import { refreshPaymentCollectionForCartWorkflow } from "@medusajs/medusa/core-flows"
+import {
+  planTopUpAdjustments,
+  toMinorUnits,
+  type TopUpFloorInput,
+  type TopUpItemInput,
+} from "../lib/topup-math"
 
 /**
  * Universal top-up floor for percentage-off-items promotions.
@@ -22,25 +28,12 @@ import { refreshPaymentCollectionForCartWorkflow } from "@medusajs/medusa/core-f
  * placed — eligibility (target rules, exclusions, campaigns) is never
  * invented, only rescaled.
  *
- * Termination: the math is a deterministic integer function of stored state
- * and our writes bypass promo recomputation, so the refired event recomputes
- * identical values, hits the exact-equality check, and writes nothing.
- * At most two cycles, no timers or counters.
+ * The math itself is pure and unit-tested (see ../lib/topup-math and its
+ * tests); this file only maps DTOs in and out and performs the writes.
+ * Termination: deterministic integer function of stored state, and writes
+ * bypass promo recomputation, so the refired event recomputes identical
+ * values, hits the exact-equality check, and writes nothing.
  */
-
-type AdjustmentLike = {
-  id: string
-  item_id: string
-  code?: string | null
-  amount?: unknown
-  promotion_id?: string | null
-  description?: string | null
-}
-
-const toMinorUnits = (value: unknown): number => {
-  const n = Number(value)
-  return Number.isFinite(n) ? Math.round(n) : NaN
-}
 
 export async function correctTopUpForCart(
   cartId: string,
@@ -59,20 +52,39 @@ export async function correctTopUpForCart(
     return { rewritten: 0 }
   }
 
-  const items = (cart.items ?? []) as unknown as {
+  const rawItems = (cart.items ?? []) as unknown as {
     id: string
     original_total?: unknown
     subtotal?: unknown
     is_discountable?: boolean
-    adjustments?: AdjustmentLike[]
+    adjustments?: {
+      id: string
+      promotion_id?: string | null
+      amount?: unknown
+      code?: string | null
+      description?: string | null
+    }[]
   }[]
+
+  const items: TopUpItemInput[] = rawItems.map((item) => ({
+    id: item.id,
+    base: toMinorUnits(item.original_total ?? item.subtotal ?? 0),
+    discountable: item.is_discountable !== false,
+    adjustments: (item.adjustments ?? []).map((adj) => ({
+      id: adj.id,
+      promoId: adj.promotion_id ?? null,
+      amount: toMinorUnits(adj.amount ?? 0) || 0,
+      code: adj.code ?? undefined,
+      description: adj.description ?? undefined,
+    })),
+  }))
 
   // Distinct promos that actually placed item adjustments on this cart.
   const promoIds = [
     ...new Set(
       items
-        .flatMap((item) => item.adjustments ?? [])
-        .map((adj) => adj.promotion_id)
+        .flatMap((item) => item.adjustments)
+        .map((adj) => adj.promoId)
         .filter((id): id is string => Boolean(id))
     ),
   ]
@@ -85,8 +97,7 @@ export async function correctTopUpForCart(
     { relations: ["application_method"] }
   )
 
-  type FloorPromo = { id: string; code?: string; value: number }
-  const floors: FloorPromo[] = []
+  const floors: TopUpFloorInput[] = []
   for (const promo of promotions as unknown as {
     id: string
     code?: string
@@ -100,145 +111,43 @@ export async function correctTopUpForCart(
     if (!method || method.type !== "percentage" || method.target_type !== "items") {
       continue
     }
-    const value = Number(method.value)
-    if (!Number.isFinite(value) || value <= 0 || value > 100) {
-      logger.warn(
-        `[topup] promo ${promo.code ?? promo.id} has out-of-range value ${String(
-          method.value
-        )} - leaving its adjustments exactly as the engine computed them`
-      )
-      continue
-    }
-    floors.push({ id: promo.id, code: promo.code, value })
+    floors.push({
+      id: promo.id,
+      code: promo.code,
+      value: Number(method.value),
+    })
   }
   if (!floors.length) {
     return { rewritten: 0 }
   }
 
-  // Deterministic lowest-first layering: books are stable regardless of the
-  // order codes were entered in.
-  floors.sort((a, b) => a.value - b.value)
-  const floorByPromoId = new Map(floors.map((f) => [f.id, f]))
+  const plan = planTopUpAdjustments(items, floors)
 
-  let rewritten = 0
-  // Complete desired adjustment set, keyed by existing adjustment id.
-  // setLineItemAdjustments REPLACES the cart's whole adjustment set rather
-  // than merging, so every adjustment that must survive (changed or not) has
-  // to be re-sent - omitting one deletes it.
-  const desiredById = new Map<
-    string,
-    {
-      id: string
-      item_id: string
-      code?: string
-      amount: number
-      promotion_id: string
-      description?: string
-    }
-  >()
-  const deletions: string[] = []
-
-  for (const item of items) {
-    const adjustments = item.adjustments ?? []
-    // Protect everything first: entries not explicitly rewritten below are
-    // re-sent unchanged so the replacing set() call preserves them.
-    for (const adj of adjustments) {
-      desiredById.set(adj.id, {
-        id: adj.id,
-        item_id: item.id,
-        code: adj.code ?? undefined,
-        amount: toMinorUnits(adj.amount ?? 0) || 0,
-        promotion_id: adj.promotion_id ?? "",
-        description: adj.description ?? undefined,
-      })
-    }
-    if (item.is_discountable === false) {
-      continue
-    }
-    const base = toMinorUnits(
-      item.original_total ?? item.subtotal ?? 0
+  for (const skipped of plan.skipped) {
+    logger.warn(
+      `[topup] promo ${skipped.promo} has out-of-range value ${String(
+        skipped.value
+      )} - leaving its adjustments exactly as the engine computed them`
     )
-    if (!Number.isFinite(base) || base <= 0) {
-      continue
-    }
-    // Fixed (non-floor) promos keep native amounts but count toward the floor:
-    // the floor is a minimum total discount, so every existing reduction helps.
-    let accumulated = 0
-    for (const adj of adjustments) {
-      if (!adj.promotion_id || !floorByPromoId.has(adj.promotion_id)) {
-        accumulated += toMinorUnits(adj.amount ?? 0) || 0
-      }
-    }
-
-    for (const floor of floors) {
-      const stored = adjustments.filter(
-        (adj) => adj.promotion_id === floor.id
-      )
-      if (!stored.length) {
-        // Never invent eligibility: only rescale adjustments the engine placed.
-        continue
-      }
-      const target = Math.round((floor.value * base) / 100)
-      const desired = Math.max(0, target - accumulated)
-      accumulated += desired
-
-      const storedTotal = stored.reduce(
-        (sum, adj) => sum + (toMinorUnits(adj.amount ?? 0) || 0),
-        0
-      )
-      if (storedTotal === desired) {
-        continue
-      }
-
-      // Normalize to a single adjustment per (item, promo), updating in
-      // place: setLineItemAdjustments is update-only (id required).
-      const first = stored[0]
-      for (const adj of stored.slice(1)) {
-        deletions.push(adj.id)
-        desiredById.delete(adj.id)
-      }
-      if (desired > 0) {
-        desiredById.set(first.id, {
-          id: first.id,
-          item_id: item.id,
-          code: first.code ?? floor.code ?? "",
-          amount: desired,
-          promotion_id: floor.id,
-          description: first.description ?? undefined,
-        })
-      } else {
-        deletions.push(first.id)
-        desiredById.delete(first.id)
-      }
-      rewritten += 1
-      logger.info(
-        JSON.stringify({
-          msg: "topup-correction",
-          cart: cartId,
-          promo: floor.code ?? floor.id,
-          item: item.id,
-          base,
-          floor_value: floor.value,
-          was: storedTotal,
-          now: desired,
-        })
-      )
-    }
+  }
+  for (const entry of plan.audit) {
+    logger.info(JSON.stringify({ msg: "topup-correction", cart: cartId, ...entry }))
   }
 
-  if (!rewritten) {
+  if (!plan.rewritten) {
     return { rewritten: 0 }
   }
 
   // Delete-then-set: deletions drop stale duplicates/zeroed rows, then the
-  // complete desired set is written. If the set ever throws after deletions,
-  // the next cart.updated re-runs this same pure function on actual state and
+  // complete desired set is written (setLineItemAdjustments REPLACES rather
+  // than merges). If the set ever throws after deletions, the next
+  // cart.updated re-runs the same pure function on actual state and
   // converges - no manual repair path exists or is needed.
-  if (deletions.length) {
-    await cartModuleService.deleteLineItemAdjustments(deletions)
+  if (plan.deletions.length) {
+    await cartModuleService.deleteLineItemAdjustments(plan.deletions)
   }
   await cartModuleService.setLineItemAdjustments(cartId, [
-    ...desiredById.values(),
+    ...plan.desiredById.values(),
   ])
 
   // Keep payment sessions consistent with corrected totals, exactly as the
@@ -247,7 +156,7 @@ export async function correctTopUpForCart(
     input: { cart_id: cartId },
   })
 
-  return { rewritten }
+  return { rewritten: plan.rewritten }
 }
 
 async function topupCorrectionHandler({
