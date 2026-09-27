@@ -110,6 +110,13 @@ admin CRUD + Shopify URL CSV import; 404 log → suggested redirects report.
 **Accept**: old Shopify URLs 301 correctly; 404 report populates.
 **Test**: QA import + hit Sands. **Depends on**: nothing (do before migration cutover).
 
+### PR-16 — Region-lock checkout
+**Scope**: a cart belongs to exactly one region (its creation region). Country switch abandons the cart
+(remove cookie, fresh cart — never migrate items/prices); placeOrder verifies live cart region against the
+rendered checkout region and refuses + resets on mismatch.
+**Accept**: switch country mid-shop → empty new-region cart; switch mid-checkout → order refused with reset.
+**Test**: QA both paths. **Depends on**: nothing.
+
 ## Ops tasks (not PRs, blockers noted above)
 - [ ] Resend dedicated domain + SPF/DKIM (blocks PR-02)
 - [ ] Stripe manual-capture on test keys (blocks PR-09)
