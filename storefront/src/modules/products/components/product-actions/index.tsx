@@ -11,6 +11,7 @@ import OptionSelect from "@modules/products/components/product-actions/option-se
 
 import ErrorMessage from "@modules/checkout/components/error-message"
 import MobileActions from "./mobile-actions"
+import NotifyMe from "@modules/products/components/notify-me"
 import ProductPrice from "../product-price"
 import { addToCart } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
@@ -171,6 +172,9 @@ export default function ProductActions({
             ? "Out of stock"
             : "Add to cart"}
         </Button>
+        {selectedVariant && !inStock ? (
+          <NotifyMe variantId={selectedVariant.id!} />
+        ) : null}
         <ErrorMessage error={error} data-testid="add-product-error-message" />
         <MobileActions
           product={product}

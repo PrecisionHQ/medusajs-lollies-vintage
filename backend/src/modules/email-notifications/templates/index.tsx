@@ -7,6 +7,7 @@ import { CartAbandonedEmail, CART_ABANDONED, isCartAbandonedData } from './cart-
 import { ReviewRequestEmail, REVIEW_REQUEST, isReviewRequestData } from './review-request'
 import { WinbackEmail, WINBACK, isWinbackData } from './winback'
 import { WelcomeEmail, WELCOME, isWelcomeData } from './welcome'
+import { BackInStockEmail, BACK_IN_STOCK, isBackInStockData } from './back-in-stock'
 
 export const EmailTemplates = {
   INVITE_USER,
@@ -15,7 +16,8 @@ export const EmailTemplates = {
   CART_ABANDONED,
   REVIEW_REQUEST,
   WINBACK,
-  WELCOME
+  WELCOME,
+  BACK_IN_STOCK
 } as const
 
 export type EmailTemplateType = keyof typeof EmailTemplates
@@ -85,6 +87,15 @@ export function generateEmailTemplate(templateKey: string, data: unknown): React
       }
       return <WelcomeEmail {...data} />
 
+    case EmailTemplates.BACK_IN_STOCK:
+      if (!isBackInStockData(data)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Invalid data for template "${EmailTemplates.BACK_IN_STOCK}"`
+        )
+      }
+      return <BackInStockEmail {...data} />
+
     default:
       throw new MedusaError(
         MedusaError.Types.INVALID_DATA,
@@ -93,4 +104,4 @@ export function generateEmailTemplate(templateKey: string, data: unknown): React
   }
 }
 
-export { InviteUserEmail, OrderPlacedTemplate, ResetPasswordEmail, CartAbandonedEmail, ReviewRequestEmail, WinbackEmail, WelcomeEmail }
+export { InviteUserEmail, OrderPlacedTemplate, ResetPasswordEmail, CartAbandonedEmail, ReviewRequestEmail, WinbackEmail, WelcomeEmail, BackInStockEmail }

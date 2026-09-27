@@ -9,6 +9,8 @@ npx medusa db:generate --modules marketing
 npx medusa db:migrate
 ```
 
+(The review module rides the same pass: `db:generate --modules marketing review`.)
+
 Then seed the default config row once (the job also self-seeds on first run):
 
 `medusa exec` a script or Admin → Flows → Save (saving creates the row if missing).
@@ -29,6 +31,20 @@ Then seed the default config row once (the job also self-seeds on first run):
   delivered-at proxy; per-product review deep-links land with PR-04.
 - Admin: `src/api/admin/marketing/flows/route.ts` + `src/admin/routes/flows/page.tsx`.
 - Unsubscribe: `src/api/store/marketing/unsubscribe/route.ts` (HMAC token, see file).
+
+## Back-in-stock (PR-06)
+
+- `models/stock-subscription.ts` — one row per shopper × variant, `notified_at`
+  null while pending, random `token` for the emailed unsubscribe link.
+- `src/subscribers/back-in-stock.ts` on `inventory-level.updated`: acts only
+  when available quantity (stocked − reserved) crosses 5; resolves each
+  subscription exactly once (per-row try/catch).
+- Store API: `src/api/store/availability/subscriptions/route.ts`
+  (POST subscribe idempotent per variant × email, GET authed list, DELETE own),
+  `.../availability/unsubscribe/route.ts` (tokened delete).
+- Template: `back-in-stock` (product link is region-free `/products/:handle`).
+- Storefront: `NotifyMe` replaces Add to cart when OOS, account Stock alerts
+  page + nav, `/unsubscribe?scope=stock` branch.
 
 ## Runtime verification (needs infra — not yet run here)
 

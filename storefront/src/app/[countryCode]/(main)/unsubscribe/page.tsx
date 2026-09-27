@@ -4,12 +4,12 @@ import { sdk } from "@lib/config"
 import { getStoreName } from "@lib/util/env"
 
 /**
- * PR-02 — One-click marketing unsubscribe landing page.
+ * PR-02/PR-06 — One-click unsubscribe landing page.
  *
- * Linked from every marketing email with `?email=&token=` (HMAC-signed by the
- * backend). This server component calls the backend unsubscribe route and
- * renders the result — no client JS needed. Invalid links show a failure
- * message and write nothing.
+ * Marketing emails link with `?email=&token=` (HMAC-signed by the backend);
+ * stock alerts link with `?scope=stock&id=&token=` (random token). This server
+ * component calls the matching backend route and renders the result — no
+ * client JS needed. Invalid links show a failure message and write nothing.
  */
 export const metadata: Metadata = {
   title: `Unsubscribe | ${getStoreName()}`,
@@ -19,14 +19,25 @@ export const metadata: Metadata = {
 }
 
 type Props = {
-  searchParams: Promise<{ email?: string; token?: string }>
+  searchParams: Promise<{ email?: string; token?: string; scope?: string; id?: string }>
 }
 
 export default async function UnsubscribePage({ searchParams }: Props) {
-  const { email, token } = await searchParams
+  const { email, token, scope, id } = await searchParams
   let ok = false
+  const isStock = scope === "stock"
 
-  if (email && token) {
+  if (isStock && id && token) {
+    try {
+      const res = await sdk.client.fetch<{ unsubscribed?: boolean }>(
+        `/store/availability/unsubscribe`,
+        { method: "POST", body: { id, token } }
+      )
+      ok = res.unsubscribed === true
+    } catch {
+      ok = false
+    }
+  } else if (email && token) {
     try {
       const res = await sdk.client.fetch<{ unsubscribed?: boolean }>(
         `/store/marketing/unsubscribe`,
@@ -45,8 +56,10 @@ export default async function UnsubscribePage({ searchParams }: Props) {
       </h1>
       <p className="text-ui-fg-subtle">
         {ok
-          ? "You won't receive marketing emails from us anymore. Order confirmations and account emails are unaffected."
-          : "The unsubscribe link is invalid or expired. If you keep getting marketing emails, please contact us."}
+          ? isStock
+            ? "You won't receive stock alerts for that product anymore."
+            : "You won't receive marketing emails from us anymore. Order confirmations and account emails are unaffected."
+          : "The unsubscribe link is invalid or expired. Please contact us if this keeps happening."}
       </p>
     </div>
   )
