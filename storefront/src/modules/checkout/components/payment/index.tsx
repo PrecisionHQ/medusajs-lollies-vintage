@@ -14,6 +14,7 @@ import PaymentContainer from "@modules/checkout/components/payment-container"
 import { isStripe as isStripeFunc, paymentInfoMap } from "@lib/constants"
 import { StripeContext } from "@modules/checkout/components/payment-wrapper"
 import { initiatePaymentSession } from "@lib/data/cart"
+import { isPaidByGiftCard } from "@modules/gift-cards/utils"
 
 const Payment = ({
   cart,
@@ -43,8 +44,8 @@ const Payment = ({
   const isStripe = isStripeFunc(activeSession?.provider_id)
   const stripeReady = useContext(StripeContext)
 
-  const paidByGiftcard =
-    cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
+  // Gift cards carry-over block: v2 uses credit lines, not cart.gift_cards.
+  const paidByGiftcard = isPaidByGiftCard(cart)
 
   const paymentReady =
     (activeSession && cart?.shipping_methods.length !== 0) || paidByGiftcard

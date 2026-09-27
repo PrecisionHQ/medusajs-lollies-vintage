@@ -2,6 +2,7 @@ import { Heading } from "@medusajs/ui"
 
 import ItemsPreviewTemplate from "@modules/cart/templates/preview"
 import DiscountCode from "@modules/checkout/components/discount-code"
+import GiftCardCode from "@modules/gift-cards/components/gift-card-code"
 import CartTotals from "@modules/common/components/cart-totals"
 import Divider from "@modules/common/components/divider"
 
@@ -21,6 +22,8 @@ const CheckoutSummary = ({ cart }: { cart: any }) => {
         <ItemsPreviewTemplate items={cart?.items} />
         <div className="my-6">
           <DiscountCode cart={cart} />
+          {/* Gift cards carry-over block: lift with modules/gift-cards */}
+          <GiftCardCode cart={cart} currencyCode={cart.currency_code} />
         </div>
       </div>
     </div>

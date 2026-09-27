@@ -3,6 +3,7 @@
 import { Heading, Text, clx } from "@medusajs/ui"
 
 import PaymentButton from "../payment-button"
+import { isPaidByGiftCard } from "@modules/gift-cards/utils"
 import { useSearchParams } from "next/navigation"
 import { getStoreName } from "@lib/util/env"
 
@@ -11,8 +12,8 @@ const Review = ({ cart }: { cart: any }) => {
 
   const isOpen = searchParams.get("step") === "review"
 
-  const paidByGiftcard =
-    cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
+  // Gift cards carry-over block: v2 uses credit lines, not cart.gift_cards.
+  const paidByGiftcard = isPaidByGiftCard(cart)
 
   const previousStepsCompleted =
     cart.shipping_address &&
