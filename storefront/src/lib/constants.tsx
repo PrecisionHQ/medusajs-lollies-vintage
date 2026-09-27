@@ -48,6 +48,9 @@ export const isManual = (providerId?: string) => {
 export const isPolar = (providerId?: string) => {
   return providerId?.startsWith("pp_polar")
 }
+export const isDodo = (providerId?: string) => {
+  return providerId?.startsWith("pp_dodo")
+}
 
 // Add currencies that don't need to be divided by 100
 export const noDivisionCurrencies = [

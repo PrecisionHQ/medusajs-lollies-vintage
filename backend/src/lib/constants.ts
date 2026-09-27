@@ -173,6 +173,17 @@ export const POLAR_PRODUCT_ID = process.env.POLAR_PRODUCT_ID;
 export const POLAR_SUCCESS_URL = process.env.POLAR_SUCCESS_URL;
 
 /**
+ * (optional) Dodo Payments (redirect checkout sessions on one generic
+ * pay-what-you-want product). Registers only when api key + product +
+ * return URL are all set. DODO_ENVIRONMENT is 'test_mode' or 'live_mode'.
+ */
+export const DODO_PAYMENTS_API_KEY = process.env.DODO_PAYMENTS_API_KEY;
+export const DODO_WEBHOOK_SECRET = process.env.DODO_WEBHOOK_SECRET;
+export const DODO_ENVIRONMENT = process.env.DODO_ENVIRONMENT;
+export const DODO_PRODUCT_ID = process.env.DODO_PRODUCT_ID;
+export const DODO_RETURN_URL = process.env.DODO_RETURN_URL;
+
+/**
  * (optional) Meilisearch configuration
  */
 export const MEILISEARCH_HOST = process.env.MEILISEARCH_HOST;
