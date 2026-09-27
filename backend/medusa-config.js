@@ -64,6 +64,10 @@ const medusaConfig = {
   },
   modules: [
     {
+      // PR-02: abandoned-cart flows, send log, opt-outs. No options.
+      resolve: './src/modules/marketing',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {
