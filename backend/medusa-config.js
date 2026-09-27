@@ -94,6 +94,10 @@ const medusaConfig = {
       resolve: './src/modules/loyalty',
     },
     {
+      // PR-15: URL redirects + 404 log. No options.
+      resolve: './src/modules/redirects',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {

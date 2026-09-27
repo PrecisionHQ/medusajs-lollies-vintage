@@ -26,6 +26,55 @@ const CACHE_ID_COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === "production",
 } as const
 
+const redirectMapCache = {
+  redirectMap: new Map<string, { to: string; status: number }>(),
+  redirectMapUpdated: 0,
+}
+
+function normalizeRedirectPath(pathname: string): string {
+  // Mirrors backend normalizeRedirectPath (PR-15): lowercase, leading slash,
+  // no trailing slash — both sides must agree on form.
+  let p = pathname.toLowerCase()
+  if (!p.startsWith("/")) {
+    p = `/${p}`
+  }
+  while (p.length > 1 && p.endsWith("/")) {
+    p = p.slice(0, -1)
+  }
+  return p
+}
+
+async function getRedirectMap() {
+  if (
+    redirectMapCache.redirectMap.size ||
+    redirectMapCache.redirectMapUpdated > Date.now() - 3600 * 1000
+  ) {
+    return redirectMapCache.redirectMap
+  }
+  try {
+    const { redirects } = await fetch(`${BACKEND_URL}/store/redirects`, {
+      headers: {
+        "x-publishable-api-key": PUBLISHABLE_API_KEY!,
+      },
+      next: {
+        revalidate: 3600,
+        tags: ["redirects"],
+      },
+    }).then((res) => res.json())
+
+    redirectMapCache.redirectMap = new Map(
+      (redirects ?? []).map((r: { from: string; to: string; status: number }) => [
+        r.from,
+        { to: r.to, status: r.status === 302 ? 302 : 301 },
+      ])
+    )
+    redirectMapCache.redirectMapUpdated = Date.now()
+  } catch {
+    // Fail open: a dead backend for this endpoint must not break routing.
+  }
+  return redirectMapCache.redirectMap
+}
+
 async function getRegionMap() {
   const { regionMap, regionMapUpdated } = regionMapCache
 
@@ -119,6 +168,19 @@ export async function middleware(request: NextRequest) {
   // single shopper's revalidateTag("carts") would purge every shopper's
   // cached cart. See getCacheTag in lib/data/cookies.ts.
   const cacheId = cacheIdCookie?.value || crypto.randomUUID()
+
+  // PR-15: legacy/Shopify URLs redirect before country routing (they carry
+  // no country prefix). Query string preserved; misses fall through to the
+  // normal flow and get logged by the not-found reporter.
+  const redirectMap = await getRedirectMap()
+  const redirect = redirectMap.get(
+    normalizeRedirectPath(request.nextUrl.pathname)
+  )
+  if (redirect) {
+    const url = new URL(redirect.to, request.nextUrl.origin)
+    url.search = request.nextUrl.search
+    return NextResponse.redirect(url, redirect.status)
+  }
 
   const regionMap = await getRegionMap()
 
