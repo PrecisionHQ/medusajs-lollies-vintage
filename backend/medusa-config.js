@@ -185,7 +185,14 @@ const medusaConfig = {
     ...(MEILISEARCH_ENABLED ? [{
       resolve: '@rokmohar/medusa-plugin-meilisearch',
       options: {}
-    }] : [])
+    }] : []),
+    // Gift cards + store credit (official Loyalty Plugin). Brings its own
+    // modules, admin pages, and store APIs; DB tables land via the
+    // every-boot migrate in package.json `start`.
+    {
+      resolve: '@medusajs/loyalty-plugin',
+      options: {}
+    }
   ]
 };
 

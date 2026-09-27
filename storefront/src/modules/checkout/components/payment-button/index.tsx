@@ -8,6 +8,7 @@ import React, { useState } from "react"
 import ErrorMessage from "../error-message"
 import Spinner from "@modules/common/icons/spinner"
 import { placeOrder } from "@lib/data/cart"
+import { isPaidByGiftCard } from "@modules/gift-cards/utils"
 import { HttpTypes } from "@medusajs/types"
 import { isManual, isPaypal, isStripe } from "@lib/constants"
 
@@ -27,13 +28,12 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
     !cart.email ||
     (cart.shipping_methods?.length ?? 0) < 1
 
-  // TODO: Add this once gift cards are implemented
-  // const paidByGiftcard =
-  //   cart?.gift_cards && cart?.gift_cards?.length > 0 && cart?.total === 0
+  // Gift cards carry-over block: fully covered cart pays via gift card credit.
+  const paidByGiftcard = isPaidByGiftCard(cart)
 
-  // if (paidByGiftcard) {
-  //   return <GiftCardPaymentButton />
-  // }
+  if (paidByGiftcard) {
+    return <GiftCardPaymentButton />
+  }
 
   const paymentSession = cart.payment_collection?.payment_sessions?.[0]
 
