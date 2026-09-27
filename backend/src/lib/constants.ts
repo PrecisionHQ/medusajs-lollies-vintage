@@ -162,6 +162,17 @@ export const STRIPE_API_KEY = process.env.STRIPE_API_KEY;
 export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 
 /**
+ * (optional) Polar payments (redirect checkout). All stubbed until keys are
+ * provided: the provider only registers when access token + product + success
+ * URL are all set. POLAR_SERVER is 'sandbox' or 'production'.
+ */
+export const POLAR_ACCESS_TOKEN = process.env.POLAR_ACCESS_TOKEN;
+export const POLAR_WEBHOOK_SECRET = process.env.POLAR_WEBHOOK_SECRET;
+export const POLAR_SERVER = process.env.POLAR_SERVER;
+export const POLAR_PRODUCT_ID = process.env.POLAR_PRODUCT_ID;
+export const POLAR_SUCCESS_URL = process.env.POLAR_SUCCESS_URL;
+
+/**
  * (optional) Meilisearch configuration
  */
 export const MEILISEARCH_HOST = process.env.MEILISEARCH_HOST;

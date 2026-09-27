@@ -9,8 +9,9 @@ import ErrorMessage from "../error-message"
 import Spinner from "@modules/common/icons/spinner"
 import { placeOrder } from "@lib/data/cart"
 import { isPaidByGiftCard } from "@modules/gift-cards/utils"
+import RedirectPaymentButton from "@modules/redirect-payments/components/redirect-payment-button"
 import { HttpTypes } from "@medusajs/types"
-import { isManual, isPaypal, isStripe } from "@lib/constants"
+import { isManual, isPaypal, isPolar, isStripe } from "@lib/constants"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -56,6 +57,21 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           notReady={notReady}
           cart={cart}
           data-testid={dataTestId}
+        />
+      )
+    // Redirect-checkout providers (Polar, Dodo): session data carries the
+    // hosted checkout URL from initiatePayment. Lift with
+    // modules/redirect-payments on a template swap.
+    case isPolar(paymentSession?.provider_id):
+      return (
+        <RedirectPaymentButton
+          checkoutUrl={
+            (paymentSession?.data?.checkout_url as string | undefined) ??
+            null
+          }
+          label="Pay with Polar"
+          notReady={notReady}
+          data-testid="polar-payment-button"
         />
       )
     default:

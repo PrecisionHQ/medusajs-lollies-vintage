@@ -15,6 +15,11 @@ import {
   STORE_CORS,
   STRIPE_API_KEY,
   STRIPE_WEBHOOK_SECRET,
+  POLAR_ACCESS_TOKEN,
+  POLAR_WEBHOOK_SECRET,
+  POLAR_SERVER,
+  POLAR_PRODUCT_ID,
+  POLAR_SUCCESS_URL,
   WORKER_MODE,
   S3_FILE_URL,
   S3_ACCESS_KEY_ID,
@@ -140,19 +145,33 @@ const medusaConfig = {
         ]
       }
     }] : []),
-    ...(STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET ? [{
+    // Payment providers register only when their keys are present, so the
+    // checkout stays on manual payment until one is configured. Each entry
+    // below is stubbed (empty env) until keys are provided.
+    ...((STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET) || (POLAR_ACCESS_TOKEN && POLAR_PRODUCT_ID && POLAR_SUCCESS_URL) ? [{
       key: Modules.PAYMENT,
       resolve: '@medusajs/payment',
       options: {
         providers: [
-          {
+          ...(STRIPE_API_KEY && STRIPE_WEBHOOK_SECRET ? [{
             resolve: '@medusajs/payment-stripe',
             id: 'stripe',
             options: {
               apiKey: STRIPE_API_KEY,
               webhookSecret: STRIPE_WEBHOOK_SECRET,
             },
-          },
+          }] : []),
+          ...(POLAR_ACCESS_TOKEN && POLAR_PRODUCT_ID && POLAR_SUCCESS_URL ? [{
+            resolve: './src/modules/polar',
+            id: 'polar',
+            options: {
+              accessToken: POLAR_ACCESS_TOKEN,
+              webhookSecret: POLAR_WEBHOOK_SECRET,
+              server: POLAR_SERVER,
+              productId: POLAR_PRODUCT_ID,
+              successUrl: POLAR_SUCCESS_URL,
+            },
+          }] : []),
         ],
       },
     }] : []),

@@ -43,6 +43,11 @@ export const isPaypal = (providerId?: string) => {
 export const isManual = (providerId?: string) => {
   return providerId?.startsWith("pp_system_default")
 }
+// Redirect-checkout providers (custom Medusa payment providers in
+// backend/src/modules). Sessions carry the hosted checkout URL in data.
+export const isPolar = (providerId?: string) => {
+  return providerId?.startsWith("pp_polar")
+}
 
 // Add currencies that don't need to be divided by 100
 export const noDivisionCurrencies = [
