@@ -1,5 +1,6 @@
 import { Metadata } from "next"
 import CartTemplate from "@modules/cart/templates"
+import PreorderNotice from "@modules/cart/components/preorder-notice"
 import TrackView from "@modules/common/components/track-view"
 
 import { enrichLineItems, retrieveCart } from "@lib/data/cart"
@@ -35,6 +36,11 @@ export default async function Cart() {
       <TrackView
         event="cart_viewed"
         properties={{ item_count: cart?.items?.length ?? 0 }}
+      />
+      <PreorderNotice
+        variantIds={(cart?.items ?? [])
+          .map((i) => i.variant_id)
+          .filter((v): v is string => !!v)}
       />
       <CartTemplate cart={cart} customer={customer} />
     </>
