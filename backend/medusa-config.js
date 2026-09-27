@@ -90,6 +90,10 @@ const medusaConfig = {
       resolve: './src/modules/bundle',
     },
     {
+      // PR-13: loyalty earn & burn. No options.
+      resolve: './src/modules/loyalty',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {
