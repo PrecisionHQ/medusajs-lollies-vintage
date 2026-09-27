@@ -82,6 +82,10 @@ const medusaConfig = {
       resolve: './src/modules/reviews',
     },
     {
+      // PR-07: customer wishlists. No options.
+      resolve: './src/modules/wishlist',
+    },
+    {
       key: Modules.FILE,
       resolve: '@medusajs/file',
       options: {
