@@ -49,7 +49,11 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
       )
     case isManual(paymentSession?.provider_id):
       return (
-        <ManualTestPaymentButton notReady={notReady} data-testid={dataTestId} />
+        <ManualTestPaymentButton
+          notReady={notReady}
+          cart={cart}
+          data-testid={dataTestId}
+        />
       )
     case isPaypal(paymentSession?.provider_id):
       return (
@@ -96,6 +100,8 @@ const GiftCardPaymentButton = () => {
 
   const handleOrder = async () => {
     setSubmitting(true)
+    // Dead code until gift cards land (see TODO below) — no cart in scope,
+    // so no region to lock against; the live paths all pass one.
     await placeOrder()
   }
 
@@ -123,7 +129,7 @@ const StripePaymentButton = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
+    await placeOrder(cart.region_id)
       .catch((err) => {
         setErrorMessage(err.message)
       })
@@ -230,7 +236,7 @@ const PayPalPaymentButton = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
+    await placeOrder(cart.region_id)
       .catch((err) => {
         setErrorMessage(err.message)
       })
@@ -287,12 +293,18 @@ const PayPalPaymentButton = ({
   }
 }
 
-const ManualTestPaymentButton = ({ notReady }: { notReady: boolean }) => {
+const ManualTestPaymentButton = ({
+  cart,
+  notReady,
+}: {
+  cart: HttpTypes.StoreCart
+  notReady: boolean
+}) => {
   const [submitting, setSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const onPaymentCompleted = async () => {
-    await placeOrder()
+    await placeOrder(cart.region_id)
       .catch((err) => {
         setErrorMessage(err.message)
       })

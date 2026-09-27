@@ -5,6 +5,7 @@ import FastDelivery from "@modules/common/icons/fast-delivery"
 import Refresh from "@modules/common/icons/refresh"
 
 import Accordion from "./accordion"
+import ReviewsTab from "@modules/products/components/product-reviews"
 import { HttpTypes } from "@medusajs/types"
 
 type ProductTabsProps = {
@@ -20,6 +21,10 @@ const ProductTabs = ({ product }: ProductTabsProps) => {
     {
       label: "Shipping & Returns",
       component: <ShippingInfoTab />,
+    },
+    {
+      label: `Reviews`,
+      component: <ReviewsTab productId={product.id!} />,
     },
   ]
 

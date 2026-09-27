@@ -1,6 +1,8 @@
 import { HttpTypes } from "@medusajs/types"
 import { Heading, Text } from "@medusajs/ui"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import ProductStars from "@modules/products/components/product-stars"
+import WishlistButton from "@modules/products/components/wishlist-button"
 
 type ProductInfoProps = {
   product: HttpTypes.StoreProduct
@@ -25,6 +27,10 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
         >
           {product.title}
         </Heading>
+        <div className="flex items-center gap-x-3">
+          {product.id ? <ProductStars productId={product.id} /> : null}
+          {product.id ? <WishlistButton productId={product.id} /> : null}
+        </div>
 
         <Text
           className="text-medium text-ui-fg-subtle whitespace-pre-line"
