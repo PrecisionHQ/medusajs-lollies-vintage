@@ -11,7 +11,7 @@ import { placeOrder } from "@lib/data/cart"
 import { isPaidByGiftCard } from "@modules/gift-cards/utils"
 import RedirectPaymentButton from "@modules/redirect-payments/components/redirect-payment-button"
 import { HttpTypes } from "@medusajs/types"
-import { isManual, isPaypal, isPolar, isStripe } from "@lib/constants"
+import { isDodo, isManual, isPaypal, isPolar, isStripe } from "@lib/constants"
 
 type PaymentButtonProps = {
   cart: HttpTypes.StoreCart
@@ -72,6 +72,18 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({
           label="Pay with Polar"
           notReady={notReady}
           data-testid="polar-payment-button"
+        />
+      )
+    case isDodo(paymentSession?.provider_id):
+      return (
+        <RedirectPaymentButton
+          checkoutUrl={
+            (paymentSession?.data?.checkout_url as string | undefined) ??
+            null
+          }
+          label="Pay with Dodo"
+          notReady={notReady}
+          data-testid="dodo-payment-button"
         />
       )
     default:
