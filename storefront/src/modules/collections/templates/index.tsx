@@ -1,6 +1,7 @@
 import { Suspense } from "react"
 
 import SkeletonProductGrid from "@modules/skeletons/templates/skeleton-product-grid"
+import TrackView from "@modules/common/components/track-view"
 import RefinementList from "@modules/store/components/refinement-list"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import PaginatedProducts from "@modules/store/templates/paginated-products"
@@ -22,6 +23,10 @@ export default function CollectionTemplate({
 
   return (
     <div className="flex flex-col small:flex-row small:items-start py-6 content-container">
+      <TrackView
+        event="collection_viewed"
+        properties={{ collection_id: collection.id, handle: collection.handle }}
+      />
       <RefinementList sortBy={sort} data-testid="sort-by-container" />
       <div className="w-full">
         <div className="mb-8 text-2xl-semi">

@@ -199,3 +199,12 @@ export const WORKER_MODE =
  * Disable Admin
  */
 export const SHOULD_DISABLE_ADMIN = process.env.MEDUSA_DISABLE_ADMIN === 'true'
+
+/**
+ * (optional) PostHog server key + host for the order.placed mirror (PR-05).
+ * Stub values keep the subscriber inert — configure real ones (eu host) to switch on.
+ */
+export const POSTHOG_KEY = process.env.POSTHOG_KEY;
+export const POSTHOG_HOST = process.env.POSTHOG_HOST || 'https://eu.posthog.com';
+export const POSTHOG_ENABLED =
+  !!POSTHOG_KEY && POSTHOG_KEY.startsWith('phc_') && !POSTHOG_KEY.includes('STUB');
