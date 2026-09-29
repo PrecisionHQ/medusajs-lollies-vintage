@@ -3,12 +3,12 @@
  *
  * Shop rule: every percentage-off-items promo tops up to its own value over
  * existing adjustments. Per-item total always equals the highest applicable
- * floor; promos never compound. Deterministic lowest-first layering keeps
- * books stable regardless of the order codes were entered in.
+ * floor; promos never compound. There is no flag, toggle, or metadata — this
+ * is simply how discounts work here, which also means it cannot be switched
+ * off or tampered with at runtime.
  *
- * Separated from the subscriber so it runs under vitest in CI. The
- * subscriber (`../subscribers/topup-correction`) only maps DTOs in and out
- * and performs the writes this function plans.
+ * Deterministic lowest-first layering keeps books stable regardless of the
+ * order codes were entered in.
  */
 
 export const toMinorUnits = (value: unknown): number => {
@@ -58,8 +58,9 @@ export type TopUpAuditEntry = {
 }
 
 export type TopUpPlan = {
-  /** Complete desired set by adjustment id. Re-sent wholesale because
-   * setLineItemAdjustments REPLACES rather than merges. */
+  /** Complete desired adjustment set by adjustment id. Re-sent wholesale because
+   * setLineItemAdjustments REPLACES the cart's whole adjustment set — omitting
+   * one deletes it. */
   desiredById: Map<string, DesiredAdjustment>
   deletions: string[]
   rewritten: number
@@ -71,11 +72,10 @@ export function planTopUpAdjustments(
   items: TopUpItemInput[],
   floors: TopUpFloorInput[]
 ): TopUpPlan {
-  const validFloors = floors.filter((floor) => {
-    const ok =
-      Number.isFinite(floor.value) && floor.value > 0 && floor.value <= 100
-    return ok
-  })
+  // Filter out insane floor values (logged by caller)
+  const validFloors = floors.filter(
+    (floor) => Number.isFinite(floor.value) && floor.value > 0 && floor.value <= 100
+  )
   const skipped = floors
     .filter(
       (floor) =>
@@ -88,10 +88,14 @@ export function planTopUpAdjustments(
   const ordered = [...validFloors].sort((a, b) => a.value - b.value)
   const floorByPromoId = new Map(ordered.map((f) => [f.id, f]))
 
+  let rewritten = 0
+  // Complete desired adjustment set, keyed by existing adjustment id.
+  // setLineItemAdjustments REPLACES the cart's whole adjustment set rather
+  // than merging, so every adjustment that must survive (changed or not) has
+  // to be re-sent — omitting one deletes it.
   const desiredById = new Map<string, DesiredAdjustment>()
   const deletions: string[] = []
   const audit: TopUpAuditEntry[] = []
-  let rewritten = 0
 
   for (const item of items) {
     const adjustments = item.adjustments ?? []
@@ -103,7 +107,7 @@ export function planTopUpAdjustments(
         item_id: item.id,
         code: adj.code,
         amount: adj.amount,
-        promotion_id: adj.promoId ?? "",
+        promotion_id: adj.promoId ?? '',
         description: adj.description,
       })
     }
@@ -115,9 +119,8 @@ export function planTopUpAdjustments(
       continue
     }
 
-    // Fixed (non-floor) promos keep native amounts but count toward the
-    // floor: the floor is a minimum total discount, so every existing
-    // reduction helps.
+    // Fixed (non-floor) promos keep native amounts but count toward the floor:
+    // the floor is a minimum total discount, so every existing reduction helps.
     let accumulated = 0
     for (const adj of adjustments) {
       if (!adj.promoId || !floorByPromoId.has(adj.promoId)) {
@@ -126,7 +129,9 @@ export function planTopUpAdjustments(
     }
 
     for (const floor of ordered) {
-      const stored = adjustments.filter((adj) => adj.promoId === floor.id)
+      const stored = adjustments.filter(
+        (adj) => adj.promoId === floor.id
+      )
       if (!stored.length) {
         // Never invent eligibility: only rescale adjustments the engine placed.
         continue
@@ -135,12 +140,16 @@ export function planTopUpAdjustments(
       const desired = Math.max(0, target - accumulated)
       accumulated += desired
 
-      const storedTotal = stored.reduce((sum, adj) => sum + adj.amount, 0)
+      const storedTotal = stored.reduce(
+        (sum, adj) => sum + adj.amount,
+        0
+      )
       if (storedTotal === desired) {
         continue
       }
 
-      // Normalize to a single adjustment per (item, promo).
+      // Normalize to a single adjustment per (item, promo), updating in
+      // place: setLineItemAdjustments is update-only (id required).
       const first = stored[0]
       for (const adj of stored.slice(1)) {
         deletions.push(adj.id)
@@ -153,7 +162,7 @@ export function planTopUpAdjustments(
           code: first.code ?? floor.code,
           amount: desired,
           promotion_id: floor.id,
-          description: first.description,
+          description: first.description ?? undefined,
         })
       } else {
         deletions.push(first.id)
@@ -171,5 +180,67 @@ export function planTopUpAdjustments(
     }
   }
 
-  return { desiredById, deletions, rewritten, audit, skipped }
+  if (!rewritten) {
+    return { desiredById, deletions, rewritten, audit, skipped }
+  }
+
+  // Note: The actual delete/set operations are performed by the caller
+  // (the subscriber) since this is a pure function. The caller should:
+  // 1. Delete the stale adjustments: await cartModuleService.deleteLineItemAdjustments(deletions)
+  // 2. Write the complete desired set: await cartModuleService.setLineItemAdjustments(cartId, [...desiredById.values()])
+  // 3. Refresh payment collection: await refreshPaymentCollectionForCartWorkflow(container).run({ input: { cart_id: cartId } })
+
+return { desiredById, deletions, rewritten, audit, skipped }
+}
+
+export type TopUpAdjustmentInput = {
+  id: string
+  promoId: string | null
+  amount: number
+  code?: string
+  description?: string
+}
+
+export type TopUpItemInput = {
+  id: string
+  /** Pre-discount line total, minor units. NaN/<=0 items are skipped. */
+  base: number
+  discountable: boolean
+  adjustments: TopUpAdjustmentInput[]
+}
+
+export type TopUpFloorInput = {
+  id: string
+  code?: string
+  /** Percent, e.g. 40 for 40%. Out-of-range values are skipped, loudly. */
+  value: number
+}
+
+export type DesiredAdjustment = {
+  id: string
+  item_id: string
+  code?: string
+  amount: number
+  promotion_id: string
+  description?: string
+}
+
+export type TopUpAuditEntry = {
+  promo: string
+  item: string
+  base: number
+  floor_value: number
+  was: number
+  now: number
+}
+
+export type TopUpPlan = {
+  /** Complete desired adjustment set by adjustment id. Re-sent wholesale because
+   * setLineItemAdjustments REPLACES the cart's whole adjustment set — omitting
+   * one deletes it. */
+  desiredById: Map<string, DesiredAdjustment>
+  deletions: string[]
+  rewritten: number
+  audit: TopUpAuditEntry[]
+  skipped: { promo: string; value: number }[]
 }

@@ -18,6 +18,9 @@
     "ib": "init-backend",
     "migrate": "medusa db:migrate && medusa db:sync-links",
     "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
     "start": "init-backend && npm run migrate && cd .medusa/server && medusa start --verbose",
     "dev": "medusa develop",
     "email:dev": "email dev --dir=./src/modules/email-notifications/templates --port=3002"
@@ -60,7 +63,7 @@
     "react-email": "^5.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "vitest": "3"
+    "vitest": "^3.2.7"
   },
   "pnpm": {
     "overrides": {
