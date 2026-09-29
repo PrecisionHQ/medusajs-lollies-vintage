@@ -1,0 +1,17 @@
+{
+  "name": "bucket-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Read-only public proxy in front of a private Railway bucket (product images).",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "express": "^4.21.0"
+  }
+}
