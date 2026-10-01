@@ -154,4 +154,3 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - `backend/scripts/curate-top-picks.mjs` — resolves Shopify frontpage order to Medusa IDs → `storefront/src/data/curated.ts` (+ `.json` twin for record; homepage consumes the `.ts`).
 - `backend/scripts/fix-visibility-and-merch.mjs` — publishes draft new-in members, merch move-then-delete with orphan guard.
 - No runtime impact: scripts are never imported by app code. Verified via `--dry-run` runs against production data (read-only).
->>>>>>> origin/master
