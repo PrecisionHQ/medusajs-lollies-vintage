@@ -144,6 +144,10 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Railway builder uses pnpm 9.15.9, which rejects `storefront/pnpm-workspace.yaml` without a `packages` field (`packages field missing or empty`) — every storefront deploy failed at `pnpm install --frozen-lockfile`.
 - Fix: `"packageManager": "pnpm@11.5.1"` (builder == local version), explicit `allowBuilds` decisions (`sharp: true`, parcel/watcher + core-js `false`), `@/*` tsconfig path, lockfile refresh for Modave deps (bootstrap, swiper, photoswipe, sass, …).
 - Verified: `pnpm install --frozen-lockfile` clean locally and on Railway; `next build` SUCCESS; storefront `/gb` 200 on `storefront-production-7a40.up.railway.app`.
+## Elegant Abode homepage theme (2026-10-01, PR: storefront/elegant-abode-homepage)
+- Replaces the Medusa starter homepage with the Modave Elegant Abode theme on live data: Topbar3/Header1/sections/Footer1, product sections via Medusa adapter, Lollies menu (Home/Shop All/Sales/Bridal/New In + categories), Explore Collections + Shop by Category tile rows (no inventory counts), curated Top Picks/Trending from Shopify frontpage order, sale collage countdown banner, compact testimonials; news section removed.
+- Requires PR-A (build) + PR-B data (collections bridal/trending/new-in, sale + garment categories, curated.json); sections fall back to static demo data without them.
+- Verified: typecheck (one pre-existing gift-cards error), `/gb` + menu + tiles + collection/category pages 200 on storefront-production-7a40.up.railway.app.
 
 ## Shopify collection/category import scripts (2026-10-01, PR: ops/shopify-collection-scripts)
 - `backend/scripts/import-shopify-collections.mjs` — builds merchandising data from Shopify lists (bridal/sale-upto-50-off via title match) + newest/random collections + name-rule garment categories; `--dry-run` default, `--apply` + `--cats` write. Handles single-collection exclusivity (sale as category) and guards deletions (refuses non-empty).

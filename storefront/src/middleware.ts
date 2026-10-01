@@ -262,6 +262,11 @@ export const config = {
   // to the URL it puts in the og:image tag. Matching the path prefix handles
   // both. Verified by fetching it: without this entry the route answers 307 to
   // /gb/opengraph-image and every shared link loses its preview card.
+  //
+  // NOTE: the standalone /preview-elegant-abode demo route used to be
+  // exempted here so it could render with no backend running. It has been
+  // deleted now that Elegant Abode IS the homepage ([countryCode]/page.tsx,
+  // region-routed like everything else), so no exemption remains.
   matcher: [
     "/((?!api|_next/static|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg).*)",
   ],
