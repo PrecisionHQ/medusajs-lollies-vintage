@@ -1,2 +1,4 @@
 allowBuilds:
+  '@parcel/watcher': false
+  core-js: false
   sharp: true
