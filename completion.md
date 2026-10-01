@@ -148,3 +148,10 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Replaces the Medusa starter homepage with the Modave Elegant Abode theme on live data: Topbar3/Header1/sections/Footer1, product sections via Medusa adapter, Lollies menu (Home/Shop All/Sales/Bridal/New In + categories), Explore Collections + Shop by Category tile rows (no inventory counts), curated Top Picks/Trending from Shopify frontpage order, sale collage countdown banner, compact testimonials; news section removed.
 - Requires PR-A (build) + PR-B data (collections bridal/trending/new-in, sale + garment categories, curated.json); sections fall back to static demo data without them.
 - Verified: typecheck (one pre-existing gift-cards error), `/gb` + menu + tiles + collection/category pages 200 on storefront-production-7a40.up.railway.app.
+
+## Shopify collection/category import scripts (2026-10-01, PR: ops/shopify-collection-scripts)
+- `backend/scripts/import-shopify-collections.mjs` — builds merchandising data from Shopify lists (bridal/sale-upto-50-off via title match) + newest/random collections + name-rule garment categories; `--dry-run` default, `--apply` + `--cats` write. Handles single-collection exclusivity (sale as category) and guards deletions (refuses non-empty).
+- `backend/scripts/curate-top-picks.mjs` — resolves Shopify frontpage order to Medusa IDs → `storefront/src/data/curated.ts` (+ `.json` twin for record; homepage consumes the `.ts`).
+- `backend/scripts/fix-visibility-and-merch.mjs` — publishes draft new-in members, merch move-then-delete with orphan guard.
+- No runtime impact: scripts are never imported by app code. Verified via `--dry-run` runs against production data (read-only).
+>>>>>>> origin/master
