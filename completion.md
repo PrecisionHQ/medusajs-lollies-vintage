@@ -139,3 +139,9 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 
 - **Polar: SOLVED.** Ad-hoc prices: `checkouts.create({ products: [...], prices: { productId: [{ amountType: "fixed", priceAmount, priceCurrency }] } })` — arbitrary cart totals with one generic Polar product, no catalog sync. Clean fit.
 - **Dodo: LIKELY but unverified.** `product_cart[].amount` field hinted in docs; confirm against API reference or test key before building; product-mirroring fallback exists.
+
+## Shopify collection/category import scripts (2026-10-01, PR: ops/shopify-collection-scripts)
+- `backend/scripts/import-shopify-collections.mjs` — builds merchandising data from Shopify lists (bridal/sale-upto-50-off via title match) + newest/random collections + name-rule garment categories; `--dry-run` default, `--apply` + `--cats` write. Handles single-collection exclusivity (sale as category) and guards deletions (refuses non-empty).
+- `backend/scripts/curate-top-picks.mjs` — resolves Shopify frontpage order to Medusa IDs → `storefront/src/data/curated.json` (homepage picks; NOT needed by this PR, consumed by the storefront theme PR).
+- `backend/scripts/fix-visibility-and-merch.mjs` — publishes draft new-in members, merch move-then-delete with orphan guard.
+- No runtime impact: scripts are never imported by app code. Verified via `--dry-run` runs against production data (read-only).
