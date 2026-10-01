@@ -139,3 +139,8 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 
 - **Polar: SOLVED.** Ad-hoc prices: `checkouts.create({ products: [...], prices: { productId: [{ amountType: "fixed", priceAmount, priceCurrency }] } })` — arbitrary cart totals with one generic Polar product, no catalog sync. Clean fit.
 - **Dodo: LIKELY but unverified.** `product_cart[].amount` field hinted in docs; confirm against API reference or test key before building; product-mirroring fallback exists.
+
+## Storefront pnpm 11 build fix (2026-10-01, PR: storefront/build-pnpm11)
+- Railway builder uses pnpm 9.15.9, which rejects `storefront/pnpm-workspace.yaml` without a `packages` field (`packages field missing or empty`) — every storefront deploy failed at `pnpm install --frozen-lockfile`.
+- Fix: `"packageManager": "pnpm@11.5.1"` (builder == local version), explicit `allowBuilds` decisions (`sharp: true`, parcel/watcher + core-js `false`), `@/*` tsconfig path, lockfile refresh for Modave deps (bootstrap, swiper, photoswipe, sass, …).
+- Verified: `pnpm install --frozen-lockfile` clean locally and on Railway; `next build` SUCCESS; storefront `/gb` 200 on `storefront-production-7a40.up.railway.app`.
