@@ -42,11 +42,11 @@ export default function Header1({
           <div className="col-xl-3 col-md-4 col-6">
             <Link href={`/`} className="logo-header">
               <Image
-                alt="logo"
+                alt="Lollies Vintage"
                 className="logo"
-                src="/modave/images/logo/logo.svg"
-                width={144}
-                height={25}
+                src="/modave/images/logo/lollies.webp"
+                width={64}
+                height={64}
               />
             </Link>
           </div>
