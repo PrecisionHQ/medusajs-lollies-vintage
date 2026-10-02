@@ -1,22 +1,58 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { search } from "@modules/search/actions";
 
-import { productMain } from "@/data/products";
-import ProductCard1 from "../productCards/ProductCard1";
+const POPULAR = [
+  { label: "Dresses", href: "dresses", kind: "category" },
+  { label: "Bridal", href: "bridal", kind: "collection" },
+  { label: "New In", href: "new-in", kind: "collection" },
+  { label: "Sale", href: "sale", kind: "category" },
+  { label: "Maxi Dresses", href: "maxi-dresses", kind: "category" },
+];
+
+/**
+ * Header search modal: live suggestions from MeiliSearch as you type,
+ * submit jumps to the full results page (with facets). Popular links go
+ * to real categories/collections.
+ */
 export default function SearchModal() {
-  const [loading, setLoading] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const countryCode = (pathname || "").split("/")[1] || "gb";
+  const [value, setValue] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const timer = useRef(null);
 
-  const [loadedItems, setLoadedItems] = useState(productMain.slice(0, 8));
-  const handleLoad = () => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoadedItems((pre) => [
-        ...pre,
-        ...productMain.slice(pre.length, pre.length + 4),
-      ]);
-      setLoading(false);
-    }, 1000);
+  useEffect(() => {
+    if (timer.current) clearTimeout(timer.current);
+    const q = value.trim();
+    if (q.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    timer.current = setTimeout(async () => {
+      try {
+        const hits = await search(q);
+        setSuggestions((hits || []).slice(0, 6));
+      } catch {
+        setSuggestions([]);
+      }
+    }, 300);
+    return () => {
+      if (timer.current) clearTimeout(timer.current);
+    };
+  }, [value]);
+
+  const go = (q) => {
+    const query = (q ?? value).trim();
+    if (!query) return;
+    setSuggestions([]);
+    router.push(`/${countryCode}/results/${encodeURIComponent(query)}`);
   };
+
   return (
     <div className="modal fade modal-search" id="search">
       <div className="modal-dialog modal-dialog-centered">
@@ -28,7 +64,13 @@ export default function SearchModal() {
               data-bs-dismiss="modal"
             />
           </div>
-          <form className="form-search" onSubmit={(e) => e.preventDefault()}>
+          <form
+            className="form-search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              go();
+            }}
+          >
             <fieldset className="text">
               <input
                 type="text"
@@ -36,9 +78,9 @@ export default function SearchModal() {
                 className=""
                 name="text"
                 tabIndex={0}
-                defaultValue=""
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
                 aria-required="true"
-                required
               />
             </fieldset>
             <button className="" type="submit">
@@ -67,59 +109,46 @@ export default function SearchModal() {
               </svg>
             </button>
           </form>
-          <div>
-            <h5 className="mb_16">Feature keywords Today</h5>
-            <ul className="list-tags">
-              <li>
-                <a href="#" className="radius-60 link">
-                  Dresses
-                </a>
-              </li>
-              <li>
-                <a href="#" className="radius-60 link">
-                  Dresses women
-                </a>
-              </li>
-              <li>
-                <a href="#" className="radius-60 link">
-                  Dresses midi
-                </a>
-              </li>
-              <li>
-                <a href="#" className="radius-60 link">
-                  Dress summer
-                </a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h6 className="mb_16">Recently viewed products</h6>
-            <div className="tf-grid-layout tf-col-2 lg-col-3 xl-col-4">
-              {loadedItems.map((product, i) => (
-                <ProductCard1 product={product} key={i} />
+          {suggestions.length > 0 && (
+            <div className="mt-3">
+              {suggestions.map((hit) => (
+                <Link
+                  key={hit.id || hit.handle}
+                  href={`/${countryCode}/products/${hit.handle}`}
+                  className="d-flex align-items-center gap-2 mb-2 link"
+                  onClick={() => setSuggestions([])}
+                >
+                  {hit.thumbnail ? (
+                    <Image
+                      src={hit.thumbnail}
+                      alt={hit.title}
+                      width={48}
+                      height={64}
+                      style={{ objectFit: "cover", borderRadius: 6 }}
+                    />
+                  ) : null}
+                  <span className="text-line-clamp-1">{hit.title}</span>
+                </Link>
               ))}
             </div>
-          </div>
-          {/* Load Item */}
-
-          {productMain.length == loadedItems.length ? (
-            ""
-          ) : (
-            <div
-              className="wd-load view-more-button text-center"
-              onClick={() => handleLoad()}
-            >
-              <button
-                className={`tf-loading btn-loadmore tf-btn btn-reset ${
-                  loading ? "loading" : ""
-                } `}
-              >
-                <span className="text text-btn text-btn-uppercase">
-                  Load more
-                </span>
-              </button>
-            </div>
           )}
+          <div>
+            <h5 className="mb_16">Popular right now</h5>
+            <ul className="list-tags">
+              {POPULAR.map((p) => (
+                <li key={p.href}>
+                  <Link
+                    href={`/${countryCode}/${
+                      p.kind === "collection" ? "collections" : "categories"
+                    }/${p.href}`}
+                    className="radius-60 link"
+                  >
+                    {p.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
     </div>

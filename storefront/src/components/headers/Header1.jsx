@@ -3,6 +3,15 @@ import Nav from "./Nav";
 import Image from "next/image";
 import Link from "next/link";
 import CartLength from "../common/CartLength";
+/**
+ * @param {object} props
+ * @param {boolean} [props.fullWidth]
+ * @param {import("@/lib/util/lollies-menu").MenuLink[]} [props.menu]
+ * @param {import("@/lib/util/lollies-menu").ShopLink[]} [props.shopLinks]
+ * @param {import("@/lib/util/lollies-menu").ShopLink[]} [props.catLinks]
+ * @param {import("@/lib/util/modave-product-adapter").ModaveCardProduct[]} [props.recentProducts]
+ * @param {string} [props.countryCode]
+ */
 export default function Header1({
   fullWidth = false,
   // Live Lollies menu (built server-side with the visitor's countryCode).

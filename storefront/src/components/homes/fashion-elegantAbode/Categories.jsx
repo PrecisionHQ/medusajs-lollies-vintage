@@ -17,7 +17,7 @@ import { usePathname } from "next/navigation";
  * layout: "slider" (swipe carousel, used by Explore Collections) or
  * "grid" (all tiles visible at once, used by Shop by Category).
  */
-function TileCard({ item }) {
+export function TileCard({ item }) {
   return (
     <div
       className="collection-position-2 style-3 hover-img wow fadeInUp"
@@ -47,6 +47,8 @@ export default function Categories({
   liveItems,
   title = "Explore Collections",
   layout = "slider",
+  viewAllHref,
+  viewAllLabel = "View All Collection",
 }) {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
@@ -69,8 +71,8 @@ export default function Categories({
       <div className="container">
         <div className="heading-section-2 wow fadeInUp">
           <h3 className="heading">{title}</h3>
-          <Link href={`/${countryCode}/store`} className="btn-line py_8">
-            View All Collection
+          <Link href={viewAllHref || `/${countryCode}/store`} className="btn-line py_8">
+            {viewAllLabel}
           </Link>
         </div>
       </div>

@@ -1,7 +1,8 @@
 import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
-import ProductTemplate from "@modules/products/templates"
+import ProductTemplate from "@modules/products/templates/modave-product-template"
+import "@/app/modave-theme.css"
 import { getRegion, listRegions } from "@lib/data/regions"
 import { getProductByHandle, getProductsList } from "@lib/data/products"
 import { getStoreName } from "@lib/util/env"

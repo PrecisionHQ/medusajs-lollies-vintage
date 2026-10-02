@@ -474,3 +474,22 @@ export async function updateRegion(countryCode: string, currentPath: string) {
 
   redirect(`/${countryCode}${currentPath}`)
 }
+
+/**
+ * Drawer/page-friendly cart read: retrieve + enrich line items with
+ * product/variant detail in one call. Client-callable (server action).
+ */
+export async function retrieveEnrichedCart() {
+  const cart = await retrieveCart()
+
+  if (!cart) {
+    return null
+  }
+
+  if (cart?.items?.length) {
+    const enrichedItems = await enrichLineItems(cart?.items, cart?.region_id!)
+    cart.items = enrichedItems as HttpTypes.StoreCartLineItem[]
+  }
+
+  return cart
+}

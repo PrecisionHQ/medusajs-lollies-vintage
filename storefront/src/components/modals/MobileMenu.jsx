@@ -11,7 +11,7 @@ import { usePathname } from "next/navigation";
  * Bridal, New In). Accepts the same server-built props as Nav; falls back
  * to URL-derived defaults so it never renders dead demo links.
  */
-export default function MobileMenu({ menu, shopLinks, catLinks }) {
+export default function MobileMenu({ menu, shopLinks, catLinks } = {}) {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
   const defaults = buildLolliesMenu(countryCode);
