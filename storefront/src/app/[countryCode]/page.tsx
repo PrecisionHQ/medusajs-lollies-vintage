@@ -152,7 +152,7 @@ export default async function Home({
         <Products liveItems={topPicks} />
         <BannerCountdown countryCode={countryCode} images={saleImages} />
         <MarqueeSection2 parentClass="tf-marquee marquee-white bg-purple-2" />
-        <Lookbook liveItems={picksSource} />
+        <Lookbook />
         <Products2
           title="Top Trending"
           parentClass="flat-spacing pt-0"

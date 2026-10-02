@@ -78,6 +78,40 @@
   border-color: var(--main, #181818);
 }
 
+/* Trendsetters' Lookbook video grid: uniform 3:4 tiles, cover-cropped,
+ * caption chip overlaid bottom-left. Videos autoplay muted+looped. */
+.modave-scope .lookbook-video-grid {
+  margin-top: 36px;
+}
+.modave-scope .lookbook-video {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: 0;
+  background: #000;
+}
+.modave-scope .lookbook-video video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.modave-scope .lookbook-video-label {
+  position: absolute;
+  left: 14px;
+  bottom: 12px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+}
+
 /* PDP gallery: uniform 3:4 stage + thumbnail strip. */
 .modave-scope .pdp-gallery-main {
   aspect-ratio: 3 / 4;

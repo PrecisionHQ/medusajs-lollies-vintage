@@ -268,6 +268,6 @@ export const config = {
   // deleted now that Elegant Abode IS the homepage ([countryCode]/page.tsx,
   // region-routed like everything else), so no exemption remains.
   matcher: [
-    "/((?!api|_next/static|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg).*)",
+    "/((?!api|_next/static|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg|.*\\.mp4|.*\\.webm).*)",
   ],
 }
