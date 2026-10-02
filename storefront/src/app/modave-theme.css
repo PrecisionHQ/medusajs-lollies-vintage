@@ -78,6 +78,110 @@
   border-color: var(--main, #181818);
 }
 
+/* Split hero: text card left, portrait video right at a fixed 480px so
+   all six render the same ~600px height — full frame visible, no crop,
+   no stage jumps between slides. Bottom padding clears the
+   absolutely-positioned pagination dots. */
+.modave-scope .tf-slideshow .hero-split-inner {
+  display: flex;
+  align-items: center;
+  /* Card and video sit adjacent (tight gap, pair anchored left) rather
+     than being spread across the full container by space-between. */
+  justify-content: flex-start;
+  gap: 16px;
+  padding-top: 56px;
+  padding-bottom: 72px;
+}
+.modave-scope .tf-slideshow .hero-split-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 620px;
+}
+/* Equal card size on every slide: copy length varies (desktop headings
+   wrap to 2 or 3 lines at 80px, descriptions to 1 or 2), so the card
+   height is pinned on desktop and title/button spread vertically.
+   Tablet/mobile headings are 50/30px so all fit 2 lines there — only the
+   description is normalized (2-line min-height) to keep those equal too.
+   Worst-case desktop stack (measured with the theme font): 3-line
+   heading 264 + gaps + 2-line desc 56 + button ~54 + padding 60 = ~490,
+   so 520 carries margin instead of risking clipped text (card-box clips). */
+@media (min-width: 992px) {
+  .modave-scope .tf-slideshow .hero-split-content .card-box {
+    height: 520px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+}
+.modave-scope .tf-slideshow .hero-split-content .body-text-1 {
+  min-height: 56px;
+}
+.modave-scope .tf-slideshow .hero-split-video {
+  flex: none;
+  width: 480px;
+  /* All six clips are 4:5 — reserve the height before metadata loads so
+     the panel never flashes a black box or shifts the stage. */
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  line-height: 0;
+}
+.modave-scope .tf-slideshow .hero-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  /* Feather all four edges ~32px into the stage color. Studio backdrops
+     fall off toward the corners, so no flat stage color can match the
+     border pixels everywhere — fading the edge out removes the hard
+     rectangular seam instead of chasing it with color. */
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      transparent 0,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent 0,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 32px,
+      #000 calc(100% - 32px),
+      transparent 100%
+    );
+  mask-composite: intersect;
+}
+@media (max-width: 767px) {
+  .modave-scope .tf-slideshow .hero-split-inner {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+    padding-top: 32px;
+    padding-bottom: 64px;
+  }
+  .modave-scope .tf-slideshow .hero-split-video {
+    order: -1; /* video on top when stacked */
+    width: min(320px, 100%);
+    margin: 0 auto;
+  }
+}
 /* Trendsetters' Lookbook video grid: uniform 3:4 tiles, cover-cropped,
  * caption chip overlaid bottom-left. Videos autoplay muted+looped. */
 .modave-scope .lookbook-video-grid {

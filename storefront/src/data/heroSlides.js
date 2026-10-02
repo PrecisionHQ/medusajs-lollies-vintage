@@ -125,6 +125,88 @@ export const slidesData = [
   },
 ];
 
+// Hero video slides: one lookbook video per slide with the Elegant Abode
+// overlay copy cycled from slidesData above. delayMs is each clip's real
+// duration (measured from the files) so Swiper's per-slide autoplay
+// advances exactly when the video ends — the video's own `ended` event
+// is the primary trigger, the timer is the fallback.
+//
+// bgColor = each clip's backdrop, sampled from the outer edge ring of its
+// first frame (QuickLook thumbnail + PIL median) so the slide stage blends
+// into the video seamlessly. Swap the value if a clip is re-exported.
+export const heroVideoSlides = [
+  {
+    id: 1,
+    label: "White",
+    videoSrc: "/modave/videos/video-white.mp4",
+    bgColor: "#f1f1f0",
+    delayMs: 13640,
+    heading: "Elegant chic <br /> Everyday",
+    description:
+      "Achieve effortless style with our elegant pieces.",
+    buttonText: "Explore Collection",
+  },
+  {
+    id: 2,
+    label: "Black",
+    videoSrc: "/modave/videos/video-black.mp4",
+    bgColor: "#e7e7e7",
+    delayMs: 15840,
+    heading: "Show up in style <br /> with our stylish <br /> jumpsuit",
+    description:
+      "Find your next go-to jumpsuit",
+    buttonText: "Shop Sale",
+    // Long headline: 60px keeps it to 3 lines so the fixed-height card
+    // never clips (measured against the theme font at card width).
+    headingStyle: { fontSize: "60px", lineHeight: "66px" },
+  },
+  {
+    id: 3,
+    label: "Green",
+    videoSrc: "/modave/videos/video-green.mp4",
+    bgColor: "#e9ebec",
+    delayMs: 12680,
+    heading: "Every Piece <br /> tells a Story",
+    description:
+      "Choose outfits that reflect your unique flair",
+    buttonText: "Shop New",
+  },
+  {
+    id: 4,
+    label: "Purple",
+    videoSrc: "/modave/videos/video-purple.mp4",
+    bgColor: "#e9ebed",
+    delayMs: 13040,
+    heading: "Elegant chic <br /> Everyday",
+    description:
+      "Achieve effortless style with our elegant pieces.",
+    buttonText: "Explore Collection",
+  },
+  {
+    id: 5,
+    label: "Bridal",
+    videoSrc: "/modave/videos/video-bridal.mp4",
+    bgColor: "#eef0ef",
+    delayMs: 10360,
+    heading: "Show up in style <br /> with our stylish <br /> jumpsuit",
+    description:
+      "Find your next go-to jumpsuit",
+    buttonText: "Shop Sale",
+    headingStyle: { fontSize: "60px", lineHeight: "66px" },
+  },
+  {
+    id: 6,
+    label: "Gold",
+    videoSrc: "/modave/videos/video-gold.mp4",
+    bgColor: "#9c8b83",
+    delayMs: 17867,
+    heading: "Every Piece <br /> tells a Story",
+    description:
+      "Choose outfits that reflect your unique flair",
+    buttonText: "Shop New",
+  },
+];
+
 export const slides5 = [
   {
     id: 1,
