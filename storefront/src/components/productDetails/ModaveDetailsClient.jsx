@@ -100,6 +100,10 @@ export default function ModaveDetailsClient({
   const inStock = variantInStock(selectedVariant);
   const needsSelection =
     (product.variants?.length ?? 0) > 1 && !selectedVariant;
+  // Honest label when nothing on the product is purchasable: without it
+  // the button reads "Select options" forever on a sold-out product,
+  // which looks like a dead button.
+  const noneAvailable = !(product.variants || []).some(variantInStock);
 
   const priceInfo = useMemo(() => {
     try {
@@ -409,7 +413,9 @@ export default function ModaveDetailsClient({
                           >
                             <span>
                               {needsSelection
-                                ? "Select options"
+                                ? (noneAvailable
+                                  ? "Out of stock"
+                                  : "Select options")
                                 : !inStock
                                 ? "Out of stock"
                                 : isAdding

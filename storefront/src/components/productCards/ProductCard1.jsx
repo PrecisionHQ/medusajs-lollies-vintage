@@ -231,7 +231,20 @@ export default function ProductCard1({
           </a>
         </div>
         <div className="list-btn-main">
-          {product.addToCart == "Quick Add" ? (
+          {product.handle ? (
+            // Live Medusa cards (modave-product-adapter always sets handle)
+            // go through Quick View: real variant pickers + the real cart.
+            // The demo quickAdd/cart branches below only serve static
+            // fallback items that have no handle.
+            <a
+              className="btn-main-product"
+              href="#quickView"
+              onClick={() => setQuickViewItem(product)}
+              data-bs-toggle="modal"
+            >
+              ADD TO CART
+            </a>
+          ) : product.addToCart == "Quick Add" ? (
             <a
               className="btn-main-product"
               href="#quickAdd"

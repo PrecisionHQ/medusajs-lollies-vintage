@@ -13,7 +13,6 @@ import ModaveDescriptionTabs from "@/components/productDetails/ModaveDescription
 import ModaveRelatedProducts from "@/components/productDetails/ModaveRelatedProducts"
 import CartModal from "@/components/modals/CartModal"
 import QuickView from "@/components/modals/QuickView"
-import QuickAdd from "@/components/modals/QuickAdd"
 import Compare from "@/components/modals/Compare"
 import MobileMenu from "@/components/modals/MobileMenu"
 import SearchModal from "@/components/modals/SearchModal"
@@ -139,7 +138,6 @@ const ModaveProductTemplate: React.FC<ModaveProductTemplateProps> = ({
         <SizeGuide />
         <CartModal />
         <QuickView />
-        <QuickAdd />
         <Compare />
         <MobileMenu menu={menu} shopLinks={shopLinks} catLinks={catLinks} />
         <SearchModal />

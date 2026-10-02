@@ -18,7 +18,6 @@ import ScrollTop from "@/components/common/ScrollTop"
 import ModaveScripts from "@/components/common/ModaveScripts"
 import CartModal from "@/components/modals/CartModal"
 import QuickView from "@/components/modals/QuickView"
-import QuickAdd from "@/components/modals/QuickAdd"
 import Compare from "@/components/modals/Compare"
 import MobileMenu from "@/components/modals/MobileMenu"
 import SearchModal from "@/components/modals/SearchModal"
@@ -169,7 +168,6 @@ export default async function Home({
             Medusa PDPs, where purchase uses the real cart. */}
         <CartModal />
         <QuickView />
-        <QuickAdd />
         <Compare />
         <MobileMenu menu={menu} shopLinks={shopLinks} catLinks={catLinks} />
         <SearchModal />
