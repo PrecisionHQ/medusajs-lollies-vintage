@@ -15,24 +15,24 @@ import Products from "@/components/homes/fashion-elegantAbode/Products"
 import Features from "@/components/common/Features"
 import Brands from "@/components/common/Brands"
 import ScrollTop from "@/components/common/ScrollTop"
+import ModaveScripts from "@/components/common/ModaveScripts"
 import CartModal from "@/components/modals/CartModal"
 import QuickView from "@/components/modals/QuickView"
 import QuickAdd from "@/components/modals/QuickAdd"
 import Compare from "@/components/modals/Compare"
 import MobileMenu from "@/components/modals/MobileMenu"
 import SearchModal from "@/components/modals/SearchModal"
+import NewsLetterModal from "@/components/modals/NewsLetterModal"
 import Wishlist from "@/components/modals/Wishlist"
 import { getProductsList, getProductsById } from "@/lib/data/products"
 import { getRegion } from "@/lib/data/regions"
-import { getCollectionByHandle } from "@/lib/data/collections"
-import { getCategoryByHandle } from "@/lib/data/categories"
+import { getTiles, getSaleImages } from "@/lib/data/listing-tiles"
 import { adaptMedusaProductsToModave } from "@/lib/util/modave-product-adapter"
 import { buildLolliesMenu } from "@/lib/util/lollies-menu"
 import { getStoreName } from "@/lib/util/env"
-import { collectionData } from "@/data/collections"
 import { topPicks as curatedTopPicks } from "@/data/curated"
 
-import "./modave.css"
+import "@/app/modave-theme.css"
 
 export const metadata: Metadata = {
   title: getStoreName(),
@@ -59,129 +59,6 @@ export const metadata: Metadata = {
  * renders blank. No product counts are shown anywhere — inventory depth
  * stays private.
  */
-type Tile = {
-  id: string
-  title: string
-  href: string
-  imageSrc: string
-}
-
-// Tiles for the two merchandising rows. Collections row first (curated
-// drops), then garment categories (≥5 live products), then Shop All.
-type TileSpec =
-  | { kind: "collection"; handle: string; title: string }
-  | { kind: "category"; handle: string; title: string; minCount?: number }
-
-const COLLECTION_TILES: TileSpec[] = [
-  { kind: "collection", handle: "trending", title: "Trending" },
-  { kind: "collection", handle: "bridal", title: "Bridal" },
-  { kind: "category", handle: "sale", title: "Sale" },
-  { kind: "collection", handle: "new-in", title: "New In" },
-]
-
-const CATEGORY_TILES: TileSpec[] = [
-  { kind: "category", handle: "dresses", title: "Dresses" },
-  { kind: "category", handle: "maxi-dresses", title: "Maxi Dresses" },
-  { kind: "category", handle: "mini-midi-dresses", title: "Mini & Midi Dresses" },
-  { kind: "category", handle: "satin-dresses", title: "Satin Dresses" },
-  { kind: "category", handle: "curve", title: "Curve" },
-  { kind: "category", handle: "jumpsuits-playsuits", title: "Jumpsuits & Playsuits" },
-  { kind: "category", handle: "coord-sets", title: "Co-ord Sets", minCount: 1 },
-  { kind: "category", handle: "signature-edit", title: "Signature Edition" },
-]
-
-async function fetchTile(
-  spec: TileSpec,
-  countryCode: string,
-  fallbackIdx: number
-): Promise<Tile | null> {
-  try {
-    const ref =
-      spec.kind === "collection"
-        ? await getCollectionByHandle(spec.handle)
-        : (await getCategoryByHandle([spec.handle])).product_categories?.[0]
-    if (!ref) return null
-    const base = `/${countryCode}/${
-      spec.kind === "collection" ? "collections" : "categories"
-    }/${spec.handle}`
-    const { response } = await getProductsList({
-      queryParams: {
-        ...(spec.kind === "collection"
-          ? { collection_id: [ref.id] }
-          : { category_id: [(ref as { id: string }).id] }),
-        limit: 1,
-      },
-      countryCode,
-    })
-    const minCount = "minCount" in spec ? spec.minCount ?? 0 : 0
-    if (response.count < minCount) return null
-    const curatedKey = `${
-      spec.kind === "collection" ? "collections" : "categories"
-    }/${spec.handle}`
-    return {
-      id: ref.id,
-      title: spec.title,
-      href: base,
-      imageSrc:
-        CURATED_TILE_IMAGES[curatedKey] ||
-        tileImage(response.products[0]?.thumbnail, fallbackIdx),
-    }
-  } catch {
-    return null
-  }
-}
-
-async function getTiles(
-  countryCode: string,
-  totalProducts: number,
-  shopAllImage?: string
-): Promise<{ collectionTiles: Tile[]; categoryTiles: Tile[] }> {  const [collectionTiles, categoryTiles] = await Promise.all([
-    Promise.all(
-      COLLECTION_TILES.map((spec, i) => fetchTile(spec, countryCode, i))
-    ).then((ts) => ts.filter((t): t is Tile => t !== null)),
-    Promise.all(
-      CATEGORY_TILES.map((spec, i) =>
-        fetchTile({ minCount: 5, ...spec } as TileSpec, countryCode, i)
-      )
-    ).then((ts) => ts.filter((t): t is Tile => t !== null)),
-  ])
-  if (totalProducts > 0) {
-    const { response } = await getProductsList({
-      queryParams: { limit: 1 },
-      countryCode,
-    }).catch(() => ({ response: { products: [], count: totalProducts } }))
-    collectionTiles.push({
-      id: "all",
-      title: "Shop All",
-      href: `/${countryCode}/store`,
-      // First curated pick when available — never the seed-product default.
-      imageSrc: shopAllImage || tileImage(response.products[0]?.thumbnail, 3),
-    })
-  }
-  return { collectionTiles, categoryTiles }
-}
-
-// Sale product thumbnails for the countdown banner collage.
-async function getSaleImages(
-  countryCode: string,
-  limit = 6
-): Promise<string[]> {
-  try {
-    const sale = await getCategoryByHandle(["sale"])
-    const id = sale.product_categories?.[0]?.id
-    if (!id) return []
-    const { response } = await getProductsList({
-      queryParams: { category_id: [id], limit },
-      countryCode,
-    })
-    return response.products
-      .map((p: { thumbnail?: string | null }) => p.thumbnail)
-      .filter((t): t is string => !!t)
-  } catch {
-    return []
-  }
-}
-
 async function getLiveCardProducts(countryCode: string) {
   try {
     const { response } = await getProductsList({
@@ -225,22 +102,6 @@ async function getCuratedPicks(countryCode: string) {
 const withoutSeeds = <T extends { title: string }>(items: T[]): T[] =>
   items.filter((p) => !p.title.startsWith("Medusa "))
 
-const tileImage = (thumb: string | null | undefined, fallbackIdx: number) =>
-  thumb || collectionData[fallbackIdx % collectionData.length].imageSrc
-
-// Curated tile artwork overrides the automatic first-product thumbnail.
-// Bridal + Sale use their Shopify editorial images; every other tile shows
-// its first live product (the representative pick — swap the entry here to
-// change it, no code changes needed).
-const CURATED_TILE_IMAGES: Record<string, string> = {
-  "collections/bridal":
-    "https://cdn.shopify.com/s/files/1/0054/6940/5295/collections/PhotoGrid-1647107497974.jpg?v=1679834661",
-  "categories/sale":
-    "https://cdn.shopify.com/s/files/1/0054/6940/5295/products/maya-petite-bridesmaid-v-neck-maxi-tulle-dress-with-tonal-delicate-sequin-in-navy.jpg?v=1638320659",
-}
-
-
-
 export default async function Home({
   params,
 }: {
@@ -266,6 +127,7 @@ export default async function Home({
 
   return (
     <Context>
+      <ModaveScripts />
       <div className="modave-scope">
         <Topbar3 />
         <Header1
@@ -276,11 +138,16 @@ export default async function Home({
           countryCode={countryCode}
         />
         <Hero />
-        <Categories liveItems={collectionTiles} />
+        <Categories
+          liveItems={collectionTiles}
+          viewAllHref={`/${countryCode}/collections`}
+        />
         <Categories
           liveItems={categoryTiles}
           title="Shop by Category"
           layout="grid"
+          viewAllHref={`/${countryCode}/categories`}
+          viewAllLabel="View All Categories"
         />
         <Products liveItems={topPicks} />
         <BannerCountdown countryCode={countryCode} images={saleImages} />
@@ -306,6 +173,7 @@ export default async function Home({
         <Compare />
         <MobileMenu menu={menu} shopLinks={shopLinks} catLinks={catLinks} />
         <SearchModal />
+        <NewsLetterModal products={topPicks} />
         <Wishlist />
       </div>
     </Context>

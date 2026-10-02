@@ -1,11 +1,13 @@
 import { Metadata } from "next"
-import CartTemplate from "@modules/cart/templates"
+
+import ShopCartLive from "@/components/otherPages/ShopCartLive"
+import ModavePageShell from "@/components/common/ModavePageShell"
 import PreorderNotice from "@modules/cart/components/preorder-notice"
 import TrackView from "@modules/common/components/track-view"
 
 import { enrichLineItems, retrieveCart } from "@lib/data/cart"
 import { HttpTypes } from "@medusajs/types"
-import { getCustomer } from "@lib/data/customer"
+import "@/app/modave-theme.css"
 
 export const metadata: Metadata = {
   title: "Cart",
@@ -27,12 +29,16 @@ const fetchCart = async () => {
   return cart
 }
 
-export default async function Cart() {
+export default async function Cart({
+  params,
+}: {
+  params: Promise<{ countryCode: string }>
+}) {
+  const { countryCode } = await params
   const cart = await fetchCart()
-  const customer = await getCustomer()
 
   return (
-    <>
+    <ModavePageShell countryCode={countryCode}>
       <TrackView
         event="cart_viewed"
         properties={{ item_count: cart?.items?.length ?? 0 }}
@@ -42,7 +48,7 @@ export default async function Cart() {
           .map((i) => i.variant_id)
           .filter((v): v is string => !!v)}
       />
-      <CartTemplate cart={cart} customer={customer} />
-    </>
+      <ShopCartLive cart={cart} countryCode={countryCode} />
+    </ModavePageShell>
   )
 }

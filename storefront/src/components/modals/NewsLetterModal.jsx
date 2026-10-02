@@ -1,34 +1,46 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import Link from "next/link";
 import axios from "axios";
-export default function NewsLetterModal() {
-  const pathname = usePathname();
+import { loadBootstrap } from "../common/modave-bootstrap";
+
+/**
+ * Email-capture popup. Shows on every page load (refresh) after a short
+ * delay, with live product picks to make it attractive and a
+ * "Discounts of up to 40%" hook. Submit posts to the Brevo contacts
+ * endpoint (shared with the footer signup).
+ */
+export default function NewsLetterModal({ products = [] }) {
   const modalElement = useRef();
+  const shown = useRef(false);
+
   useEffect(() => {
+    let cancelled = false;
+    let modal = null;
     const showModal = async () => {
-      if (pathname === "/") {
-        const bootstrap = await import("bootstrap"); // dynamically import bootstrap
-        const myModal = new bootstrap.Modal(
-          document.getElementById("newsletterPopup"),
-          {
-            keyboard: false,
-          }
-        );
-
-        // Show the modal after a delay using a promise
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        myModal.show();
-
-        modalElement.current.addEventListener("hidden.bs.modal", () => {
-          myModal.hide();
-        });
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      if (cancelled || shown.current) return;
+      const el = document.getElementById("newsletterPopup");
+      if (!el) return;
+      try {
+        const bs = await loadBootstrap();
+        modal = new bs.Modal(el, { keyboard: false });
+        shown.current = true;
+        modal.show();
+      } catch {
+        // Modal unavailable — page still renders.
       }
     };
-
     showModal();
-  }, [pathname]);
+    return () => {
+      cancelled = true;
+      try {
+        modal?.hide();
+      } catch {}
+    };
+  }, []);
+
   const [success, setSuccess] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
   const handleShowMessage = () => {
@@ -38,32 +50,30 @@ export default function NewsLetterModal() {
     }, 2000);
   };
   const sendEmail = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
     const email = e.target.email.value;
-
     try {
       const response = await axios.post(
         "https://express-brevomail.vercel.app/api/contacts",
-        {
-          email,
-        }
+        { email }
       );
-
       if ([200, 201].includes(response.status)) {
-        e.target.reset(); // Reset the form
-        setSuccess(true); // Set success state
+        e.target.reset();
+        setSuccess(true);
         handleShowMessage();
       } else {
-        setSuccess(false); // Handle unexpected responses
+        setSuccess(false);
         handleShowMessage();
       }
     } catch (error) {
       console.error("Error:", error.response?.data || "An error occurred");
-      setSuccess(false); // Set error state
+      setSuccess(false);
       handleShowMessage();
-      e.target.reset(); // Reset the form
+      e.target.reset();
     }
   };
+
+  const picks = (products || []).slice(0, 3);
 
   return (
     <div
@@ -77,7 +87,7 @@ export default function NewsLetterModal() {
             <Image
               className="lazyload"
               data-src="/modave/images/section/newsletter.jpg"
-              alt="/images"
+              alt="Lollies newsletter"
               src="/modave/images/section/newsletter.jpg"
               width={660}
               height={440}
@@ -89,11 +99,41 @@ export default function NewsLetterModal() {
           </div>
           <div className="modal-bottom text-center">
             <p className="text-btn-uppercase fw-4 font-2">
-              Subscribe To Our Newletter!
+              Discounts of up to 40%!
             </p>
             <h5>
-              Receive 10% OFF your next order, exclusive offers &amp; more!
+              Subscribe and unlock member-only deals, exclusive offers &amp;
+              more!
             </h5>
+            {picks.length > 0 && (
+              <div className="d-flex justify-content-center gap-2 my-3">
+                {picks.map((p) => (
+                  <Link
+                    key={p.id}
+                    href={p.href || "#"}
+                    className="d-block"
+                    style={{
+                      width: 72,
+                      aspectRatio: "3/4",
+                      overflow: "hidden",
+                      borderRadius: 8,
+                    }}
+                  >
+                    <Image
+                      src={p.imgSrc}
+                      alt={p.title}
+                      width={144}
+                      height={192}
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                      }}
+                    />
+                  </Link>
+                ))}
+              </div>
+            )}
             <div
               className={`tfSubscribeMsg  footer-sub-element ${
                 showMessage ? "active" : ""
@@ -133,28 +173,6 @@ export default function NewsLetterModal() {
               </div>
               <div id="subscribe-msg" />
             </form>
-            <ul className="tf-social-icon style-default justify-content-center">
-              <li>
-                <a href="#" className="social-facebook">
-                  <i className="icon icon-fb" />
-                </a>
-              </li>
-              <li>
-                <a href="#" className="social-twiter">
-                  <i className="icon icon-x" />
-                </a>
-              </li>
-              <li>
-                <a href="#" className="social-instagram">
-                  <i className="icon icon-instagram" />
-                </a>
-              </li>
-              <li>
-                <a href="#" className="social-pinterest">
-                  <i className="icon icon-pinterest" />
-                </a>
-              </li>
-            </ul>
           </div>
         </div>
       </div>
