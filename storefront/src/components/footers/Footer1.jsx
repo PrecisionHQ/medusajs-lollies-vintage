@@ -9,6 +9,28 @@ import ToolbarBottom from "../headers/ToolbarBottom";
 import ScrollTop from "../common/ScrollTop";
 import { footerLinks, socialLinks } from "@/data/footerLinks";
 import axios from "axios";
+
+/**
+ * Payment badges in lolliesvintage.com's order. Badge images come from the
+ * vendored theme set where they identifiably match (Visa, Mastercard,
+ * Amex, PayPal, Maestro, Google Pay, Apple Pay glyph); the rest render as
+ * text chips in the same bordered container so the row stays uniform.
+ */
+const PAYMENTS = [
+  { name: "American Express", img: "/modave/images/payment/img-3.png" },
+  { name: "Apple Pay", img: "/modave/images/payment/applePay.png", text: "Pay" },
+  { name: "BLIK" },
+  { name: "Google Pay", img: "/modave/images/payment/img-9.png" },
+  { name: "Klarna", img: "/modave/images/payment/klarna.svg" },
+  { name: "Maestro", img: "/modave/images/payment/img-8.png" },
+  { name: "Mastercard", img: "/modave/images/payment/img-2.png" },
+  { name: "MobilePay", img: "/modave/images/payment/mobilepay.svg" },
+  { name: "PayPal", img: "/modave/images/payment/img-4.png" },
+  { name: "Shop Pay", img: "/modave/images/payment/shoppay.svg" },
+  { name: "Union Pay", img: "/modave/images/payment/unionpay.svg" },
+  { name: "USDC", img: "/modave/images/payment/usdc.svg" },
+  { name: "Visa", img: "/modave/images/payment/img-1.png" },
+];
 export default function Footer1({
   border = true,
   dark = false,
@@ -80,6 +102,34 @@ export default function Footer1({
   }, []); // Empty dependency array means this will run only once on mount
   return (
     <>
+      {/* Payment band directly above the footer: same 13-method set as
+          lolliesvintage.com, uniform white badge chips. */}
+      <section className="pay-band">
+        <div className="container">
+          <div className="pay-band-inner">
+            <p className="text-caption-1">We Accept:</p>
+            <ul>
+              {PAYMENTS.map((p) => (
+                <li key={p.name} className="pay-chip" title={p.name}>
+                  {p.img ? (
+                    <Image
+                      alt={p.name}
+                      src={p.img}
+                      width={44}
+                      height={28}
+                    />
+                  ) : null}
+                  {p.text ? (
+                    <span>{p.text}</span>
+                  ) : !p.img ? (
+                    <span>{p.name}</span>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
       <footer
         id="footer"
         className={`footer ${dark ? "bg-main" : ""} ${
@@ -94,39 +144,22 @@ export default function Footer1({
                   <div className="footer-infor">
                     <div className="footer-logo">
                       <Link href={`/`}>
-                        <Image
-                          alt=""
-                          src={
-                            dark
-                              ? "/modave/images/logo/logo-white.svg"
-                              : "/modave/images/logo/logo.svg"
-                          }
-                          width={127}
-                          height={24}
-                          style={{ width: "auto", height: "auto" }}
-                        />
-                      </Link>
-                    </div>
-                    <div className="footer-address">
-                      <p>549 Oak St.Crystal Lake, IL 60014</p>
-                      <Link
-                        href={`/contact`}
-                        className={`tf-btn-default fw-6 ${
-                          dark ? "style-white" : ""
-                        } `}
-                      >
-                        GET DIRECTION
-                        <i className="icon-arrowUpRight" />
+                        {/* Lollies mark on a white chip so it reads on the
+                            dark footer (the artwork has dark text). */}
+                        <span className="footer-logo-chip">
+                          <Image
+                            alt="Lollies Vintage"
+                            src="/modave/images/logo/lollies.webp"
+                            width={108}
+                            height={108}
+                          />
+                        </span>
                       </Link>
                     </div>
                     <ul className="footer-info">
                       <li>
                         <i className="icon-mail" />
-                        <p>themesflat@gmail.com</p>
-                      </li>
-                      <li>
-                        <i className="icon-phone" />
-                        <p>315-666-6688</p>
+                        <p>lolliesvintage1@yahoo.com</p>
                       </li>
                     </ul>
                     <ul
@@ -136,8 +169,27 @@ export default function Footer1({
                     >
                       {socialLinks.map((link, index) => (
                         <li key={index}>
-                          <a href={link.href} className={link.className}>
-                            <i className={`icon ${link.iconClass}`} />
+                          <a
+                            href={link.href}
+                            className={link.className}
+                            target="_blank"
+                            rel="noreferrer"
+                            aria-label={link.label}
+                            title={link.label}
+                          >
+                            {link.svgPath ? (
+                              <svg
+                                viewBox="0 0 24 24"
+                                width="18"
+                                height="18"
+                                fill="currentColor"
+                                aria-hidden="true"
+                              >
+                                <path d={link.svgPath} />
+                              </svg>
+                            ) : (
+                              <i className={`icon ${link.iconClass}`} />
+                            )}
                           </a>
                         </li>
                       ))}
@@ -271,7 +323,8 @@ export default function Footer1({
                   <div className="footer-bottom-wrap">
                     <div className="left">
                       <p className="text-caption-1">
-                        ©{new Date().getFullYear()} Modave. All Rights Reserved.
+                        ©{new Date().getFullYear()} Lollies Vintage. All Rights
+                        Reserved.
                       </p>
                       <div className="tf-cur justify-content-end">
                         <div className="tf-currencies">
@@ -285,63 +338,10 @@ export default function Footer1({
                           />
                         </div>
                       </div>
-                    </div>
-                    <div className="tf-payment">
-                      <p className="text-caption-1">Payment:</p>
-                      <ul>
-                        <li>
-                          <Image
-                            alt=""
-                            src="/modave/images/payment/img-1.png"
-                            width={100}
-                            height={64}
-                          />
-                        </li>
-                        <li>
-                          <Image
-                            alt=""
-                            src="/modave/images/payment/img-2.png"
-                            width={100}
-                            height={64}
-                          />
-                        </li>
-                        <li>
-                          <Image
-                            alt=""
-                            src="/modave/images/payment/img-3.png"
-                            width={100}
-                            height={64}
-                          />
-                        </li>
-                        <li>
-                          <Image
-                            alt=""
-                            src="/modave/images/payment/img-4.png"
-                            width={98}
-                            height={64}
-                          />
-                        </li>
-                        <li>
-                          <Image
-                            alt=""
-                            src="/modave/images/payment/img-5.png"
-                            width={102}
-                            height={64}
-                          />
-                        </li>
-                        <li>
-                          <Image
-                            alt=""
-                            src="/modave/images/payment/img-6.png"
-                            width={98}
-                            height={64}
-                          />
-                        </li>
-                      </ul>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
         </div>
