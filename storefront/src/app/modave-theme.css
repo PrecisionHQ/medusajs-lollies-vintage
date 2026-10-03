@@ -255,3 +255,76 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Footer: Lollies logo on a white chip (the artwork has dark text, so it
+   needs the badge to read on the dark footer), payment badges matching
+   lolliesvintage.com's method set, Snapchat hover in brand yellow. */
+.modave-scope .footer-logo-chip {
+  display: inline-block;
+  background: #fff;
+  border-radius: 14px;
+  padding: 10px;
+  line-height: 0;
+}
+.modave-scope .footer-logo-chip img {
+  display: block;
+  width: 108px;
+  height: 108px;
+}
+.modave-scope .pay-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 46px;
+  height: 30px;
+  padding: 0 8px;
+  background: #fff;
+  border: 1px solid var(--line, #e5e5e5);
+  border-radius: 6px;
+  color: #111;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.modave-scope .pay-chip img {
+  height: 18px;
+  width: auto;
+}
+/* Standalone payment band directly above the footer. */
+.modave-scope .pay-band {
+  padding: 28px 0;
+  border-top: 1px solid var(--line, #e5e5e5);
+}
+.modave-scope .pay-band-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.modave-scope .pay-band-inner > p {
+  margin: 0;
+}
+.modave-scope .pay-band-inner ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.modave-scope .tf-social-icon a svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+.modave-scope .tf-social-icon .social-snapchat:hover {
+  background: #fffc00;
+  color: #000;
+  border: none;
+}
