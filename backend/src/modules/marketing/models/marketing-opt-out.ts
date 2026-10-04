@@ -8,6 +8,5 @@ import { model } from "@medusajs/framework/utils";
 export const MarketingOptOut = model.define("marketing_opt_out", {
   id: model.id().primaryKey(),
   email: model.text(),
-  // Set explicitly at creation (DML dateTime has no callable default).
-  created_at: model.dateTime(),
+  // DML auto-adds created_at/updated_at to every model, so no explicit field.
 });

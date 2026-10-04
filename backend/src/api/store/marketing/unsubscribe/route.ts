@@ -26,7 +26,6 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   if (!existing.length) {
     await marketing.createMarketingOptOuts({
       email: normalized,
-      created_at: new Date(),
     });
   }
 

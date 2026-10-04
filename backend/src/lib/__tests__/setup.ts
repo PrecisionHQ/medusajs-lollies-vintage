@@ -85,14 +85,38 @@ export async function createTestPromotion(container: MedusaContainer, overrides 
   }])
 }
 
-export async function createTestGiftCard(container: MedusaContainer, overrides = {}) {
-  const loyaltyModule = container.resolve('loyalty')
-  return loyaltyModule.createGiftCards([{
-    code: `TEST-${Date.now()}`,
-    value: 50,
-    currency_code: 'eur',
-    ...overrides
-  }])[0]
+export async function createTestGiftCard(container: MedusaContainer, overrides: Record<string, any> = {}) {
+  // No gift-card module exists in this codebase; the app's gift-card
+  // equivalent is a single-use fixed-value promo code (same shape the
+  // loyalty redeem route issues). Back the helper with the promotion
+  // module so tests exercise the real redemption path.
+  const promotions = container.resolve(Modules.PROMOTION)
+  const {
+    code = `TEST-${Date.now()}`,
+    value = 50,
+    currency_code = "eur",
+    ...rest
+  } = overrides
+  const created = await promotions.createPromotions({
+    code,
+    type: "standard",
+    status: "active",
+    is_automatic: false,
+    campaign: {
+      name: `Test gift card ${code}`,
+      campaign_identifier: `test-${code.toLowerCase()}`,
+      budget: { type: "usage", limit: 1 },
+    },
+    application_method: {
+      type: "fixed",
+      target_type: "order",
+      allocation: "across",
+      value,
+      currency_code,
+    },
+    ...rest,
+  })
+  return Array.isArray(created) ? created[0] : created
 }
 
 /**
