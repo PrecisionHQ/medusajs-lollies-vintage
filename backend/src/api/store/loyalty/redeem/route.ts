@@ -14,7 +14,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     res.status(401).json({ message: "Sign in to redeem points." });
     return;
   }
-  const loyalty = req.scope.resolve("loyalty") as any;
+  const loyalty = req.scope.resolve("rewards") as any;
   const promotions: IPromotionModuleService = req.scope.resolve(
     Modules.PROMOTION
   );

@@ -17,7 +17,7 @@ export const GET = async (
     res.status(400).json({ message: "customer_id is required." });
     return;
   }
-  const loyalty = req.scope.resolve("loyalty") as any;
+  const loyalty = req.scope.resolve("rewards") as any;
   const balance = await liveBalance(loyalty, customerId);
   const ledger = await loyalty.listLoyaltyLedgers(
     { customer_id: customerId },

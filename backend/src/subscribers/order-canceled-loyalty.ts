@@ -15,7 +15,7 @@ export default async function orderCanceledLoyaltyHandler({
 }: SubscriberArgs<{ id: string }>) {
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
   const orderModuleService: IOrderModuleService = container.resolve(Modules.ORDER);
-  const loyalty = container.resolve('loyalty') as any;
+  const loyalty = container.resolve('rewards') as any;
 
   try {
     const order = await orderModuleService.retrieveOrder(data.id);
