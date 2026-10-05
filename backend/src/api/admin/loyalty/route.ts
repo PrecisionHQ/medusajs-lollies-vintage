@@ -13,7 +13,7 @@ export const GET = async (
   req: AuthenticatedMedusaRequest,
   res: MedusaResponse
 ) => {
-  const loyalty = req.scope.resolve("loyalty") as any;
+  const loyalty = req.scope.resolve("rewards") as any;
   const settings = await getSettings(loyalty);
   const accounts = await loyalty.listLoyaltyAccounts({}, { take: 5000 });
   const outstanding = accounts.reduce(
@@ -27,7 +27,7 @@ export const POST = async (
   req: AuthenticatedMedusaRequest,
   res: MedusaResponse
 ) => {
-  const loyalty = req.scope.resolve("loyalty") as any;
+  const loyalty = req.scope.resolve("rewards") as any;
   const body = (req.body ?? {}) as {
     earn_per_major?: number;
     burn_threshold?: number;

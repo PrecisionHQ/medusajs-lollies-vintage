@@ -12,7 +12,7 @@ export const GET = async (req: MedusaRequest, res: MedusaResponse) => {
     res.status(401).json({ message: "Sign in to view loyalty points." });
     return;
   }
-  const loyalty = req.scope.resolve("loyalty") as any;
+  const loyalty = req.scope.resolve("rewards") as any;
   const settings = await getSettings(loyalty);
   const balance = await liveBalance(loyalty, customerId);
   const ledger = await loyalty.listLoyaltyLedgers(
