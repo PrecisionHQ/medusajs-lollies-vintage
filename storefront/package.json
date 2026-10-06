@@ -50,6 +50,7 @@
     "react-range-slider-input": "^3.3.5",
     "sass": "^1.105.0",
     "server-only": "^0.0.1",
+    "sharp": "^0.35.5",
     "swiper": "^14.3.0",
     "tailwindcss-radix": "^2.8.0"
   },
