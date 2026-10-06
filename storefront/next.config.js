@@ -48,7 +48,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
     // Thumbnails request quality 50. Next 16 requires every quality used to be
     // declared here, and warns about it from 15 onwards.
     qualities: [50, 75, 100],
@@ -56,6 +55,10 @@ const nextConfig = {
       {
         protocol: "http",
         hostname: "localhost",
+      },
+      { // Product and tile artwork lives on the Shopify CDN.
+        protocol: "https",
+        hostname: "cdn.shopify.com",
       },
       // Needed to serve images from the /public folder
       ...remotePattern(process.env.NEXT_PUBLIC_BASE_URL),
