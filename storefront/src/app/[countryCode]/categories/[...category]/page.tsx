@@ -22,6 +22,10 @@ type Props = {
 
 export const PRODUCT_LIMIT = 16
 
+/** Catalog freshness: re-render at most hourly so assortment edits
+ *  appear without a redeploy (on-demand webhook later). */
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const product_categories = await listCategories()
 
