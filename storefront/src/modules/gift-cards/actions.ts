@@ -37,7 +37,7 @@ export async function applyGiftCard(code: string) {
       body: { code: trimmed },
     })
     .then(async () => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
     })
     .catch(medusaError)
 }
@@ -55,7 +55,7 @@ export async function removeGiftCard(code: string) {
       body: { code },
     })
     .then(async () => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
     })
     .catch(medusaError)
 }

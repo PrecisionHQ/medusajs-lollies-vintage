@@ -3,22 +3,36 @@ import { revalidateTag } from "next/cache"
 import { cookies } from "next/headers"
 
 /**
- * Per-visitor cache scoping.
+ * Cache tags, two tiers.
  *
- * Next keys its data cache by URL plus request options, so cached entries
- * never collide between visitors even on authenticated calls. Tags are a
- * different axis: they are plain global strings, so a bare
- * revalidateTag("carts") from one shopper throws away every shopper's cached
- * cart at once. Middleware issues each visitor a `_medusa_cache_id` and every
- * tag is suffixed with it, so an invalidation reaches exactly one person.
+ * GLOBAL (default): data identical for every visitor — products,
+ * collections, categories, regions, reviews, shipping methods list,
+ * payment providers. The tag is shared, needs no request scope (so
+ * build-time reads in generateStaticParams stay tagged), and one purge
+ * refreshes everyone.
+ *
+ * VISITOR (`{ visitor: true }`): data that varies per shopper — carts,
+ * customers, orders, auth, per-cart shipping. The tag is suffixed with
+ * the middleware-issued `_medusa_cache_id`, so one shopper's
+ * revalidateTag can never purge another shopper's entries. Next keys its
+ * data cache by URL plus request options, so cached entries never
+ * collide between visitors even on authenticated calls — tags are the
+ * only shared axis, hence the suffix.
  *
  * The try/catch is load-bearing, not defensive padding. `cookies()` throws
  * when there is no request scope, which is the case inside
- * generateStaticParams: both the product and category routes call into this
- * data layer at build time. Swallowing it there degrades to an untagged,
- * uncached read, which is correct for a build.
+ * generateStaticParams: both the product and category routes call into
+ * this data layer at build time. Swallowing it there degrades a visitor
+ * read to untagged/uncached, which is correct for a build (global reads
+ * never touch cookies at all).
  */
-export const getCacheTag = async (tag: string): Promise<string> => {
+export const getCacheTag = async (
+  tag: string,
+  opts?: { visitor?: boolean }
+): Promise<string> => {
+  if (!opts?.visitor) {
+    return tag
+  }
   try {
     const cookiesStore = await cookies()
     const cacheId = cookiesStore.get("_medusa_cache_id")?.value
@@ -49,9 +63,10 @@ export const getCacheTag = async (tag: string): Promise<string> => {
  * safety without opting the whole storefront out of prerendering.
  */
 export const getCacheDirectives = async (
-  tag: string
+  tag: string,
+  opts?: { visitor?: boolean }
 ): Promise<{} | { cache: "force-cache"; next: { tags: string[] } }> => {
-  const cacheTag = await getCacheTag(tag)
+  const cacheTag = await getCacheTag(tag, opts)
 
   if (!cacheTag) {
     return {}
@@ -61,13 +76,18 @@ export const getCacheDirectives = async (
 }
 
 /**
- * Invalidates one visitor's entries for a tag.
+ * Invalidates entries for a tag — global, or one visitor's when
+ * `{ visitor: true }` matches how the read was cached.
  *
- * No-ops when the visitor has no cache id, which is exactly the case where
- * getCacheDirectives left the read uncached, so there is nothing to purge.
+ * Visitor purges no-op without a cache id, which is exactly the case
+ * where getCacheDirectives left the read uncached, so there is nothing
+ * to purge.
  */
-export const revalidateCacheTag = async (tag: string): Promise<void> => {
-  const cacheTag = await getCacheTag(tag)
+export const revalidateCacheTag = async (
+  tag: string,
+  opts?: { visitor?: boolean }
+): Promise<void> => {
+  const cacheTag = await getCacheTag(tag, opts)
 
   if (cacheTag) {
     revalidateTag(cacheTag)
