@@ -118,8 +118,45 @@ rendered checkout region and refuses + resets on mismatch.
 **Test**: QA both paths. **Depends on**: nothing.
 
 ## Ops tasks (not PRs, blockers noted above)
-- [ ] Resend dedicated domain + SPF/DKIM (blocks PR-02)
+- [ ] Resend dedicated domain + SPF/DKIM (blocks PR-02; order confirmations never sent from Railway to date)
 - [ ] Stripe manual-capture on test keys (blocks PR-09)
-- [ ] Stripe payout accounts per currency (PR-01, PR-10)
-- [ ] Playwright QA per PR, seed fixtures, never seed prod
+- [ ] Stripe payout accounts per currency: EUR + GBP now, USD with the US region; DKK/SEK/NOK/CHF while those regions stay live (else FX bleeds margin on every payout)
+- [ ] Playwright QA per PR (`test:qa`, 16 specs) — suite exists since #30 but has never run green end-to-end, locally or against Railway
 - [ ] Quarterly tax-threshold review (EU OSS €10k, UK £50k, US nexus)
+- [ ] Railway DB backup before any `medusa exec` region script; never `pnpm ib` (it seeds) against prod
+
+## Program status — October 2026
+
+PR-01..PR-16 are merged (#8–#28). Since then: #29 backend QA gates, #30 the QA suite itself,
+#31 read-only bucket proxy (Railway buckets were private-only), #32 pnpm pin for Railway builds,
+#33 Shopify collection import, #34–#40 Modave storefront theme (homepage, routes, purchasable catalog,
+footer — the starter-storefront assumptions in this doc no longer hold), #41–#42 loyalty key deconflict.
+`test:qa` is built to run locally AND against Railway (`qa-remote`); the deploy-only class (real mail,
+real charges, public bucket, prod build) cannot be proven locally.
+
+### Locked decisions
+1. **Currency scope: EUR + GBP + USD only, for now.** No new currencies (Phase 2 deferred except US).
+   DK/SE/NO/CH regions stay as-is.
+2. **Country coverage (scripts pending): add a US region (USD)** — none exists, so dollars can't be
+   spent despite USD prices + store currency existing. **Expand EUR** `de,es,fr,it` + `nl,be,ie,at,pt,fi`
+   (parity-doc list), one tax region + one shipping-zone row per added country. **Add `no`/`ch`
+   shipping-zone rows** — both regions exist but can't check out today (no zone = no shipping options).
+3. **Storefront auto-detects visitor country → currency (requirement).** Priority: URL prefix >
+   remembered cookie > Vercel/CF headers > Accept-Language region > free IP lookup > default region.
+   Detect once on entry, never override an explicit choice (region-lock abandons carts on switch).
+   Sequenced after (2) — detection falls back to GBP for unserved countries. IP provider: free API starter.
+4. **Module key: custom loyalty module registers as `"rewards"`** (official loyalty plugin owns
+   `"loyalty"`); directory stays `src/modules/loyalty`, API paths stay `/loyalty/*`. (#42)
+
+### Bring-up fixes pending (verified locally, uncommitted at time of writing)
+- Module-service write shapes: `create*`/`update*` return the entity, not an array — ~14 call sites
+  across reviews, wishlist, redirects, bundles, flows, loyalty, stock subscriptions 500 on first write
+  or silently no-op (`updateX(selector, data)` passes data as context).
+- `review-request` filters `Order.fulfillment_status` (API-computed, not queryable) — job throws hourly;
+  filter the `fulfillments` relation instead (same for the verified-purchase check).
+- Bundle `buyget` promotions need `max_quantity` with a non-`across` allocation (`each`) — creation
+  currently fails validation 100% of the time.
+- Region scripts must preserve existing variant prices and store currencies on re-run (prior runs wiped
+  EUR/USD prices and the currency list).
+- Six new modules' migrations (marketing, reviews, wishlist, bundle, rewards, redirects) were generated
+  but never committed — a fresh clone has no tables for them.
