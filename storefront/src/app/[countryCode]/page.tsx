@@ -33,6 +33,10 @@ import { topPicks as curatedTopPicks } from "@/data/curated"
 
 import "@/app/modave-theme.css"
 
+/** Catalog freshness: re-render at most hourly so new products, prices
+ *  and tiles appear without a redeploy (on-demand webhook later). */
+export const revalidate = 3600
+
 export const metadata: Metadata = {
   title: getStoreName(),
   description: `Shop the latest at ${getStoreName()}.`,

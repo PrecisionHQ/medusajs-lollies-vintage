@@ -11,6 +11,10 @@ type Props = {
   params: Promise<{ countryCode: string; handle: string }>
 }
 
+/** Catalog freshness: re-render at most hourly so price/copy edits
+ *  appear without a redeploy (on-demand webhook later). */
+export const revalidate = 3600
+
 export async function generateStaticParams() {
   const countryCodes = await listRegions().then(
     (regions) =>
