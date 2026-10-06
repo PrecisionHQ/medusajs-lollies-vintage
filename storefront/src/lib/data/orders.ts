@@ -15,7 +15,7 @@ export const retrieveOrder = cache(async function (id: string) {
       method: "GET",
       query: { fields: "*payment_collections.payments" },
       headers: { ...(await getAuthHeaders()) },
-      ...(await getCacheDirectives("orders")),
+      ...(await getCacheDirectives("orders", { visitor: true })),
     })
     .then(({ order }) => order)
     .catch((err) => medusaError(err))
@@ -30,7 +30,7 @@ export const listOrders = cache(async function (
       method: "GET",
       query: { limit, offset },
       headers: { ...(await getAuthHeaders()) },
-      ...(await getCacheDirectives("orders")),
+      ...(await getCacheDirectives("orders", { visitor: true })),
     })
     .then(({ orders }) => orders)
     .catch((err) => medusaError(err))

@@ -48,7 +48,7 @@ export async function retrieveCart() {
     .fetch<{ cart: HttpTypes.StoreCart }>(`/store/carts/${cartId}`, {
       method: "GET",
       headers: { ...(await getAuthHeaders()) },
-      ...(await getCacheDirectives("carts")),
+      ...(await getCacheDirectives("carts", { visitor: true })),
     })
     .then(({ cart }) => cart)
     .catch(() => {
@@ -68,7 +68,7 @@ export async function getOrSetCart(countryCode: string) {
     const cartResp = await sdk.store.cart.create({ region_id: region.id })
     cart = cartResp.cart
     await setCartId(cart.id)
-    await revalidateCacheTag("carts")
+    await revalidateCacheTag("carts", { visitor: true })
   }
 
   // PR-16 — Region lock. A cart belongs to exactly one region: the one it
@@ -82,7 +82,7 @@ export async function getOrSetCart(countryCode: string) {
     const cartResp = await sdk.store.cart.create({ region_id: region.id })
     cart = cartResp.cart
     await setCartId(cart.id)
-    await revalidateCacheTag("carts")
+    await revalidateCacheTag("carts", { visitor: true })
   }
 
   return cart
@@ -97,7 +97,7 @@ export async function updateCart(data: HttpTypes.StoreUpdateCart) {
   return sdk.store.cart
     .update(cartId, data, {}, await getAuthHeaders())
     .then(async ({ cart }) => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
       return cart
     })
     .catch(medusaError)
@@ -132,7 +132,7 @@ export async function addToCart({
       await getAuthHeaders()
     )
     .then(async () => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
     })
     .catch(medusaError)
 }
@@ -156,7 +156,7 @@ export async function updateLineItem({
   await sdk.store.cart
     .updateLineItem(cartId, lineId, { quantity }, {}, await getAuthHeaders())
     .then(async () => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
     })
     .catch(medusaError)
 }
@@ -174,7 +174,7 @@ export async function deleteLineItem(lineId: string) {
   await sdk.store.cart
     .deleteLineItem(cartId, lineId, {}, await getAuthHeaders())
     .then(async () => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
     })
     .catch(medusaError)
 }
@@ -241,7 +241,7 @@ export async function setShippingMethod({
       await getAuthHeaders()
     )
     .then(async () => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
     })
     .catch(medusaError)
 }
@@ -256,7 +256,7 @@ export async function initiatePaymentSession(
   return sdk.store.payment
     .initiatePaymentSession(cart, data, {}, await getAuthHeaders())
     .then(async (resp) => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
       return resp
     })
     .catch(medusaError)
@@ -274,7 +274,7 @@ export async function applyPromotions(codes: string[]) {
   // against it, so the options have to be refetched too. Upstream does the
   // same thing here under its "fulfillment" tag; this repo calls that tag
   // "shipping". See lib/data/fulfillment.ts.
-  await revalidateCacheTag("shipping")
+  await revalidateCacheTag("shipping", { visitor: true })
 }
 
 export async function applyGiftCard(code: string) {
@@ -416,7 +416,7 @@ export async function placeOrder(expectedRegionId?: string) {
     const liveCart = await retrieveCart().catch(() => null)
     if (liveCart && liveCart.region_id !== expectedRegionId) {
       await removeCartId()
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
       throw new Error(
         "Your location changed during checkout, so this cart was reset. Please review your new totals and try again."
       )
@@ -426,11 +426,11 @@ export async function placeOrder(expectedRegionId?: string) {
   const cartRes = await sdk.store.cart
     .complete(cartId, {}, await getAuthHeaders())
     .then(async (cartRes) => {
-      await revalidateCacheTag("carts")
+      await revalidateCacheTag("carts", { visitor: true })
       // The order list is cached now, so a new order has to purge it or the
       // shopper lands on an account page that does not list what they just
       // bought.
-      await revalidateCacheTag("orders")
+      await revalidateCacheTag("orders", { visitor: true })
       return cartRes
     })
     .catch(medusaError)
@@ -464,7 +464,7 @@ export async function updateRegion(countryCode: string, currentPath: string) {
   // starts empty in the new region.
   if (cartId) {
     await removeCartId()
-    await revalidateCacheTag("carts")
+    await revalidateCacheTag("carts", { visitor: true })
   }
 
   // Prices, availability and the cart total are all region-dependent, so
