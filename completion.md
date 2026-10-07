@@ -154,3 +154,10 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - `backend/scripts/curate-top-picks.mjs` — resolves Shopify frontpage order to Medusa IDs → `storefront/src/data/curated.ts` (+ `.json` twin for record; homepage consumes the `.ts`).
 - `backend/scripts/fix-visibility-and-merch.mjs` — publishes draft new-in members, merch move-then-delete with orphan guard.
 - No runtime impact: scripts are never imported by app code. Verified via `--dry-run` runs against production data (read-only).
+
+## Footer region display (2026-10-07, PR: storefront/footer-region-display)
+- Footer (Footer1) rendered the Modave demo CurrencySelect/LanguageSelect (hardcoded USD/VND, English/Vietnam) that changed nothing and disagreed with the shopper's real region.
+- New `storefront/src/components/common/FooterRegionDisplay.jsx`: client component reading the URL country prefix via useParams, resolving the region against live `/store/regions`, rendering flag + country name + currency (symbol for EUR/GBP/USD, code otherwise) + "English" (storefront is English-only, no i18n). Renders nothing until loaded and nothing on failure — no indicator beats a wrong one; never breaks the footer.
+- QA: new `storefront/qa/17-footer-region.spec.ts` (gb → United Kingdom/GBP/English with no VND/Vietnam; de → Germany/EUR) — 2 passed locally against backend :9000 + storefront :8000. Storefront `tsc --noEmit`: one pre-existing error in untouched `gift-cards` file, none in changed files.
+- Pre-existing drift found, not caused by this change: 10 of 13 `qa/01-storefront.spec.ts` tests fail because they assert starter-nav testids (`nav-search-link` etc.) the Modave theme doesn't render (live homepage uses Header1 + live data). Suite needs an update pass, tracked separately.
+- Deploy verification pending: merge → Railway builds → confirm footer on storefront-production-7a40.up.railway.app/gb (expect "United Kingdom · £ GBP · English").
