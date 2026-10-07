@@ -3,8 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-import CurrencySelect from "../common/CurrencySelect";
-import LanguageSelect from "../common/LanguageSelect";
+import FooterRegionDisplay from "../common/FooterRegionDisplay";
 import ToolbarBottom from "../headers/ToolbarBottom";
 import ScrollTop from "../common/ScrollTop";
 import { footerLinks, socialLinks } from "@/data/footerLinks";
@@ -326,18 +325,7 @@ export default function Footer1({
                         ©{new Date().getFullYear()} Lollies Vintage. All Rights
                         Reserved.
                       </p>
-                      <div className="tf-cur justify-content-end">
-                        <div className="tf-currencies">
-                          <CurrencySelect light={dark ? true : false} />
-                        </div>
-                        <div className="tf-languages">
-                          <LanguageSelect
-                            parentClassName={`image-select center style-default type-languages ${
-                              dark ? "color-white" : ""
-                            }`}
-                          />
-                        </div>
-                      </div>
+                      <FooterRegionDisplay />
                       </div>
                     </div>
                   </div>
