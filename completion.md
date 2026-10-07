@@ -161,3 +161,9 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - QA: new `storefront/qa/17-footer-region.spec.ts` (gb → United Kingdom/GBP/English with no VND/Vietnam; de → Germany/EUR) — 2 passed locally against backend :9000 + storefront :8000. Storefront `tsc --noEmit`: one pre-existing error in untouched `gift-cards` file, none in changed files.
 - Pre-existing drift found, not caused by this change: 10 of 13 `qa/01-storefront.spec.ts` tests fail because they assert starter-nav testids (`nav-search-link` etc.) the Modave theme doesn't render (live homepage uses Header1 + live data). Suite needs an update pass, tracked separately.
 - Deploy verification pending: merge → Railway builds → confirm footer on storefront-production-7a40.up.railway.app/gb (expect "United Kingdom · £ GBP · English").
+
+## Mobile drawer region display (2026-10-07, PR: storefront/mobile-menu-region-display)
+- Follow-up to #46 (footer): the mobile drawer (`modals/MobileMenu.jsx`) rendered the same hardcoded demo CurrencySelect/LanguageSelect (USD/VND, English/Vietnam). Swapped for the shared `FooterRegionDisplay` component (reads URL country, resolves live regions) — same 1-for-1 pattern, ~10 lines.
+- QA: extended `storefront/qa/17-footer-region.spec.ts` (footer assertions scoped to the `footer` landmark since both copies share testids; new drawer test asserts hidden-DOM text so it doesn't depend on the Bootstrap offcanvas animation) — 3 passed locally.
+- Deliberately untouched: Header2/3/4/10 and Topbar/4/5/6/7/9/10/11 still render the demo selectors but are never imported by any live route (routes use Header1 + Topbar3 only) — dead demo code, no shopper impact. Same for deleting CurrencySelect.jsx/LanguageSelect.jsx (dead headers still import them).
+- Deploy verification pending: merge → Railway builds → open the mobile drawer on storefront-production-7a40.up.railway.app/gb (expect United Kingdom / GBP / English, no VND).

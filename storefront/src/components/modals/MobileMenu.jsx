@@ -1,8 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import LanguageSelect from "../common/LanguageSelect";
-import CurrencySelect from "../common/CurrencySelect";
+import FooterRegionDisplay from "../common/FooterRegionDisplay";
 import { buildLolliesMenu } from "@/lib/util/lollies-menu";
 import { usePathname } from "next/navigation";
 
@@ -200,12 +199,7 @@ export default function MobileMenu({ menu, shopLinks, catLinks } = {}) {
         </div>
         <div className="mb-bottom">
           <div className="bottom-bar-language">
-            <div className="tf-currencies">
-              <CurrencySelect />
-            </div>
-            <div className="tf-languages">
-              <LanguageSelect parentClassName="image-select center style-default type-languages" />
-            </div>
+            <FooterRegionDisplay />
           </div>
         </div>
       </div>
