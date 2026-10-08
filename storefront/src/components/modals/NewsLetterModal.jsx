@@ -4,12 +4,17 @@ import Image from "next/image";
 import Link from "next/link";
 import axios from "axios";
 import { loadBootstrap } from "../common/modave-bootstrap";
+import {
+  hasSubscribedNewsletter,
+  markNewsletterSubscribed,
+} from "@/lib/util/newsletter";
 
 /**
  * Email-capture popup. Shows on every page load (refresh) after a short
- * delay, with live product picks to make it attractive and a
- * "Discounts of up to 40%" hook. Submit posts to the Brevo contacts
- * endpoint (shared with the footer signup).
+ * delay — unless the visitor already subscribed (suppression flag in
+ * localStorage, set by either newsletter form). Live product picks make it
+ * attractive, with a "Discounts of up to 40%" hook. Submit posts to our
+ * owned subscribe endpoint (double opt-in from our database).
  */
 export default function NewsLetterModal({ products = [] }) {
   const modalElement = useRef();
@@ -19,6 +24,10 @@ export default function NewsLetterModal({ products = [] }) {
     let cancelled = false;
     let modal = null;
     const showModal = async () => {
+      // Already subscribed (either form sets the flag) — never nag again.
+      if (hasSubscribedNewsletter()) {
+        return;
+      }
       await new Promise((resolve) => setTimeout(resolve, 2500));
       if (cancelled || shown.current) return;
       const el = document.getElementById("newsletterPopup");
@@ -52,14 +61,24 @@ export default function NewsLetterModal({ products = [] }) {
   const sendEmail = async (e) => {
     e.preventDefault();
     const email = e.target.email.value;
+    // Owned newsletter list (see Footer1): double opt-in from our database,
+    // not the theme's external endpoint.
     try {
       const response = await axios.post(
-        "https://express-brevomail.vercel.app/api/contacts",
-        { email }
+        `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/newsletter/subscribe`,
+        { email, source: "popup" },
+        {
+          headers: {
+            "x-publishable-api-key":
+              process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          },
+        }
       );
       if ([200, 201].includes(response.status)) {
         e.target.reset();
         setSuccess(true);
+        // Don't show this popup to this visitor again.
+        markNewsletterSubscribed();
         handleShowMessage();
       } else {
         setSuccess(false);

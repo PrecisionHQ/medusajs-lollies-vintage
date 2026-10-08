@@ -174,3 +174,9 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Hooks: `login()`/`signup()` in `lib/data/customer.ts` identify actor_id + alias anonymous id + alias typed email; `setAddresses()` in `lib/data/cart.ts` identifies guest checkout email (skipped when signed in — one owner per profile). Newsletter modal deliberately out: it posts to an external Brevomail endpoint, not our stack (flagged separately).
 - New dep `posthog-node@^5.54.1` (matches backend) + lockfile.
 - Verified: storefront `tsc --noEmit` clean except the known pre-existing gift-cards error. End-to-end stitching unverifiable until `POSTHOG_KEY` is real (stubs keep everything inert by design) — procedure: consented session → browse → register → buy, then one PostHog person with the full timeline.
+
+## Owned newsletter list (2026-10-08, PR: feat/newsletter-owned)
+- Retired the theme's external Brevo post: footer + popup forms now POST our `/store/newsletter/subscribe` (double opt-in, rows in `marketing_newsletter_subscription`: pending → confirmed → unsubscribed). Confirm mail via new Resend `NEWSLETTER_CONFIRM` template — stub keys fail gracefully (warn logged, row kept pending, resend on next subscribe). Confirm page `/newsletter/confirmed`; unsubscribe route also marks newsletter rows.
+- Popup suppression: `localStorage` flag set by either form on success; popup skips when set (same-browser; localStorage, nothing sent server-side).
+- QA: curl matrix green (400 invalid / 200 subscribe / dedupe keeps source / 404 bad token / confirm + idempotent re-confirm / HMAC unsubscribe marks row + opt-out). `qa/18` (2 tests) + `qa/17` (3 tests) green locally. `tsc` clean both packages except the known pre-existing gift-cards error.
+- Deploy verification pending: merge → Railway builds + migrates → subscribe/confirm on the live store (expect pending row, then confirmed).

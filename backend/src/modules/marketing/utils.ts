@@ -40,3 +40,12 @@ export function buildRecoveryLink(cartId: string): string {
   const base = STOREFRONT_URL.replace(/\/$/, "");
   return `${base}/cart/recover/${cartId}`;
 }
+
+export function buildNewsletterConfirmLink(token: string): string {
+  // No region prefix: storefront middleware.ts adds the visitor's country
+  // (same pattern as unsubscribe + password-reset links). Random token, no
+  // login needed — the subscription row is still pending until clicked.
+  const base = STOREFRONT_URL.replace(/\/$/, "");
+  const params = new URLSearchParams({ token });
+  return `${base}/newsletter/confirmed?${params.toString()}`;
+}

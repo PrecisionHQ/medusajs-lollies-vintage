@@ -8,6 +8,7 @@ import { ReviewRequestEmail, REVIEW_REQUEST, isReviewRequestData } from './revie
 import { WinbackEmail, WINBACK, isWinbackData } from './winback'
 import { WelcomeEmail, WELCOME, isWelcomeData } from './welcome'
 import { BackInStockEmail, BACK_IN_STOCK, isBackInStockData } from './back-in-stock'
+import { NewsletterConfirmEmail, NEWSLETTER_CONFIRM, isNewsletterConfirmData } from './newsletter-confirm'
 
 export const EmailTemplates = {
   INVITE_USER,
@@ -17,7 +18,8 @@ export const EmailTemplates = {
   REVIEW_REQUEST,
   WINBACK,
   WELCOME,
-  BACK_IN_STOCK
+  BACK_IN_STOCK,
+  NEWSLETTER_CONFIRM
 } as const
 
 export type EmailTemplateType = keyof typeof EmailTemplates
@@ -96,6 +98,15 @@ export function generateEmailTemplate(templateKey: string, data: unknown): React
       }
       return <BackInStockEmail {...data} />
 
+    case EmailTemplates.NEWSLETTER_CONFIRM:
+      if (!isNewsletterConfirmData(data)) {
+        throw new MedusaError(
+          MedusaError.Types.INVALID_DATA,
+          `Invalid data for template "${EmailTemplates.NEWSLETTER_CONFIRM}"`
+        )
+      }
+      return <NewsletterConfirmEmail {...data} />
+
     default:
       throw new MedusaError(
         MedusaError.Types.INVALID_DATA,
@@ -104,4 +115,4 @@ export function generateEmailTemplate(templateKey: string, data: unknown): React
   }
 }
 
-export { InviteUserEmail, OrderPlacedTemplate, ResetPasswordEmail, CartAbandonedEmail, ReviewRequestEmail, WinbackEmail, WelcomeEmail, BackInStockEmail }
+export { InviteUserEmail, OrderPlacedTemplate, ResetPasswordEmail, CartAbandonedEmail, ReviewRequestEmail, WinbackEmail, WelcomeEmail, BackInStockEmail, NewsletterConfirmEmail }
