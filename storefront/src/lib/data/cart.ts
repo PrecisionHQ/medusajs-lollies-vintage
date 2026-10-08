@@ -1,6 +1,11 @@
 "use server"
 
 import { sdk } from "@lib/config"
+import {
+  hasSession,
+  identifyServerUser,
+  normalizeEmail,
+} from "@lib/analytics/posthog-server"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { omit } from "lodash"
@@ -393,6 +398,17 @@ export async function setAddresses(currentState: unknown, formData: FormData) {
         phone: formData.get("billing_address.phone"),
       }
     await updateCart(data)
+
+    // Phase 1 stitching (guests): identify the typed email so consented
+    // anonymous browsing joins this address on purchase. Skipped for signed-in
+    // shoppers — stitchSignIn owns identity there, and a second person keyed
+    // by email would fork the profile. Never blocks checkout.
+    if (!(await hasSession())) {
+      const guestEmail = normalizeEmail(formData.get("email"))
+      if (guestEmail) {
+        await identifyServerUser(guestEmail)
+      }
+    }
   } catch (e: any) {
     return e.message
   }

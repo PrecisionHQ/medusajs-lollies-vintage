@@ -1,6 +1,13 @@
 ﻿"use server"
 
 import { sdk } from "@lib/config"
+import {
+  actorIdFromJwt,
+  aliasServerUser,
+  anonymousId,
+  identifyServerUser,
+  normalizeEmail,
+} from "@lib/analytics/posthog-server"
 import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { redirect } from "next/navigation"
@@ -13,8 +20,7 @@ import {
   setAuthToken,
 } from "./cookies"
 
-// See the note in regions.ts for why this is a client.fetch call rather than
-// the sdk.store.* helper. This one is worth spelling out: the old call put the
+// See the note in regions.ts for why this is a client.fetch call rather than// the sdk.store.* helper. This one is worth spelling out: the old call put the
 // cache tag and the authorization header in the same object, so the auth half
 // worked and the caching half silently did nothing.
 export const getCustomer = cache(async function () {
@@ -39,6 +45,29 @@ export const updateCustomer = cache(async function (
   await revalidateCacheTag("customers", { visitor: true })
   return updateRes
 })
+
+/**
+ * Phase 1 stitching: identify the session's customer so consented anonymous
+ * browsing joins this account. Links, in order: the previous anonymous id
+ * (the explicit server-side equivalent of posthog-js auto-alias) and the
+ * typed email (merges a guest-identified person from an earlier checkout in
+ * the same journey). All no-ops without consent + real keys; never throws.
+ */
+async function stitchSignIn(token: string, email: unknown) {
+  const actorId = actorIdFromJwt(token)
+  if (!actorId) {
+    return
+  }
+  await identifyServerUser(actorId)
+  const anon = await anonymousId()
+  if (anon) {
+    await aliasServerUser(actorId, anon)
+  }
+  const address = normalizeEmail(email)
+  if (address) {
+    await aliasServerUser(actorId, address)
+  }
+}
 
 export async function signup(_currentState: unknown, formData: FormData) {
   const password = formData.get("password") as string
@@ -77,6 +106,7 @@ export async function signup(_currentState: unknown, formData: FormData) {
 
     await setAuthToken(loginToken)
 
+    await stitchSignIn(loginToken, customerForm.email)
     await revalidateCacheTag("customers", { visitor: true })
     return createdCustomer
   } catch (error: any) {
@@ -100,6 +130,7 @@ export async function login(_currentState: unknown, formData: FormData) {
     }
 
     await setAuthToken(token)
+    await stitchSignIn(token, email)
     await revalidateCacheTag("customers", { visitor: true })
   } catch (error: any) {
     return error.toString()
