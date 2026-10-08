@@ -167,3 +167,8 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - QA: extended `storefront/qa/17-footer-region.spec.ts` (footer assertions scoped to the `footer` landmark since both copies share testids; new drawer test asserts hidden-DOM text so it doesn't depend on the Bootstrap offcanvas animation) — 3 passed locally.
 - Deliberately untouched: Header2/3/4/10 and Topbar/4/5/6/7/9/10/11 still render the demo selectors but are never imported by any live route (routes use Header1 + Topbar3 only) — dead demo code, no shopper impact. Same for deleting CurrencySelect.jsx/LanguageSelect.jsx (dead headers still import them).
 - Deploy verification pending: merge → Railway builds → open the mobile drawer on storefront-production-7a40.up.railway.app/gb (expect United Kingdom / GBP / English, no VND).
+
+## Analytics views definition, Phase 2 (2026-10-07, PR: docs/analytics-views)
+- New `docs/analytics-views.md`: the five guest-intelligence views (viewed-never-added, category affinity, search no-result terms, guest→buyer funnel, repeat-visitor cohorts) defined against the real event taxonomy, each with build spec, the action it drives, and the criterion for promotion to the admin KPI page.
+- Deliberately no code: views live in the PostHog UI until one earns a dashboard card. Known prerequisite recorded in-doc: `product_viewed` needs category/price enrichment before affinity views work.
+- Verification: peer review of event/property names vs TrackView call sites. Live numbers wait on real keys + traffic volume (data-maturity, not code).
