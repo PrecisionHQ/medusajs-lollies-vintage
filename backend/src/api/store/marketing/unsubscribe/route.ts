@@ -29,5 +29,18 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     });
   }
 
+  // Newsletter consent lives on its own row: mark it unsubscribed too so the
+  // address can never be mailed as "confirmed" again. The opt-out above keeps
+  // the flows quiet regardless.
+  const [sub] = (await marketing.listNewsletterSubscriptions({
+    email: normalized,
+  })) as any[];
+  if (sub && sub.status !== "unsubscribed") {
+    await marketing.updateNewsletterSubscriptions({
+      id: sub.id,
+      status: "unsubscribed",
+    });
+  }
+
   res.json({ unsubscribed: true });
 };

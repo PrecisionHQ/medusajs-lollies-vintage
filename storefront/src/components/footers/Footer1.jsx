@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import FooterRegionDisplay from "../common/FooterRegionDisplay";
+import { markNewsletterSubscribed } from "@/lib/util/newsletter";
 import ToolbarBottom from "../headers/ToolbarBottom";
 import ScrollTop from "../common/ScrollTop";
 import { footerLinks, socialLinks } from "@/data/footerLinks";
@@ -49,17 +50,28 @@ export default function Footer1({
     e.preventDefault(); // Prevent default form submission behavior
     const email = e.target.email.value;
 
+    // Owned newsletter list: the address stays in our database (double
+    // opt-in) instead of flowing to the theme's external Brevo endpoint.
     try {
       const response = await axios.post(
-        "https://express-brevomail.vercel.app/api/contacts",
+        `${process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL}/store/newsletter/subscribe`,
         {
           email,
+          source: "footer",
+        },
+        {
+          headers: {
+            "x-publishable-api-key":
+              process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY,
+          },
         }
       );
 
       if ([200, 201].includes(response.status)) {
         e.target.reset(); // Reset the form
         setSuccess(true); // Set success state
+        // Suppress the auto-popup from now on: this visitor subscribed.
+        markNewsletterSubscribed();
         handleShowMessage();
       } else {
         setSuccess(false); // Handle unexpected responses
