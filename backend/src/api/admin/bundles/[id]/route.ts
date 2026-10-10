@@ -33,7 +33,7 @@ export const POST = async (
     return;
   }
   if (name?.trim()) {
-    await bundles.updateBundles({ id: bundle.id }, { name: name.trim() });
+    await bundles.updateBundles({ id: bundle.id, name: name.trim() });
   }
   if (status === "active" || status === "inactive") {
     await promotions.updatePromotions({

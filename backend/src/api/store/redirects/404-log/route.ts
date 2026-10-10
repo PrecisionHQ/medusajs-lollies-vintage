@@ -15,10 +15,11 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   }
   const rows = await redirects.listNotFoundLogs({ path: normalized });
   if (rows.length) {
-    await redirects.updateNotFoundLogs(
-      { id: rows[0].id },
-      { hits: (rows[0].hits ?? 0) + 1, last_seen: new Date() }
-    );
+    await redirects.updateNotFoundLogs({
+      id: rows[0].id,
+      hits: (rows[0].hits ?? 0) + 1,
+      last_seen: new Date(),
+    });
   } else {
     await redirects.createNotFoundLogs({
       path: normalized,

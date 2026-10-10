@@ -56,10 +56,12 @@ export const POST = async (
   }
   const existing = await redirects.listRedirects({ from_path: fromPath });
   if (existing.length) {
-    const [updated] = await redirects.updateRedirects(
-      { id: existing[0].id },
-      { to_path: toPath, status_code: code }
-    );
+    const updatedRaw = await redirects.updateRedirects({
+      id: existing[0].id,
+      to_path: toPath,
+      status_code: code,
+    });
+    const updated = Array.isArray(updatedRaw) ? updatedRaw[0] : updatedRaw;
     res.json({ redirect: { id: updated.id }, deduped: true });
     return;
   }

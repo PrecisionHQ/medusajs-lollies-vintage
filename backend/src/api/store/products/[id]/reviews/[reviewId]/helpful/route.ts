@@ -14,9 +14,10 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     return;
   }
 
-  const [updated] = await reviews.updateReviews(
-    { id: reviewId },
-    { helpful_count: (existing.helpful_count ?? 0) + 1 }
-  );
+  const updatedRaw = await reviews.updateReviews({
+    id: reviewId,
+    helpful_count: (existing.helpful_count ?? 0) + 1,
+  });
+  const updated = Array.isArray(updatedRaw) ? updatedRaw[0] : updatedRaw;
   res.json({ helpful_count: updated.helpful_count });
 };

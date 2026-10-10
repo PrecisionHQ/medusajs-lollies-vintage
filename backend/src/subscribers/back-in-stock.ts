@@ -79,10 +79,10 @@ export default async function backInStockHandler({
         if (!variant || (variant.inventory_quantity ?? 0) < STOCK_THRESHOLD) {
           continue;
         }
-        await marketing.updateStockSubscriptions(
-          { id: sub.id },
-          { notified_at: new Date() }
-        );
+        await marketing.updateStockSubscriptions({
+          id: sub.id,
+          notified_at: new Date(),
+        });
         await notificationModuleService.createNotifications({
           to: sub.email,
           channel: 'email',

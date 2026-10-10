@@ -42,6 +42,10 @@ export default async function campaignSenderJob(container: MedusaContainer) {
       logger.info(
         `campaign-sender: sent=${total.sent} failed=${total.failed} skipped=${total.skipped}`
       );
+    } else {
+      // Prove the scheduler is alive even with nothing due (matches the
+      // other jobs' every-run logging).
+      logger.info(`campaign-sender: nothing due`);
     }
   } catch (error) {
     logger.error(`campaign-sender job failed: ${(error as Error).message}`);

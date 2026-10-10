@@ -45,7 +45,7 @@ export async function runCampaignSend(
   }
 
   if (campaign.status === "scheduled") {
-    await marketing.updateMarketingCampaigns({ id: campaignId }, { status: "sending" });
+    await marketing.updateMarketingCampaigns({ id: campaignId, status: "sending" });
   }
 
   // Exclusion sets, loaded once per run.
@@ -134,7 +134,7 @@ export async function runCampaignSend(
   }
 
   await marketing
-    .updateMarketingCampaigns({ id: campaignId }, { status: "sent" })
+    .updateMarketingCampaigns({ id: campaignId, status: "sent" })
     .catch(() => {});
   return { sent, failed, skipped, done: true };
 }

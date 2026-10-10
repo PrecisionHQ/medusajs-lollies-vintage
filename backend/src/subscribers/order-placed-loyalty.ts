@@ -46,10 +46,10 @@ export default async function orderPlacedLoyaltyHandler({
       expires_at: expiryDate(settings.expiry_months),
     });
     const account = await getAccount(loyalty, customerId);
-    await loyalty.updateLoyaltyAccounts(
-      { id: account.id },
-      { balance: account.balance + points }
-    );
+    await loyalty.updateLoyaltyAccounts({
+      id: account.id,
+      balance: account.balance + points,
+    });
     logger.info(`Loyalty: +${points} pts for customer ${customerId}.`);
   } catch (error) {
     logger.error(`Loyalty earn failed: ${(error as Error).message}`);

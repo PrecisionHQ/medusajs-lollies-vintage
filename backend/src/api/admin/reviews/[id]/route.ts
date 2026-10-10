@@ -18,9 +18,10 @@ export const POST = async (
     return;
   }
 
-  const [updated] = await reviews.updateReviews(
-    { id: req.params.id },
-    { status: action === "approve" ? "approved" : "rejected" }
-  );
+  const updatedRaw = await reviews.updateReviews({
+    id: req.params.id,
+    status: action === "approve" ? "approved" : "rejected",
+  });
+  const updated = Array.isArray(updatedRaw) ? updatedRaw[0] : updatedRaw;
   res.json({ review: { id: updated.id, status: updated.status } });
 };

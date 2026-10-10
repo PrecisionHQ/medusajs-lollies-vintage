@@ -35,10 +35,11 @@ export const POST = async (
 
   // House pattern (see flows route): update, then re-list — the update
   // return shape isn't trustworthy for reading back.
-  await marketing.updateMarketingCampaigns(
-    { id },
-    { status: "scheduled", scheduled_at: new Date() }
-  );
+  await marketing.updateMarketingCampaigns({
+    id,
+    status: "scheduled",
+    scheduled_at: new Date(),
+  });
   const fresh = await marketing.listMarketingCampaigns({ id });
   res.json({ campaign: fresh?.[0] ?? null, queued: true });
 };
