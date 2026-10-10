@@ -55,9 +55,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     expires_at: null,
   });
   const account = await getAccount(loyalty, customerId);
-  await loyalty.updateLoyaltyAccounts(
-    { id: account.id },
-    { balance: Math.max(0, account.balance - settings.burn_threshold) }
-  );
+  await loyalty.updateLoyaltyAccounts({
+    id: account.id,
+    balance: Math.max(0, account.balance - settings.burn_threshold),
+  });
   res.status(201).json({ code });
 };

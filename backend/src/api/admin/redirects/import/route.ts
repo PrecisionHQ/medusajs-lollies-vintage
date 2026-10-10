@@ -37,10 +37,11 @@ export const POST = async (
     }
     const existing = await redirects.listRedirects({ from_path: from });
     if (existing.length) {
-      await redirects.updateRedirects(
-        { id: existing[0].id },
-        { to_path: to, status_code: code }
-      );
+      await redirects.updateRedirects({
+        id: existing[0].id,
+        to_path: to,
+        status_code: code,
+      });
       updated += 1;
     } else {
       await redirects.createRedirects({

@@ -43,10 +43,10 @@ export default async function orderCanceledLoyaltyHandler({
         expires_at: null,
       });
       const account = await getAccount(loyalty, customerId);
-      await loyalty.updateLoyaltyAccounts(
-        { id: account.id },
-        { balance: Math.max(0, account.balance - row.delta) }
-      );
+      await loyalty.updateLoyaltyAccounts({
+        id: account.id,
+        balance: Math.max(0, account.balance - row.delta),
+      });
     }
     logger.info(`Loyalty: reversed earn for canceled order ${order.id}.`);
   } catch (error) {

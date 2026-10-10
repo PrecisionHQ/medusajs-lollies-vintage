@@ -53,7 +53,7 @@ export const POST = async (
     return;
   }
 
-  const updated = await marketing.updateMarketingCampaigns({ id }, patch);
-  const row = Array.isArray(updated) ? updated[0] : updated;
-  res.json({ campaign: row ?? updated });
+  await marketing.updateMarketingCampaigns({ id, ...patch });
+  const fresh = await marketing.listMarketingCampaigns({ id });
+  res.json({ campaign: fresh?.[0] ?? null });
 };

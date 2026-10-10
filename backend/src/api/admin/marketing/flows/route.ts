@@ -158,7 +158,7 @@ export const POST = async (
       ...update,
     });
   } else if (Object.keys(update).length) {
-    await marketing.updateFlowConfigs({ key: def.key }, update);
+    await marketing.updateFlowConfigs({ id: configs[0].id, ...update });
     configs = await marketing.listFlowConfigs({ key: def.key });
   }
 

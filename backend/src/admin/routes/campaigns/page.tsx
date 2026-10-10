@@ -24,6 +24,8 @@ type Campaign = {
   product_handles: string | null;
   status: string;
   scheduled_at: string | null;
+  sent?: number;
+  failed?: number;
   updated_at?: string;
 };
 
@@ -96,6 +98,18 @@ const CampaignsPage = () => {
       }),
     onSuccess: () => setNotice(`Test sent to ${testEmail}.`),
     onError: (e: Error) => setNotice(`Test failed: ${e.message}`),
+  });
+
+  const sendMutation = useMutation({
+    mutationFn: (id: string) =>
+      sdk.client.fetch(`/admin/marketing/campaigns/${id}/send-now`, {
+        method: "POST",
+      }),
+    onSuccess: () => {
+      setNotice("Queued — the sender picks it up within 15 minutes.");
+      refresh();
+    },
+    onError: (e: Error) => setNotice(`Queue failed: ${e.message}`),
   });
 
   const openNew = () => {
@@ -173,11 +187,25 @@ const CampaignsPage = () => {
                     {c.status}
                   </StatusBadge>
                   <Text className="font-medium truncate">{c.subject}</Text>
+                  {(c.sent ?? 0) + (c.failed ?? 0) > 0 ? (
+                    <Text className="text-ui-fg-subtle shrink-0">
+                      {c.sent ?? 0} sent
+                      {(c.failed ?? 0) > 0 ? `, ${c.failed} failed` : ""}
+                    </Text>
+                  ) : null}
                 </div>
                 <div className="flex gap-2 shrink-0">
                   {c.status === "draft" ? (
                     <Button variant="secondary" onClick={() => openEdit(c)}>
                       Edit
+                    </Button>
+                  ) : null}
+                  {c.status === "draft" || c.status === "scheduled" ? (
+                    <Button
+                      variant="secondary"
+                      onClick={() => sendMutation.mutate(c.id)}
+                    >
+                      Send now
                     </Button>
                   ) : null}
                   <Button

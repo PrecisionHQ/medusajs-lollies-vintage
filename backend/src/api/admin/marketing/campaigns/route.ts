@@ -5,7 +5,7 @@ import {
 
 /**
  * P2 — Campaign drafts (batch sending lands in P3).
- * GET lists newest-first; POST creates a draft.
+ * GET lists newest-first with sent/failed counts from the send log.
  */
 export const GET = async (
   req: AuthenticatedMedusaRequest,
@@ -16,7 +16,25 @@ export const GET = async (
     {},
     { order: { created_at: "DESC" }, take: 100 }
   );
-  res.json({ campaigns });
+  const rows = [];
+  for (const c of campaigns || []) {
+    let sent = 0,
+      failed = 0;
+    try {
+      const sends = await marketing.listMarketingCampaignSends(
+        { campaign_id: c.id },
+        { select: ["status"], take: 100000 }
+      );
+      for (const s of sends || []) {
+        if (s.status === "sent") sent += 1;
+        else if (s.status === "failed") failed += 1;
+      }
+    } catch {
+      // Send log table may predate this deployment; counts stay zero.
+    }
+    rows.push({ ...c, sent, failed });
+  }
+  res.json({ campaigns: rows });
 };
 
 const required = (v: unknown) =>

@@ -49,9 +49,9 @@ export const POST = async (
   if (typeof body.burn_currency === "string" && body.burn_currency.length === 3) {
     update.burn_currency = body.burn_currency.toLowerCase();
   }
-  const settings = await getSettings(loyalty);
+  const settings = (await getSettings(loyalty)) as any;
   if (Object.keys(update).length) {
-    await loyalty.updateLoyaltySettings({ key: "default" }, update);
+    await loyalty.updateLoyaltySettings({ id: settings.id, ...update });
   }
   const next = await getSettings(loyalty);
   void settings;
