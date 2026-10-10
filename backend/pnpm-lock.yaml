@@ -23,10 +23,10 @@ importers:
         version: 2.19.0(@types/node@22.19.1)
       '@medusajs/dashboard':
         specifier: 2.19.0
-        version: 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.13.0)(typescript@5.9.3)
+        version: 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.17.1)(typescript@5.9.3)
       '@medusajs/draft-order':
         specifier: 2.19.0
-        version: 2.19.0(uivg6grcgeifc4ld7ctdqd5q5a)
+        version: 2.19.0(c5sbbhahmp2wplen3w7tizyihu)
       '@medusajs/framework':
         specifier: 2.19.0
         version: 2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)
@@ -35,10 +35,10 @@ importers:
         version: 2.19.0
       '@medusajs/loyalty-plugin':
         specifier: 2.19.0
-        version: 2.19.0(tkojjvid2yleclriz4dn4rktsy)
+        version: 2.19.0(ah47smy2dw7bl54a3pwx2ewmje)
       '@medusajs/medusa':
         specifier: 2.19.0
-        version: 2.19.0(5gsxpwotzyw3up35w4y6e37zpe)
+        version: 2.19.0(ncha5q7fpkdopr3qdrdxaq5pye)
       '@medusajs/notification-sendgrid':
         specifier: 2.19.0
         version: 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
@@ -60,9 +60,12 @@ importers:
       '@react-email/components':
         specifier: ^1.0.1
         version: 1.0.12(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-email/render':
+        specifier: ^2.1.0
+        version: 2.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@rokmohar/medusa-plugin-meilisearch':
         specifier: 2.0.0
-        version: 2.0.0(@medusajs/admin-sdk@2.19.0)(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))(@medusajs/medusa@2.19.0(5gsxpwotzyw3up35w4y6e37zpe))(@medusajs/ui@4.2.1(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@tanstack/react-query@5.64.2(react@18.3.1))(awilix@8.0.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        version: 2.0.0(@medusajs/admin-sdk@2.19.0)(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))(@medusajs/medusa@2.19.0(ncha5q7fpkdopr3qdrdxaq5pye))(@medusajs/ui@4.2.1(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@tanstack/react-query@5.64.2(react@18.3.1))(awilix@8.0.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@tanstack/react-query':
         specifier: 5.64.2
         version: 5.64.2(react@18.3.1)
@@ -86,7 +89,7 @@ importers:
         version: 7.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       resend:
         specifier: 6.25.0
-        version: 6.25.0(@react-email/render@2.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
+        version: 6.25.0(@react-email/render@2.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1))
       standardwebhooks:
         specifier: 1.1.1
         version: 1.1.1
@@ -3289,6 +3292,13 @@ packages:
       react: ^18.0 || ^19.0 || ^19.0.0-rc
       react-dom: ^18.0 || ^19.0 || ^19.0.0-rc
 
+  '@react-email/render@2.1.0':
+    resolution: {integrity: sha512-F+zE3O6d6sW6Aj2UjvZAA17R7tJKM7kcq2mgV6k4HCT8jeLLFaVP2txMtH1lgqYFRMZ0Gxsd37q2PRyiXLXXxA==}
+    engines: {node: '>=20.0.0'}
+    peerDependencies:
+      react: ^18.0 || ^19.0 || ^19.0.0-rc
+      react-dom: ^18.0 || ^19.0 || ^19.0.0-rc
+
   '@react-email/row@0.0.13':
     resolution: {integrity: sha512-bYnOac40vIKCId7IkwuLAAsa3fKfSfqCvv6epJKmPE0JBuu5qI4FHFCl9o9dVpIIS08s/ub+Y/txoMt0dYziGw==}
     engines: {node: '>=20.0.0'}
@@ -5317,6 +5327,9 @@ packages:
   html-to-text@9.0.5:
     resolution: {integrity: sha512-qY60FjREgVZL03vJU6IfMV4GDjGBIoOyvuFdpBDIX9yTlDw0TjxVBQp+P8NvpdIXNJvfWBTNul7fsAQJq2FNpg==}
     engines: {node: '>=14'}
+
+  html5parser@3.0.0:
+    resolution: {integrity: sha512-iNpSopa+4YHX50UOk825tBy7MghmXHo/ZpLskBYN0kAr1xhH8GlIMk5bLRXcZlfP3AnLUcSuFMu8C4MdOUxA8A==}
 
   htmlparser2@8.0.2:
     resolution: {integrity: sha512-GYdjWKDkbRLkZ5geuHs5NY1puJ+PXwP7+fHPRz06Eirsb9ugf6d8kkXav6ADhcODhFFPMIXyxkxSuMf3D6NCFA==}
@@ -8453,13 +8466,13 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-hook-form: 7.83.0(react@18.3.1)
 
-  '@hookform/resolvers@5.5.7(@sinclair/typebox@0.34.41)(ajv@8.13.0)(react-hook-form@7.83.0(react@18.3.1))(zod@4.2.0)':
+  '@hookform/resolvers@5.5.7(@sinclair/typebox@0.34.41)(ajv@8.17.1)(react-hook-form@7.83.0(react@18.3.1))(zod@4.2.0)':
     dependencies:
       '@standard-schema/utils': 0.3.0
       react-hook-form: 7.83.0(react@18.3.1)
     optionalDependencies:
       '@sinclair/typebox': 0.34.41
-      ajv: 8.13.0
+      ajv: 8.17.1
       zod: 4.2.0
 
   '@img/colour@1.0.0':
@@ -8678,11 +8691,11 @@ snapshots:
 
   '@js-sdsl/ordered-map@4.4.2': {}
 
-  '@medusajs/admin-bundler@2.19.0(@sinclair/typebox@0.34.41)(@types/node@22.19.1)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.13.0)(jiti@1.21.7)(picomatch@4.0.3)(typescript@5.9.3)(yaml@2.9.0)':
+  '@medusajs/admin-bundler@2.19.0(@sinclair/typebox@0.34.41)(@types/node@22.19.1)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.17.1)(jiti@1.21.7)(picomatch@4.0.3)(typescript@5.9.3)(yaml@2.9.0)':
     dependencies:
       '@medusajs/admin-shared': 2.19.0
       '@medusajs/admin-vite-plugin': 2.19.0(picomatch@4.0.3)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))
-      '@medusajs/dashboard': 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.13.0)(typescript@5.9.3)
+      '@medusajs/dashboard': 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.17.1)(typescript@5.9.3)
       '@vitejs/plugin-react': 5.2.0(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))
       autoprefixer: 10.4.22(postcss@8.5.26)
       compression: 1.8.1
@@ -8895,7 +8908,7 @@ snapshots:
     dependencies:
       '@medusajs/framework': 2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)
 
-  '@medusajs/dashboard@2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.13.0)(typescript@5.9.3)':
+  '@medusajs/dashboard@2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.17.1)(typescript@5.9.3)':
     dependencies:
       '@ariakit/react': 0.4.20(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@babel/runtime': 7.28.4
@@ -8903,7 +8916,7 @@ snapshots:
       '@dnd-kit/sortable': 8.0.0(@dnd-kit/core@6.3.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       '@dnd-kit/utilities': 3.2.2(react@18.3.1)
       '@hookform/error-message': 2.0.1(react-dom@18.3.1(react@18.3.1))(react-hook-form@7.83.0(react@18.3.1))(react@18.3.1)
-      '@hookform/resolvers': 5.5.7(@sinclair/typebox@0.34.41)(ajv@8.13.0)(react-hook-form@7.83.0(react@18.3.1))(zod@4.2.0)
+      '@hookform/resolvers': 5.5.7(@sinclair/typebox@0.34.41)(ajv@8.17.1)(react-hook-form@7.83.0(react@18.3.1))(zod@4.2.0)
       '@medusajs/admin-shared': 2.19.0
       '@medusajs/icons': 2.19.0(react@18.3.1)
       '@medusajs/js-sdk': 2.19.0
@@ -8994,11 +9007,11 @@ snapshots:
       - supports-color
       - tedious
 
-  '@medusajs/draft-order@2.19.0(uivg6grcgeifc4ld7ctdqd5q5a)':
+  '@medusajs/draft-order@2.19.0(c5sbbhahmp2wplen3w7tizyihu)':
     dependencies:
       '@ariakit/react': 0.4.20(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@babel/runtime': 7.28.4
-      '@hookform/resolvers': 5.5.7(@sinclair/typebox@0.34.41)(ajv@8.13.0)(react-hook-form@7.83.0(react@18.3.1))(zod@4.2.0)
+      '@hookform/resolvers': 5.5.7(@sinclair/typebox@0.34.41)(ajv@8.17.1)(react-hook-form@7.83.0(react@18.3.1))(zod@4.2.0)
       '@medusajs/framework': 2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)
       '@medusajs/js-sdk': 2.19.0
       '@tanstack/react-query': 5.64.2(react@18.3.1)
@@ -9013,7 +9026,7 @@ snapshots:
     optionalDependencies:
       '@medusajs/admin-sdk': 2.19.0
       '@medusajs/cli': 2.19.0(@types/node@22.19.1)
-      '@medusajs/dashboard': 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.13.0)(typescript@5.9.3)
+      '@medusajs/dashboard': 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.17.1)(typescript@5.9.3)
       '@medusajs/icons': 2.19.0(react@18.3.1)
       '@medusajs/test-utils': 2.19.0(@medusajs/core-flows@2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)))(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))(@medusajs/medusa@2.19.0)
       '@medusajs/ui': 4.2.1(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
@@ -9168,14 +9181,14 @@ snapshots:
     dependencies:
       '@medusajs/framework': 2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)
 
-  '@medusajs/loyalty-plugin@2.19.0(tkojjvid2yleclriz4dn4rktsy)':
+  '@medusajs/loyalty-plugin@2.19.0(ah47smy2dw7bl54a3pwx2ewmje)':
     dependencies:
       '@medusajs/framework': 2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)
-      '@medusajs/medusa': 2.19.0(5gsxpwotzyw3up35w4y6e37zpe)
+      '@medusajs/medusa': 2.19.0(ncha5q7fpkdopr3qdrdxaq5pye)
     optionalDependencies:
       '@medusajs/admin-sdk': 2.19.0
       '@medusajs/cli': 2.19.0(@types/node@22.19.1)
-      '@medusajs/dashboard': 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.13.0)(typescript@5.9.3)
+      '@medusajs/dashboard': 2.19.0(@sinclair/typebox@0.34.41)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.17.1)(typescript@5.9.3)
       '@medusajs/icons': 2.19.0(react@18.3.1)
       '@medusajs/test-utils': 2.19.0(@medusajs/core-flows@2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)))(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))(@medusajs/medusa@2.19.0)
       '@medusajs/ui': 4.2.1(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
@@ -9183,12 +9196,12 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
       react-router-dom: 7.18.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-  '@medusajs/medusa@2.19.0(5gsxpwotzyw3up35w4y6e37zpe)':
+  '@medusajs/medusa@2.19.0(ncha5q7fpkdopr3qdrdxaq5pye)':
     dependencies:
       '@inquirer/checkbox': 2.5.0
       '@inquirer/confirm': 2.0.17
       '@inquirer/input': 2.3.0
-      '@medusajs/admin-bundler': 2.19.0(@sinclair/typebox@0.34.41)(@types/node@22.19.1)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.13.0)(jiti@1.21.7)(picomatch@4.0.3)(typescript@5.9.3)(yaml@2.9.0)
+      '@medusajs/admin-bundler': 2.19.0(@sinclair/typebox@0.34.41)(@types/node@22.19.1)(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(ajv@8.17.1)(jiti@1.21.7)(picomatch@4.0.3)(typescript@5.9.3)(yaml@2.9.0)
       '@medusajs/analytics': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
       '@medusajs/analytics-local': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
       '@medusajs/analytics-posthog': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))(posthog-node@5.54.1(rxjs@7.8.2))
@@ -9206,7 +9219,7 @@ snapshots:
       '@medusajs/core-flows': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
       '@medusajs/currency': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
       '@medusajs/customer': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
-      '@medusajs/draft-order': 2.19.0(uivg6grcgeifc4ld7ctdqd5q5a)
+      '@medusajs/draft-order': 2.19.0(c5sbbhahmp2wplen3w7tizyihu)
       '@medusajs/event-bus-local': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
       '@medusajs/event-bus-redis': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
       '@medusajs/file': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
@@ -9477,7 +9490,7 @@ snapshots:
       ulid: 2.4.0
     optionalDependencies:
       '@medusajs/core-flows': 2.19.0(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))
-      '@medusajs/medusa': 2.19.0(5gsxpwotzyw3up35w4y6e37zpe)
+      '@medusajs/medusa': 2.19.0(ncha5q7fpkdopr3qdrdxaq5pye)
     transitivePeerDependencies:
       - debug
       - supports-color
@@ -11614,6 +11627,15 @@ snapshots:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 
+  '@react-email/render@2.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      entities: 4.5.0
+      html-to-text: 9.0.5
+      html5parser: 3.0.0
+      prettier: 3.7.4
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
   '@react-email/row@0.0.13(react@18.3.1)':
     dependencies:
       react: 18.3.1
@@ -12015,11 +12037,11 @@ snapshots:
       '@react-types/shared': 3.32.1(react@18.3.1)
       react: 18.3.1
 
-  '@rokmohar/medusa-plugin-meilisearch@2.0.0(@medusajs/admin-sdk@2.19.0)(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))(@medusajs/medusa@2.19.0(5gsxpwotzyw3up35w4y6e37zpe))(@medusajs/ui@4.2.1(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@tanstack/react-query@5.64.2(react@18.3.1))(awilix@8.0.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@rokmohar/medusa-plugin-meilisearch@2.0.0(@medusajs/admin-sdk@2.19.0)(@medusajs/framework@2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0))(@medusajs/medusa@2.19.0(ncha5q7fpkdopr3qdrdxaq5pye))(@medusajs/ui@4.2.1(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3))(@tanstack/react-query@5.64.2(react@18.3.1))(awilix@8.0.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@medusajs/admin-sdk': 2.19.0
       '@medusajs/framework': 2.19.0(@medusajs/cli@2.19.0(@types/node@22.19.1))(@types/node@22.19.1)(ioredis@5.8.2)(vite@7.3.6(@types/node@22.19.1)(jiti@1.21.7)(yaml@2.9.0))(zod@4.2.0)
-      '@medusajs/medusa': 2.19.0(5gsxpwotzyw3up35w4y6e37zpe)
+      '@medusajs/medusa': 2.19.0(ncha5q7fpkdopr3qdrdxaq5pye)
       '@medusajs/ui': 4.2.1(@types/react-dom@18.3.7(@types/react@18.3.27))(@types/react@18.3.27)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(typescript@5.9.3)
       '@tanstack/react-query': 5.64.2(react@18.3.1)
       awilix: 8.0.1
@@ -13861,6 +13883,8 @@ snapshots:
       htmlparser2: 8.0.2
       selderee: 0.11.0
 
+  html5parser@3.0.0: {}
+
   htmlparser2@8.0.2:
     dependencies:
       domelementtype: 2.3.0
@@ -15125,12 +15149,12 @@ snapshots:
 
   require-main-filename@2.0.0: {}
 
-  resend@6.25.0(@react-email/render@2.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)):
+  resend@6.25.0(@react-email/render@2.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)):
     dependencies:
       postal-mime: 2.7.5
       standardwebhooks: 1.0.0
     optionalDependencies:
-      '@react-email/render': 2.0.6(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@react-email/render': 2.1.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   resolve-cwd@3.0.0:
     dependencies:
