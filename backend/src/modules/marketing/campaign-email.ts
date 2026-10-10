@@ -17,6 +17,8 @@ export type CampaignRow = {
   cta_label: string | null;
   cta_href: string | null;
   product_handles: string | null;
+  status: string;
+  scheduled_at: string | null;
 };
 
 /**
