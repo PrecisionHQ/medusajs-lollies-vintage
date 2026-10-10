@@ -146,3 +146,9 @@ item was verified live on Railway unless marked otherwise.
   in-flight checkout kills).
 - **Consequences:** One campaign per promo for independent durations.
   Margin protection beyond per-item caps is still an open business decision.
+
+## ADR-016 — Interest signals are explicit interactions only
+
+- **Context:** P8 recommendations need behavioral data. The cheap version is scroll-depth/dwell-time tracking or autocapture-everything; both are surveillance-shaped and hard to explain in a privacy notice.
+- **Decision:** Only deliberate actions become events — wishlist-add, compare-add, review submit/vote, applied search filters, and the existing funnel (view/cart/checkout/order). No scroll, no dwell, no autocapture. Review events stay PostHog-only (no ad-platform use-case); wishlist/compare map to retargetable pixel events.
+- **Consequences:** Sparser signal than behavioral tracking, but every event is defensible consent-wise and directly usable for scoring. Time-on-page style questions stay unanswerable by design.

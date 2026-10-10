@@ -180,3 +180,8 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Popup suppression: `localStorage` flag set by either form on success; popup skips when set (same-browser; localStorage, nothing sent server-side).
 - QA: curl matrix green (400 invalid / 200 subscribe / dedupe keeps source / 404 bad token / confirm + idempotent re-confirm / HMAC unsubscribe marks row + opt-out). `qa/18` (2 tests) + `qa/17` (3 tests) green locally. `tsc` clean both packages except the known pre-existing gift-cards error.
 - Deploy verification pending: merge → Railway builds + migrates → subscribe/confirm on the live store (expect pending row, then confirmed).
+
+## P7 interest signals — wishlist, compare, reviews, filters (2026-10-10, PR: feat/p7-interest-signals)
+- Context wishlist/compare actions now fire `wishlist_add` / `compare_add` (live ids are product handles); review submit + helpful vote fire `review_submitted` / `review_vote`; results-page `search_performed` carries the active facet filters. Same consent gate throughout.
+- Mapper: wishlist_add → AddToWishlist (both networks), compare_add → custom Compare; review events PostHog-only by design (ADR-016).
+- Verified: 6/6 new mapper assertions; typecheck clean; `next build` 196/196 (one transient sitemap-timeout retry, backend healthy); live on prod, pages 200, zero pixel scripts without IDs. Interaction events themselves fire only on real user action + consent, so no-click curl verification possible — code paths wired + unit-tested.
