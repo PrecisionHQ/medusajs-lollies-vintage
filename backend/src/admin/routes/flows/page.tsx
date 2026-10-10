@@ -112,7 +112,7 @@ const FlowsPage = () => {
   return (
     <div className="flex flex-col gap-4">
       <Container className="px-6 py-4">
-        <Heading level="h2">Marketing flows</Heading>
+        <Heading level="h2">Marketing Automation</Heading>
         <Text className="text-ui-fg-subtle">
           {data.optOuts} shoppers unsubscribed. Every flow respects opt-outs
           and the 1-mail-per-3-days cap.
@@ -234,7 +234,7 @@ const FlowsPage = () => {
 };
 
 export const config = defineRouteConfig({
-  label: "Flows",
+  label: "Marketing Automation",
 });
 
 export default FlowsPage;
