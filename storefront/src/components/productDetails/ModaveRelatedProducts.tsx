@@ -1,14 +1,13 @@
 import { Suspense } from "react"
 import ModaveRelatedCarousel from "@/components/productDetails/ModaveRelatedCarousel"
-import { getProductsList } from "@lib/data/products"
 import { getRegion } from "@lib/data/regions"
+import { getRelatedProducts } from "@lib/util/recommendations"
 import { adaptMedusaProductsToModave } from "@lib/util/modave-product-adapter"
 import { HttpTypes } from "@medusajs/types"
 
 /**
- * Related products in Modave card styling. Same sourcing logic as the
- * starter RelatedProducts (collection, then tags) but rendered through
- * the live-card adapter + ProductCard1 so cards link to real PDPs.
+ * Related products in Modave card styling. P8-scored (same collection,
+ * shared tags, curated boost) instead of the old single AND-query.
  */
 async function RelatedCards({
   product,
@@ -20,21 +19,7 @@ async function RelatedCards({
   const region = await getRegion(countryCode)
   if (!region) return null
 
-  const queryParams: HttpTypes.StoreProductListParams = {}
-  if (product.collection_id) {
-    queryParams.collection_id = [product.collection_id]
-  }
-  const tagIds = product.tags?.map((t) => t.id).filter(Boolean) as
-    | string[]
-    | undefined
-  if (tagIds?.length) {
-    queryParams.tag_id = tagIds
-  }
-
-  const products = await getProductsList({ queryParams, countryCode }).then(
-    ({ response }) =>
-      response.products.filter((p) => p.id !== product.id).slice(0, 8)
-  )
+  const products = await getRelatedProducts(product, countryCode, 8)
   if (!products.length) return null
 
   const cards = adaptMedusaProductsToModave(products, countryCode)

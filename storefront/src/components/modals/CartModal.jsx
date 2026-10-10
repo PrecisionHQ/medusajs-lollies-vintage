@@ -10,7 +10,7 @@ import {
   applyPromotions,
 } from "@lib/data/cart";
 import { convertToLocale } from "@lib/util/money";
-import { fetchLatestCards } from "@/lib/util/live-product";
+import { getCartRecommendations } from "@/lib/data/recommendations";
 import { onCartUpdated, notifyCartUpdated } from "@lib/util/cart-events";
 
 /**
@@ -41,7 +41,9 @@ export default function CartModal() {
 
   useEffect(() => {
     load();
-    fetchLatestCards(4, countryCode)
+    // P8 — recommendations scored by cart affinity (curated fallback
+    // when the cart is empty), replacing recency-only latest cards.
+    getCartRecommendations(countryCode, 4)
       .then(setRecs)
       .catch(() => {});
     const el = document.getElementById("shoppingCart");
