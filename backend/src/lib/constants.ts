@@ -208,3 +208,15 @@ export const POSTHOG_KEY = process.env.POSTHOG_KEY;
 export const POSTHOG_HOST = process.env.POSTHOG_HOST || 'https://eu.posthog.com';
 export const POSTHOG_ENABLED =
   !!POSTHOG_KEY && POSTHOG_KEY.startsWith('phc_') && !POSTHOG_KEY.includes('STUB');
+
+/**
+ * (optional) Meta Conversions API for the order.placed Purchase mirror
+ * (P6). Stub/missing values keep it inert. META_TEST_EVENT_CODE (from
+ * Events Manager > Test events) routes hits to the test console instead
+ * of production reporting — set it while verifying, remove after.
+ */
+export const META_PIXEL_ID = process.env.META_PIXEL_ID;
+export const META_CAPI_TOKEN = process.env.META_CAPI_TOKEN;
+export const META_TEST_EVENT_CODE = process.env.META_TEST_EVENT_CODE;
+export const META_CAPI_ENABLED =
+  !!META_PIXEL_ID && !!META_CAPI_TOKEN && !META_CAPI_TOKEN.includes('STUB');
