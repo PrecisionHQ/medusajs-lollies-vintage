@@ -147,6 +147,22 @@ item was verified live on Railway unless marked otherwise.
 - **Consequences:** One campaign per promo for independent durations.
   Margin protection beyond per-item caps is still an open business decision.
 
+## ADR-013 — Ad pixels ride the PostHog consent gate, fail closed
+
+- **Context:** Meta/TikTok pixels needed wiring without creating a second privacy regime. Ad-blockers also remove pixel globals at the network level.
+- **Decision:** Pixels load and fire only on the existing `lollies_consent === accepted` signal; missing/placeholder IDs keep everything inert; no autocapture anywhere — a pure mapper turns our funnel events into platform events, and every access is guarded so a blocked pixel can never break shopping.
+- **Consequences:** No events flow until real IDs are configured (currently inert on prod by design). Browser/server Purchase pairs share the order id so Meta dedupes them.
+
+## ADR-014 — MedusaService `update` takes data-with-id, never (selector, data)
+
+- **Context:** Sixteen call sites across custom modules used `updateX(selector, data)`. The generated method signature is `update(data)` — selector-shaped first args either threw `id "" not found` or silently updated nothing (campaign flips, flow saves, loyalty earn, review votes, 404 counters all dead).
+- **Decision:** Always pass a single `{ id, ...patch }` object (array form where batching); normalize the return instead of blind-destructuring.
+- **Consequences:** Fixed at all 16 sites in P3; verified live (flip persists, save round-trips, counter increments). Any future `updateX(a, b)` call is a bug on sight.
+
+## ADR-015 — Never name a route directory `test`
+
+- **Context:** A `campaigns/[id]/test/route.ts` endpoint typechecked, built, and deployed — then 404'd on prod while its sibling `preview/` worked. The compiled `.medusa` output simply omitted the directory.
+- **Decision:** Medusa's builder silently drops route dirs named `test`. Name test endpoints `test-send` (or similar) and treat any future 404-on-a-compiled-route as a build-output check first (`find .medusa -path ...`), not a code bug.
 ## ADR-016 — Interest signals are explicit interactions only
 
 - **Context:** P8 recommendations need behavioral data. The cheap version is scroll-depth/dwell-time tracking or autocapture-everything; both are surveillance-shaped and hard to explain in a privacy notice.
