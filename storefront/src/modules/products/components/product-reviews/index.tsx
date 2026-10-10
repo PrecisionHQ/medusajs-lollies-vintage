@@ -9,6 +9,8 @@ import {
   submitReview,
   voteHelpful,
 } from "@lib/data/reviews"
+import { track } from "@lib/analytics/posthog"
+import { trackPixel } from "@lib/analytics/pixels"
 
 /**
  * PR-04 — Reviews tab content: approved list with helpful votes plus the
@@ -38,6 +40,9 @@ export default function ReviewsTab({ productId }: { productId: string }) {
     const res = await submitReview(productId, { rating, title, body })
     setState(res.ok ? "sent" : res.error === "signin" ? "signin" : "failed")
     if (res.ok) {
+      // P7 — strongest interest signal on the PDP.
+      track("review_submitted", { product_id: productId, rating })
+      trackPixel("review_submitted", { product_id: productId, rating })
       setTitle("")
       setBody("")
     }
@@ -49,6 +54,9 @@ export default function ReviewsTab({ productId }: { productId: string }) {
     }
     const res = await voteHelpful(productId, id)
     if (res.ok) {
+      // P7 — endorsement signal.
+      track("review_vote", { product_id: productId, review_id: id })
+      trackPixel("review_vote", { product_id: productId, review_id: id })
       setVoted(new Set(voted).add(id))
       setReviews(reviews.map((r) => (r.id === id ? { ...r, helpful_count: r.helpful_count + 1 } : r)))
     }

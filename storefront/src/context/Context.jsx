@@ -2,6 +2,8 @@
 import { allProducts } from "@/data/products";
 import { openCartModal } from "@/utlis/openCartModal";
 import { openWistlistModal } from "@/utlis/openWishlist";
+import { track } from "@/lib/analytics/posthog";
+import { trackPixel } from "@/lib/analytics/pixels";
 
 import React, { useEffect } from "react";
 import { useContext, useState } from "react";
@@ -61,6 +63,9 @@ export default function Context({ children }) {
     if (!wishList.includes(id)) {
       setWishList((pre) => [...pre, id]);
       openWistlistModal();
+      // P7 — interest signal (live ids are product handles).
+      track("wishlist_add", { product_id: id });
+      trackPixel("wishlist_add", { product_id: id });
     }
   };
 
@@ -73,6 +78,9 @@ export default function Context({ children }) {
     if (!compareItem.includes(id)) {
       // Max two products: drop the oldest when a third is added.
       setCompareItem((pre) => [...pre.slice(-1), id]);
+      // P7 — interest signal (live ids are product handles).
+      track("compare_add", { product_id: id });
+      trackPixel("compare_add", { product_id: id });
     }
   };
   const removeFromCompareItem = (id) => {
