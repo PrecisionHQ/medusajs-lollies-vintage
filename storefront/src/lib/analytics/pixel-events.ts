@@ -119,6 +119,40 @@ export function mapToPixelEvents(event: string, props: Props = {}): PixelCall[] 
         { network: "tiktok", method: "track", name: "ViewCart" },
       ];
 
+    case "wishlist_add": {
+      const id = str(props.product_id);
+      if (!id) return [];
+      return [
+        {
+          network: "meta",
+          method: "track",
+          name: "AddToWishlist",
+          params: { content_ids: [id], content_type: "product" },
+        },
+        {
+          network: "tiktok",
+          method: "track",
+          name: "AddToWishlist",
+          params: { content_id: id },
+        },
+      ];
+    }
+
+    case "compare_add": {
+      const id = str(props.product_id);
+      if (!id) return [];
+      // No standard event on either platform; custom events still build
+      // retargetable audiences for P8.
+      const params = { content_ids: [id] };
+      return [
+        { network: "meta", method: "track", name: "Compare", params },
+        { network: "tiktok", method: "track", name: "Compare", params },
+      ];
+    }
+
+    // review_submitted / review_vote: PostHog-only by design (no ad
+    // platform use-case; keeps pixel traffic to retargetable actions).
+
     case "checkout_started":
       return [
         { network: "meta", method: "track", name: "InitiateCheckout" },

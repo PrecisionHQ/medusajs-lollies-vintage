@@ -167,7 +167,16 @@ export default async function SearchResults({ params, searchParams }: Params) {
     <ModavePageShell countryCode={countryCode}>
       <TrackView
         event="search_performed"
-        properties={{ query, result_count: ids.length }}
+        properties={{
+          query,
+          result_count: ids.length,
+          // P7 — filter-use signal: which facets the shopper combined.
+          f_collection: filters.collections,
+          f_category: filters.categories,
+          f_color: filters.colors,
+          f_size: filters.sizes,
+          f_tag: filters.tags,
+        }}
       />
       <ModaveListing
         title={`Results for "${query}"`}
