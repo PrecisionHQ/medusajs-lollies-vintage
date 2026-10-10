@@ -163,3 +163,8 @@ item was verified live on Railway unless marked otherwise.
 
 - **Context:** A `campaigns/[id]/test/route.ts` endpoint typechecked, built, and deployed — then 404'd on prod while its sibling `preview/` worked. The compiled `.medusa` output simply omitted the directory.
 - **Decision:** Medusa's builder silently drops route dirs named `test`. Name test endpoints `test-send` (or similar) and treat any future 404-on-a-compiled-route as a build-output check first (`find .medusa -path ...`), not a code bug.
+## ADR-016 — Interest signals are explicit interactions only
+
+- **Context:** P8 recommendations need behavioral data. The cheap version is scroll-depth/dwell-time tracking or autocapture-everything; both are surveillance-shaped and hard to explain in a privacy notice.
+- **Decision:** Only deliberate actions become events — wishlist-add, compare-add, review submit/vote, applied search filters, and the existing funnel (view/cart/checkout/order). No scroll, no dwell, no autocapture. Review events stay PostHog-only (no ad-platform use-case); wishlist/compare map to retargetable pixel events.
+- **Consequences:** Sparser signal than behavioral tracking, but every event is defensible consent-wise and directly usable for scoring. Time-on-page style questions stay unanswerable by design.
