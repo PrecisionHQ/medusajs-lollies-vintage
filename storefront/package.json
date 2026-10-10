@@ -43,7 +43,7 @@
     "next": "^15.5.15",
     "photoswipe": "^5.4.4",
     "posthog-js": "^1.434.14",
-    "posthog-node": "^5.54.1",
+    "posthog-node": "^5.55.0",
     "react": "19.2.8",
     "react-country-flag": "^3.0.2",
     "react-dom": "19.2.8",
