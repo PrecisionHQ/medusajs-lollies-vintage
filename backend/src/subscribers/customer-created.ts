@@ -58,6 +58,9 @@ export default async function customerCreatedHandler({
 
     if (
       (await alreadySent(marketing, 'welcome', customer.id)) ||
+      // P9: newsletter-confirmed shoppers already got the welcome mail at
+      // confirmation time — never double-send on later signup.
+      (await alreadySent(marketing, 'welcome', `newsletter:${email}`)) ||
       (await isOptedOut(marketing, email)) ||
       (await recentlyEmailed(marketing, email))
     ) {
