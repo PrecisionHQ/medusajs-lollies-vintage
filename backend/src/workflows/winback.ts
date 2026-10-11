@@ -11,6 +11,7 @@ import {
 import { EmailTemplates } from "../modules/email-notifications/templates";
 import { RESEND_FROM_EMAIL, STOREFRONT_URL } from "../lib/constants";
 import { buildUnsubscribeLink } from "../modules/marketing/utils";
+import { mintUniqueCode } from "../modules/marketing/incentives";
 import {
   alreadySent,
   claimSend,
@@ -108,6 +109,7 @@ const sendWinbacksStep = createStep(
   ) => {
     const marketing = container.resolve("marketing") as any;
     const notifications = container.resolve(Modules.NOTIFICATION);
+    const promotions = container.resolve(Modules.PROMOTION);
     const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
     const base = STOREFRONT_URL.replace(/\/$/, "");
 
@@ -126,6 +128,11 @@ const sendWinbacksStep = createStep(
         }
 
         await claimSend(marketing, "winback", order.id, order.email);
+        // P9 — unique single-use code per recipient (falls back to the
+        // static template text when unresolvable).
+        const incentiveCode = config.incentive_enabled
+          ? await mintUniqueCode(promotions, config.incentive_code, "WINBACK")
+          : null;
         await notifications.createNotifications({
           to: order.email,
           channel: "email",
@@ -136,8 +143,7 @@ const sendWinbacksStep = createStep(
               subject: "We miss you — come see what's new",
             },
             name: order.customer?.first_name ?? null,
-            incentiveCode:
-              config.incentive_enabled ? config.incentive_code : null,
+            incentiveCode,
             shopLink: base,
             unsubscribeLink: buildUnsubscribeLink(order.email),
             preview: "We miss you",

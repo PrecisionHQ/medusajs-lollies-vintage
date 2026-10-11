@@ -78,10 +78,13 @@ export const GET = async (
   for (const def of FLOW_DEFS) {
     let configs = await marketing.listFlowConfigs({ key: def.key });
     if (!configs.length) {
-      configs = await marketing.createFlowConfigs({
+      // create* returns a single object for single input (array only for
+      // array input) — normalize so configs[0] below never reads undefined.
+      const created = await marketing.createFlowConfigs({
         key: def.key,
         ...def.defaults,
       });
+      configs = Array.isArray(created) ? created : [created];
     }
     const config = configs[0];
     let sent = 0;

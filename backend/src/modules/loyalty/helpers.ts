@@ -17,7 +17,7 @@ export async function getSettings(loyalty: any): Promise<{
   if (rows.length) {
     return rows[0];
   }
-  const [created] = await loyalty.createLoyaltySettings({
+  const createdRaw = await loyalty.createLoyaltySettings({
     key: SETTINGS_KEY,
     earn_per_major: 1,
     burn_threshold: 500,
@@ -25,6 +25,9 @@ export async function getSettings(loyalty: any): Promise<{
     burn_currency: "eur",
     expiry_months: 12,
   });
+  // Single-object input returns a single object (array only for array
+  // input) — normalize instead of destructuring blindly.
+  const created = Array.isArray(createdRaw) ? createdRaw[0] : createdRaw;
   return created;
 }
 
@@ -33,10 +36,11 @@ export async function getAccount(loyalty: any, customerId: string) {
   if (rows.length) {
     return rows[0];
   }
-  const [created] = await loyalty.createLoyaltyAccounts({
+  const createdRaw = await loyalty.createLoyaltyAccounts({
     customer_id: customerId,
     balance: 0,
   });
+  const created = Array.isArray(createdRaw) ? createdRaw[0] : createdRaw;
   return created;
 }
 
