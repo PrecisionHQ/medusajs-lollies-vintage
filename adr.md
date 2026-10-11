@@ -175,3 +175,9 @@ item was verified live on Railway unless marked otherwise.
 - **Context:** Cart drawer showed newest products; PDP related was one unranked AND-query. Real co-view/purchase scoring needs PostHog keys + event volume that don't exist yet.
 - **Decision:** One pure scorer (collection +3, tag +1, curated +2) with coview/copurchase/priceBand weights present but zeroed. Surfaces read top-N of score order with stable ties; thin pools backstop to curated then latest so rows always render full.
 - **Consequences:** Ships value with zero data dependencies; turning on event scoring later is a weights + data change, no restructuring. Ranking only — no UI redesign per surface.
+
+## ADR-018 — Growth mail that degrades to honesty, never to spam
+
+- **Context:** P9 adds cross-sell, price-drop, unique incentives and a welcome handoff. Every one of them can misfire (no affinity, no price data, missing template).
+- **Decision:** No affinity → no mail (never generic blasts); no price data → skip the item (never guess); unresolvable template → static-code fallback (never block the send); failed sends log as failed rows, never retried silently. Welcome fires once per email across newsletter-confirm and signup via shared idempotency keys.
+- **Consequences:** The failure mode of every growth flow is silence with a log row, never a wrong mail. First real sends still need RESEND keys on the backend.
