@@ -66,12 +66,36 @@ function initPostHog() {
   })
 }
 
+/** First-touch UTM params planted by middleware (Ads v1). Explicit event
+ *  properties win on collision. Empty when never landed with UTMs. */
+export function readUtmParams(): Record<string, string> {
+  if (typeof document === "undefined") {
+    return {}
+  }
+  const match = document.cookie.match(/(?:^|; )_lollies_utm=([^;]*)/)
+  if (!match?.[1]) {
+    return {}
+  }
+  const out: Record<string, string> = {}
+  for (const part of match[1].split("|")) {
+    const eq = part.indexOf("=")
+    if (eq > 0 && part.slice(0, eq).startsWith("utm_")) {
+      try {
+        out[part.slice(0, eq)] = decodeURIComponent(part.slice(eq + 1))
+      } catch {
+        // Malformed segment — skip it, keep the rest.
+      }
+    }
+  }
+  return out
+}
+
 /** Capture only when consented + configured; silent no-op otherwise. */
 export function track(event: string, properties?: Record<string, unknown>) {
   try {
     initPostHog()
     if (posthog.__loaded) {
-      posthog.capture(event, properties)
+      posthog.capture(event, { ...readUtmParams(), ...properties })
     }
   } catch {
     // Analytics must never break shopping.
