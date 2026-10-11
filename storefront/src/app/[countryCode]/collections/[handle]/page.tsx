@@ -32,7 +32,7 @@ export const PRODUCT_LIMIT = 16
 export const dynamic = "force-dynamic"
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { handle } = await params
+  const { handle, countryCode } = await params
   const collection = await getCollectionByHandle(handle)
 
   if (!collection) {
@@ -41,7 +41,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${collection.title} | ${getStoreName()}`,
-    description: `${collection.title} collection`,
+    description: `Shop the ${collection.title} collection at ${getStoreName()}.`,
+    alternates: {
+      canonical: `/${countryCode}/collections/${collection.handle}`,
+    },
   } as Metadata
 }
 

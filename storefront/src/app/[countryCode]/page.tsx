@@ -16,6 +16,9 @@ import Features from "@/components/common/Features"
 import Brands from "@/components/common/Brands"
 import ScrollTop from "@/components/common/ScrollTop"
 import ModaveScripts from "@/components/common/ModaveScripts"
+import JsonLd from "@/components/common/JsonLd"
+import { organizationJsonLd } from "@/lib/util/seo-jsonld"
+import { getBaseURL } from "@lib/util/env"
 import CartModal from "@/components/modals/CartModal"
 import QuickView from "@/components/modals/QuickView"
 import Compare from "@/components/modals/Compare"
@@ -131,6 +134,13 @@ export default async function Home({
   return (
     <Context>
       <ModaveScripts />
+      <JsonLd
+        data={organizationJsonLd({
+          storeName: getStoreName(),
+          baseUrl: getBaseURL(),
+          logoUrl: `${getBaseURL().replace(/\/$/, "")}/modave/images/logo/lollies.webp`,
+        })}
+      />
       <div className="modave-scope">
         <Topbar3 />
         <Header1
