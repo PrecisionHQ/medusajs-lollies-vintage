@@ -6,6 +6,7 @@ import "@/app/modave-theme.css"
 import { getRegion, listRegions } from "@lib/data/regions"
 import { getProductByHandle, getProductsList } from "@lib/data/products"
 import { getStoreName } from "@lib/util/env"
+import { stripHtmlToText } from "@lib/util/sanitize-html"
 
 type Props = {
   params: Promise<{ countryCode: string; handle: string }>
@@ -66,10 +67,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${product.title} | ${getStoreName()}`,
-    description: `${product.title}`,
+    description:
+      stripHtmlToText(product.description || "").slice(0, 160) ||
+      `Shop ${product.title} at ${getStoreName()}.`,
+    alternates: {
+      canonical: `/${countryCode}/products/${product.handle}`,
+    },
     openGraph: {
       title: `${product.title} | ${getStoreName()}`,
-      description: `${product.title}`,
+      description:
+        stripHtmlToText(product.description || "").slice(0, 160) || undefined,
       images: product.thumbnail ? [product.thumbnail] : [],
     },
   }

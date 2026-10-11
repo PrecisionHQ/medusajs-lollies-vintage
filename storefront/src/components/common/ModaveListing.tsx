@@ -1,5 +1,12 @@
 import Link from "next/link"
 import ProductCard1 from "@/components/productCards/ProductCard1"
+import JsonLd from "@/components/common/JsonLd"
+import {
+  breadcrumbJsonLd,
+  collectionJsonLd,
+  type Breadcrumb as JsonLdCrumb,
+} from "@lib/util/seo-jsonld"
+import { getBaseURL } from "@lib/util/env"
 import { ModaveCardProduct } from "@lib/util/modave-product-adapter"
 
 export type Crumb = { label: string; href?: string }
@@ -60,8 +67,22 @@ export default function ModaveListing({
   extraParams?: Record<string, string | string[]>
   sidebar?: React.ReactNode
 }) {
+  const baseUrl = getBaseURL()
+  const crumbsJsonLd: JsonLdCrumb[] = crumbs.map((c) => ({
+    label: c.label,
+    href: c.href,
+  }))
   return (
     <>
+      <JsonLd
+        data={collectionJsonLd({
+          title,
+          baseUrl,
+          path: basePath,
+          items: cards.map((card) => ({ title: card.title, href: card.href })),
+        })}
+      />
+      <JsonLd data={breadcrumbJsonLd(baseUrl, crumbsJsonLd)} />
       <div
         className="page-title"
         style={{
