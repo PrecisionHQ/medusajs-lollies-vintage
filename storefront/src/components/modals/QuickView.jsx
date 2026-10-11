@@ -12,6 +12,7 @@ import { getProductPrice } from "@/lib/util/get-product-price";
 import { stripHtmlToText } from "@/lib/util/sanitize-html";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
+import { useT } from "@/i18n/translate";
 
 const optionsAsKeymap = (variantOptions) =>
   variantOptions?.reduce((acc, varopt) => {
@@ -29,6 +30,7 @@ const optionsAsKeymap = (variantOptions) =>
 export default function QuickView() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [live, setLive] = useState(null);
@@ -140,7 +142,7 @@ export default function QuickView() {
           <div className="modal-content">
             <div className="wrap mw-100p-hidden">
               <div className="header">
-                <h5 className="title">Quick View</h5>
+                <h5 className="title">{t("product.quickView")}</h5>
                 <span
                   className="icon-close icon-close-popup"
                   data-bs-dismiss="modal"
@@ -189,7 +191,7 @@ export default function QuickView() {
           )}
           <div className="wrap mw-100p-hidden">
             <div className="header">
-              <h5 className="title">Quick View</h5>
+              <h5 className="title">{t("product.quickView")}</h5>
               <span
                 className="icon-close icon-close-popup"
                 data-bs-dismiss="modal"
@@ -238,7 +240,7 @@ export default function QuickView() {
                           onClick={openSizeGuide}
                           className="size-guide text-title link"
                         >
-                          Size Guide
+                          {t("product.sizeGuide")}
                         </a>
                       )}
                     </div>
@@ -276,7 +278,7 @@ export default function QuickView() {
                   </div>
                 ))}
                 <div className="tf-product-info-quantity">
-                  <div className="title mb_12">Quantity:</div>
+                  <div className="title mb_12">{t("product.quantity")}</div>
                   <QuantitySelect
                     quantity={quantity}
                     setQuantity={setQuantity}
@@ -290,10 +292,10 @@ export default function QuickView() {
                     >
                       <span>
                         {!selectedVariant
-                          ? "Select options"
+                          ? t("product.selectOptions")
                           : adding
-                          ? "Adding..."
-                          : "Add to cart -"}
+                          ? t("product.adding")
+                          : t("product.addToCart") + " -"}
                       </span>
                       {priceInfo && selectedVariant && (
                         <span className="tf-qty-price total-price">
@@ -311,8 +313,8 @@ export default function QuickView() {
                       <span className="icon icon-gitDiff" />
                       <span className="tooltip text-caption-2">
                         {isAddedtoCompareItem(cardId)
-                          ? "Already compared"
-                          : "Compare"}
+                          ? t("product.alreadyCompared")
+                          : t("nav.compare")}
                       </span>
                     </a>
                     <a
@@ -322,8 +324,8 @@ export default function QuickView() {
                       <span className="icon icon-heart" />
                       <span className="tooltip text-caption-2">
                         {isAddedtoWishlist(cardId)
-                          ? "Already Wishlished"
-                          : "Wishlist"}
+                          ? t("product.alreadyWishlisted")
+                          : t("nav.wishlist")}
                       </span>
                     </a>
                   </div>
@@ -332,7 +334,7 @@ export default function QuickView() {
                     href={`/${countryCode}/products/${handle}`}
                     className="btn-style-3 text-btn-uppercase"
                   >
-                    View full details
+                    {t("product.viewFullDetails")}
                   </Link>
                 </div>
               </div>

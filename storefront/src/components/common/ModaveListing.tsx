@@ -8,14 +8,25 @@ import {
 } from "@lib/util/seo-jsonld"
 import { getBaseURL } from "@lib/util/env"
 import { ModaveCardProduct } from "@lib/util/modave-product-adapter"
+import { getLocale } from "@/i18n/config"
+import { t } from "@/i18n/translate"
 
 export type Crumb = { label: string; href?: string }
 
 const SORTS = [
-  { value: "created_at", label: "Newest" },
-  { value: "price_asc", label: "Price: Low to High" },
-  { value: "price_desc", label: "Price: High to Low" },
-]
+  { value: "created_at", labelKey: "listing.newest" },
+  { value: "price_asc", labelKey: "listing.priceLowHigh" },
+  { value: "price_desc", labelKey: "listing.priceHighLow" },
+] as const
+
+// Crumb labels are UI chrome (translated here so every listing page stays
+// consistent); entity names (collection/category titles) pass through as-is.
+const CRUMB_KEYS: Record<string, string> = {
+  Homepage: "listing.homepage",
+  Collections: "home.collections",
+  Categories: "home.categories",
+  "Shop All": "home.shopAllTitle",
+};
 
 function pageHref(
   basePath: string,
@@ -68,6 +79,8 @@ export default function ModaveListing({
   sidebar?: React.ReactNode
 }) {
   const baseUrl = getBaseURL()
+  const locale = getLocale(basePath.split("/")[1] || "gb")
+  const tr = (key: string) => t(locale, key)
   const crumbsJsonLd: JsonLdCrumb[] = crumbs.map((c) => ({
     label: c.label,
     href: c.href,
@@ -96,10 +109,10 @@ export default function ModaveListing({
               <li key={i}>
                 {c.href ? (
                   <Link href={c.href} className="link">
-                    {c.label}
+                    {CRUMB_KEYS[c.label] ? tr(CRUMB_KEYS[c.label]) : c.label}
                   </Link>
                 ) : (
-                  <span>{c.label}</span>
+                  <span>{CRUMB_KEYS[c.label] ? tr(CRUMB_KEYS[c.label]) : c.label}</span>
                 )}
                 {i < crumbs.length - 1 && (
                   <i className="icon icon-arrRight" />
@@ -122,7 +135,7 @@ export default function ModaveListing({
                     (sortBy || "created_at") === s.value ? "active" : ""
                   }`}
                 >
-                  {s.label}
+                  {tr(s.labelKey)}
                 </Link>
               ))}
             </div>
@@ -142,7 +155,7 @@ export default function ModaveListing({
             </div>
           ) : (
             <div className="p-4 text-center">
-              <p>No products found in {title}.</p>
+              <p>{tr("listing.emptyIn")} {title}.</p>
             </div>
           )}
           {totalPages > 1 && (

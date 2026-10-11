@@ -13,6 +13,7 @@ import { notifyCartUpdated } from "@lib/util/cart-events";
 import { getProductPrice } from "@lib/util/get-product-price";
 import { stripHtmlToText } from "@lib/util/sanitize-html";
 import { getProductReviews } from "@lib/data/reviews";
+import { useT } from "@/i18n/translate";
 
 const optionsAsKeymap = (variantOptions) => {
   return variantOptions?.reduce((acc, varopt) => {
@@ -46,6 +47,7 @@ export default function ModaveDetailsClient({
   countryCode,
 }) {
   const router = useRouter();
+  const t = useT(countryCode);
   const [options, setOptions] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
@@ -290,9 +292,9 @@ export default function ModaveDetailsClient({
                             <div className="d-flex justify-content-between mb_12">
                               <div className="variant-picker-label">
                                 {isColor
-                                  ? "Colors: "
+                                  ? t("product.colors")
                                   : isSize
-                                  ? "selected size: "
+                                  ? t("product.selectedSize")
                                   : `${title}: `}
                                 <span className="text-title variant-picker-label-value">
                                   {options[title] ?? ""}
@@ -304,7 +306,7 @@ export default function ModaveDetailsClient({
                                   data-bs-toggle="modal"
                                   className="size-guide text-title link"
                                 >
-                                  Size Guide
+                                  {t("product.sizeGuide")}
                                 </a>
                               )}
                             </div>
@@ -380,7 +382,7 @@ export default function ModaveDetailsClient({
                         );
                       })}
                       <div className="tf-product-info-quantity">
-                        <div className="title mb_12">Quantity:</div>
+                        <div className="title mb_12">{t("product.quantity")}</div>
                         <div className="variant-picker-values gap12 align-items-center d-flex">
                           <button
                             type="button"
@@ -388,7 +390,7 @@ export default function ModaveDetailsClient({
                             onClick={() =>
                               setQuantity((q) => Math.max(1, q - 1))
                             }
-                            aria-label="Decrease quantity"
+                            aria-label={t("cart.decreaseQty")}
                           >
                             <span className="text-title">-</span>
                           </button>
@@ -397,7 +399,7 @@ export default function ModaveDetailsClient({
                             type="button"
                             className="size-btn style-text"
                             onClick={() => setQuantity((q) => q + 1)}
-                            aria-label="Increase quantity"
+                            aria-label={t("cart.increaseQty")}
                           >
                             <span className="text-title">+</span>
                           </button>
@@ -414,13 +416,13 @@ export default function ModaveDetailsClient({
                             <span>
                               {needsSelection
                                 ? (noneAvailable
-                                  ? "Out of stock"
-                                  : "Select options")
+                                  ? t("product.outOfStock")
+                                  : t("product.selectOptions"))
                                 : !inStock
-                                ? "Out of stock"
+                                ? t("product.outOfStock")
                                 : isAdding
-                                ? "Adding..."
-                                : "Add to cart -"}
+                                ? t("product.adding")
+                                : t("product.addToCart") + " -"}
                             </span>
                             {priceInfo && !needsSelection && (
                               <span className="tf-qty-price total-price">
@@ -438,8 +440,8 @@ export default function ModaveDetailsClient({
                             <span className="icon icon-gitDiff" />
                             <span className="tooltip text-caption-2">
                               {isAddedtoCompareItem(cardId)
-                                ? "Already compared"
-                                : "Compare"}
+                                ? t("product.alreadyCompared")
+                                : t("nav.compare")}
                             </span>
                           </a>
                           <a
@@ -449,8 +451,8 @@ export default function ModaveDetailsClient({
                             <span className="icon icon-heart" />
                             <span className="tooltip text-caption-2">
                               {isAddedtoWishlist(cardId)
-                                ? "Already Wishlished"
-                                : "Wishlist"}
+                                ? t("product.alreadyWishlisted")
+                                : t("nav.wishlist")}
                             </span>
                           </a>
                         </div>
@@ -460,7 +462,7 @@ export default function ModaveDetailsClient({
                           }}
                           className="btn-style-3 text-btn-uppercase"
                         >
-                          {buyingNow ? "Adding..." : "Buy it now"}
+                          {buyingNow ? t("product.adding") : t("product.buyNow")}
                         </a>
                         {error && (
                           <div className="text-danger mt-2">{error}</div>
@@ -477,7 +479,7 @@ export default function ModaveDetailsClient({
                               <i className="icon-shipping" />
                             </div>
                             <p className="text-caption-1">
-                              Delivery &amp; Return
+                              {t("product.deliveryReturn")}
                             </p>
                           </a>
                           <a
@@ -488,7 +490,7 @@ export default function ModaveDetailsClient({
                             <div className="icon">
                               <i className="icon-question" />
                             </div>
-                            <p className="text-caption-1">Ask A Question</p>
+                            <p className="text-caption-1">{t("product.askQuestion")}</p>
                           </a>
                           <a
                             href="#share_social"
@@ -498,54 +500,52 @@ export default function ModaveDetailsClient({
                             <div className="icon">
                               <i className="icon-share" />
                             </div>
-                            <p className="text-caption-1">Share</p>
+                            <p className="text-caption-1">{t("product.share")}</p>
                           </a>
                         </div>
                         <div className="tf-product-info-time">
                           <div className="icon">
                             <i className="icon-timer" />
                           </div>
-                          <p className="text-caption-1">
-                            Estimated Delivery:&nbsp;&nbsp;
-                            <span>12-26 days</span>
-                            (International), <span>3-6 days</span> (United
-                            States)
-                          </p>
+                            <p className="text-caption-1">
+                              {t("product.estimatedDelivery")}&nbsp;&nbsp;
+                              <span>12-26 days</span>
+                              ({t("product.international")}), <span>3-6 days</span> ({t("product.unitedStates")})
+                            </p>
                         </div>
                         <div className="tf-product-info-return">
                           <div className="icon">
                             <i className="icon-arrowClockwise" />
                           </div>
-                          <p className="text-caption-1">
-                            Return within <span>45 days</span> of purchase.
-                            Duties &amp; taxes are non-refundable.
-                          </p>
+                            <p className="text-caption-1">
+                              {t("product.returnPolicy")}
+                            </p>
                         </div>
                       </div>
                       <ul className="tf-product-info-sku">
                         <li>
-                          <p className="text-caption-1">SKU:</p>
+                          <p className="text-caption-1">{t("product.sku")}</p>
                           <p className="text-caption-1 text-1">
                             {selectedVariant?.sku || product.handle}
                           </p>
                         </li>
                         <li>
-                          <p className="text-caption-1">Vendor:</p>
+                          <p className="text-caption-1">{t("product.vendor")}</p>
                           <p className="text-caption-1 text-1">{STORE_NAME}</p>
                         </li>
                         <li>
-                          <p className="text-caption-1">Available:</p>
+                          <p className="text-caption-1">{t("product.available")}</p>
                           <p className="text-caption-1 text-1">
                             {selectedVariant
                               ? inStock
-                                ? "Instock"
-                                : "Out of stock"
-                              : "Select options"}
+                                ? t("product.inStock")
+                                : t("product.outOfStock")
+                              : t("product.selectOptions")}
                           </p>
                         </li>
                         {(product.categories?.length ?? 0) > 0 && (
                           <li>
-                            <p className="text-caption-1">Categories:</p>
+                            <p className="text-caption-1">{t("product.categories")}</p>
                             <p className="text-caption-1">
                               {(product.categories || []).map((c, i, arr) => (
                                 <span key={c.id}>
@@ -564,7 +564,7 @@ export default function ModaveDetailsClient({
                       </ul>
                       <div className="tf-product-info-guranteed">
                         <div className="text-title">
-                          Guranteed safe checkout:
+                          {t("product.safeCheckout")}
                         </div>
                         <div className="tf-payment">
                           {["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"].map(

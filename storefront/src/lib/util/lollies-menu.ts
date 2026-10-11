@@ -9,6 +9,9 @@
  * sale) are created by backend/scripts/import-shopify-collections.mjs.
  */
 
+import { getLocale } from "@/i18n/config"
+import { t } from "@/i18n/translate"
+
 export type MenuLink = {
   key: string
   label: string
@@ -48,21 +51,24 @@ const CATEGORY_TILES: { label: string; handle: string }[] = [
 
 export function buildLolliesMenu(countryCode: string): LolliesMenu {
   const cc = countryCode || "gb"
+  // Top-level labels are UI chrome (translated); collection/category
+  // mirrors below stay English to match their destination page titles.
+  const locale = getLocale(cc)
   return {
     menu: [
-      { key: "home", label: "Home", href: `/${cc}` },
-      { key: "shop", label: "Shop All", href: `/${cc}/store`, dropdown: true },
-      { key: "sales", label: "Sales", href: `/${cc}/categories/sale` },
-      { key: "bridal", label: "Bridal", href: `/${cc}/collections/bridal` },
-      { key: "new", label: "New In", href: `/${cc}/collections/new-in` },
+      { key: "home", label: t(locale, "nav.home"), href: `/${cc}` },
+      { key: "shop", label: t(locale, "nav.shopAll"), href: `/${cc}/store`, dropdown: true },
+      { key: "sales", label: t(locale, "nav.sales"), href: `/${cc}/categories/sale` },
+      { key: "bridal", label: t(locale, "nav.bridal"), href: `/${cc}/collections/bridal` },
+      { key: "new", label: t(locale, "nav.newIn"), href: `/${cc}/collections/new-in` },
     ],
     shopLinks: [
-      { label: "All Products", href: `/${cc}/store` },
+      { label: t(locale, "home.allProducts"), href: `/${cc}/store` },
       { label: "Trending", href: `/${cc}/collections/trending` },
       { label: "Bridal", href: `/${cc}/collections/bridal` },
       { label: "New In", href: `/${cc}/collections/new-in` },
       { label: "Sale", href: `/${cc}/categories/sale` },
-      { label: "Newest First", href: `/${cc}/store?sortBy=created_at` },
+      { label: t(locale, "listing.newestFirst"), href: `/${cc}/store?sortBy=created_at` },
     ],
     catLinks: CATEGORY_TILES.map((c) => ({
       label: c.label,

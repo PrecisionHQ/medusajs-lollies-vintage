@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import FooterRegionDisplay from "../common/FooterRegionDisplay";
 import { markNewsletterSubscribed } from "@/lib/util/newsletter";
@@ -9,6 +10,28 @@ import ToolbarBottom from "../headers/ToolbarBottom";
 import ScrollTop from "../common/ScrollTop";
 import { footerLinks, socialLinks } from "@/data/footerLinks";
 import axios from "axios";
+import { useT } from "@/i18n/translate";
+
+// Footer link labels are UI chrome (translated); hrefs stay as-is.
+// Headings/items not in these maps (brand-new links) pass through English.
+const HEADING_KEYS = {
+  Infomation: "footer.information",
+  "Customer Services": "nav.customerServices",
+};
+const ITEM_KEYS = {
+  "About Us": "nav.aboutUs",
+  "Our Stories": "nav.ourStories",
+  "Size Guide": "product.sizeGuide",
+  "Contact us": "nav.contactUs",
+  Career: "nav.career",
+  "My Account": "nav.myAccount",
+  Shipping: "footer.shipping",
+  "Return & Refund": "nav.returnRefund",
+  "Privacy Policy": "nav.privacyPolicy",
+  "Terms & Conditions": "nav.termsConditions",
+  "Orders FAQs": "nav.ordersFaqs",
+  "My Wishlist": "nav.myWishlist",
+};
 
 /**
  * Payment badges in lolliesvintage.com's order. Badge images come from the
@@ -38,6 +61,9 @@ export default function Footer1({
 }) {
   const [success, setSuccess] = useState(true);
   const [showMessage, setShowMessage] = useState(false);
+  const pathname = usePathname();
+  const countryCode = (pathname || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
 
   const handleShowMessage = () => {
     setShowMessage(true);
@@ -118,7 +144,7 @@ export default function Footer1({
       <section className="pay-band">
         <div className="container">
           <div className="pay-band-inner">
-            <p className="text-caption-1">We Accept:</p>
+            <p className="text-caption-1">{t("footer.weAccept")}</p>
             <ul>
               {PAYMENTS.map((p) => (
                 <li key={p.name} className="pay-chip" title={p.name}>
@@ -212,7 +238,9 @@ export default function Footer1({
                     {footerLinks.map((section, sectionIndex) => (
                       <div className="footer-col-block" key={sectionIndex}>
                         <div className="footer-heading text-button footer-heading-mobile">
-                          {section.heading}
+                          {HEADING_KEYS[section.heading]
+                            ? t(HEADING_KEYS[section.heading])
+                            : section.heading}
                         </div>
                         <div className="tf-collapse-content">
                           <ul className="footer-menu-list">
@@ -223,14 +251,18 @@ export default function Footer1({
                                     href={item.href}
                                     className="footer-menu_item"
                                   >
-                                    {item.label}
+                                    {ITEM_KEYS[item.label]
+                                      ? t(ITEM_KEYS[item.label])
+                                      : item.label}
                                   </Link>
                                 ) : (
                                   <a
                                     href={item.href}
                                     className="footer-menu_item"
                                   >
-                                    {item.label}
+                                    {ITEM_KEYS[item.label]
+                                      ? t(ITEM_KEYS[item.label])
+                                      : item.label}
                                   </a>
                                 )}
                               </li>
@@ -244,13 +276,12 @@ export default function Footer1({
                 <div className="col-lg-4">
                   <div className="footer-col-block">
                     <div className="footer-heading text-button footer-heading-mobile">
-                      Newletter
+                      {t("newsletter.title")}
                     </div>
                     <div className="tf-collapse-content">
                       <div className="footer-newsletter">
                         <p className="text-caption-1">
-                          Sign up for our newsletter and get 10% off your first
-                          purchase
+                          {t("newsletter.signup10")}
                         </p>
                         <div
                           className={`tfSubscribeMsg  footer-sub-element ${
@@ -259,10 +290,10 @@ export default function Footer1({
                         >
                           {success ? (
                             <p style={{ color: "rgb(52, 168, 83)" }}>
-                              You have successfully subscribed.
+                              {t("newsletter.success")}
                             </p>
                           ) : (
-                            <p style={{ color: "red" }}>Something went wrong</p>
+                            <p style={{ color: "red" }}>{t("newsletter.failure")}</p>
                           )}
                         </div>
                         <form
@@ -277,7 +308,7 @@ export default function Footer1({
                                 type="email"
                                 name="email"
                                 className="subscribe-email"
-                                placeholder="Enter your e-mail"
+                                placeholder={t("newsletter.placeholder")}
                                 tabIndex={0}
                                 aria-required="true"
                               />
@@ -309,13 +340,13 @@ export default function Footer1({
                             className="text-caption-1"
                             htmlFor="footer-Form_agree"
                           >
-                            By clicking subcribe, you agree to the{" "}
+                            {t("newsletter.agreePrefix")}{" "}
                             <Link className="fw-6 link" href={`/term-of-use`}>
-                              Terms of Service
+                              {t("nav.termsOfService")}
                             </Link>{" "}
                             and{" "}
                             <a className="fw-6 link" href="#">
-                              Privacy Policy
+                              {t("nav.privacyPolicy")}
                             </a>
                             .
                           </label>
@@ -334,8 +365,7 @@ export default function Footer1({
                   <div className="footer-bottom-wrap">
                     <div className="left">
                       <p className="text-caption-1">
-                        ©{new Date().getFullYear()} Lollies Vintage. All Rights
-                        Reserved.
+                        ©{new Date().getFullYear()} {t("footer.rights")}
                       </p>
                       <FooterRegionDisplay />
                       </div>

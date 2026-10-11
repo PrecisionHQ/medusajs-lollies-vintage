@@ -6,6 +6,7 @@ import { useContextElement } from "@/context/Context";
 import { allProducts } from "@/data/products";
 import { usePathname } from "next/navigation";
 import { fetchLiveCardsByHandles } from "@/lib/util/live-product";
+import { useT } from "@/i18n/translate";
 
 /**
  * Wishlist drawer. Resolves ids to cards from static demo data (numeric
@@ -25,6 +26,7 @@ const toCard = (elm) => ({
 export default function Wishlist() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   const { removeFromWishlist, wishList } = useContextElement();
   const [items, setItems] = useState([]);
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function Wishlist() {
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="header">
-            <h5 className="title">Wish List</h5>
+            <h5 className="title">{t("wishlist.title")}</h5>
             <span
               className="icon-close icon-close-popup"
               data-bs-dismiss="modal"
@@ -99,7 +101,7 @@ export default function Wishlist() {
                                 className="text-button tf-btn-remove remove"
                                 onClick={() => removeFromWishlist(elm.id)}
                               >
-                                Remove
+                                {t("cart.remove")}
                               </div>
                             </div>
                             <div className="d-flex align-items-center justify-content-between flex-wrap gap-12">
@@ -113,13 +115,12 @@ export default function Wishlist() {
                     </div>
                   ) : (
                     <div className="p-4">
-                      Your wishlist is empty. Start adding your favorite
-                      products to save them for later!{" "}
+                      {t("wishlist.empty")}{" "}
                       <Link
                         className="btn-line"
                         href={`/${countryCode}/store`}
                       >
-                        Explore Products
+                        {t("cart.exploreProducts")}
                       </Link>
                     </div>
                   )}
@@ -130,7 +131,7 @@ export default function Wishlist() {
                   href={`/${countryCode}/store`}
                   className="text-btn-uppercase"
                 >
-                  Or continue shopping
+                  {t("cart.continueShopping")}
                 </Link>
               </div>
             </div>

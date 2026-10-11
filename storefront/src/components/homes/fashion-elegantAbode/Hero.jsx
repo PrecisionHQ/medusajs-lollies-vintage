@@ -1,5 +1,6 @@
 "use client";
 import { heroVideoSlides } from "@/data/heroSlides";
+import { useT } from "@/i18n/translate";
 import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
@@ -22,6 +23,7 @@ import { usePathname } from "next/navigation";
 export default function Hero() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   const swiperRef = useRef(null);
   const videoRefs = useRef([]);
 
@@ -68,7 +70,12 @@ export default function Hero() {
         onSlideChange={(swiper) => setActiveVideo(swiper.realIndex)}
         dir="ltr"
       >
-        {heroVideoSlides.map((slide, i) => (
+        {heroVideoSlides.map((slide, i) => {
+          // Copy cycles 1-2-3 across the six slides (same as the data file);
+          // copy lives in dictionaries so hero text translates, while
+          // timing/artwork stay in data.
+          const copy = `slide${(i % 3) + 1}`;
+          return (
           <SwiperSlide key={slide.id} data-swiper-autoplay={slide.delayMs}>
             <div
               className="wrap-slider hero-split"
@@ -82,11 +89,11 @@ export default function Hero() {
                         className="fade-item fade-item-1 heading title-display text-white"
                         style={slide.headingStyle}
                         dangerouslySetInnerHTML={{
-                          __html: slide.heading,
+                          __html: t(`hero.${copy}Heading`),
                         }}
                       />
                       <p className="fade-item fade-item-2 body-text-1 text-white">
-                        {slide.description}
+                        {t(`hero.${copy}Description`)}
                       </p>
                     </div>
                     <div className="fade-item fade-item-3 box-btn-slider">
@@ -94,7 +101,7 @@ export default function Hero() {
                         href={`/${countryCode}/store`}
                         className="tf-btn btn-fill btn-white"
                       >
-                        <span className="text">{slide.buttonText}</span>
+                        <span className="text">{t(`hero.${copy}Button`)}</span>
                         <i className="icon icon-arrowUpRight" />
                       </Link>
                     </div>
@@ -117,7 +124,8 @@ export default function Hero() {
               </div>
             </div>
           </SwiperSlide>
-        ))}
+          );
+        })}
       </Swiper>
       <div className="wrap-pagination">
         <div className="container">

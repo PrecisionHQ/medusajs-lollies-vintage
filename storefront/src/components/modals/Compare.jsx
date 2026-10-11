@@ -9,6 +9,7 @@ import {
   fetchLiveCardsByHandles,
   fetchLiveProductByHandle,
 } from "@/lib/util/live-product";
+import { useT } from "@/i18n/translate";
 
 const toCard = (elm) => ({
   id: elm.id,
@@ -29,6 +30,7 @@ const toCard = (elm) => ({
 export default function Compare() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   const { removeFromCompareItem, compareItem, setCompareItem } =
     useContextElement();
   const [items, setItems] = useState([]);
@@ -89,7 +91,7 @@ export default function Compare() {
           <span
             className="icon-close icon-close-popup"
             data-bs-dismiss="offcanvas"
-            aria-label="Close"
+            aria-label={t("common.close")}
           />
         </div>
         <div className="wrap">
@@ -99,8 +101,7 @@ export default function Compare() {
                 <div className="tf-compare-list list-file-delete">
                   <div className="tf-compare-head">
                     <h5 className="title">
-                      Compare <br />
-                      Products
+                      {t("compare.title")}
                     </h5>
                   </div>
                   {items.length ? (
@@ -136,10 +137,10 @@ export default function Compare() {
                             {elm.specs && (
                               <div className="text-caption-1 text-secondary">
                                 {elm.specs.colors?.length > 0 && (
-                                  <div>Colors: {elm.specs.colors.join(", ")}</div>
+                                  <div>{t("product.colors")} {elm.specs.colors.join(", ")}</div>
                                 )}
                                 {elm.specs.sizes?.length > 0 && (
-                                  <div>Sizes: {elm.specs.sizes.join(", ")}</div>
+                                  <div>{t("product.sizes")} {elm.specs.sizes.join(", ")}</div>
                                 )}
                               </div>
                             )}
@@ -149,8 +150,7 @@ export default function Compare() {
                     </div>
                   ) : (
                     <div>
-                      No items added to compare yet. Browse Products to find
-                      items you’d like to compare.
+                      {t("compare.empty")}
                     </div>
                   )}
                   <div className="tf-compare-buttons">
@@ -160,7 +160,7 @@ export default function Compare() {
                         className="tf-compapre-button-clear-all clear-file-delete tf-btn w-100 btn-fill radius-4"
                       >
                         <span className="text text-btn-uppercase">
-                          Clear All Products
+                          {t("search.clearAll")}
                         </span>
                       </div>
                     </div>

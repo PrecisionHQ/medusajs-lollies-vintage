@@ -13,6 +13,8 @@ import { getCollectionsList } from "@lib/data/collections"
 import { listCategories } from "@lib/data/categories"
 import { sortProducts } from "@lib/util/sort-products"
 import { adaptMedusaProductsToModave } from "@lib/util/modave-product-adapter"
+import { getLocale } from "@/i18n/config"
+import { t } from "@/i18n/translate"
 import { splitOptionValues } from "@lib/util/search-facets"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import "@/app/modave-theme.css"
@@ -44,6 +46,8 @@ export default async function SearchResults({ params, searchParams }: Params) {
   const { query: rawQuery, countryCode } = await params
   const sp = await searchParams
   const query = decodeURI(rawQuery)
+  const locale = getLocale(countryCode)
+  const tr = (key: string) => t(locale, key)
   const sort = sp.sortBy || "created_at"
   const pageNumber = Math.max(parseInt(sp.page || "1") || 1, 1)
 
@@ -110,7 +114,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
   const groups: FacetGroup[] = [
     {
       key: "collection",
-      title: "Collection",
+      title: tr("search.collection"),
       param: "f_collection",
       values: facetVals("collection.handle").map((h) => ({
         value: h,
@@ -122,7 +126,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
     },
     {
       key: "category",
-      title: "Category",
+      title: tr("search.category"),
       param: "f_category",
       values: facetVals("categories.handle").map((h) => ({
         value: h,
@@ -134,7 +138,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
     },
     {
       key: "style",
-      title: "Style",
+      title: tr("search.style"),
       param: "f_tag",
       values: facetVals("tags.value").map((v) => ({ value: v, label: v })),
       active: filters.tags,
@@ -143,7 +147,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
     },
     {
       key: "color",
-      title: "Colour",
+      title: tr("search.colour"),
       param: "f_color",
       values: colors.map((v) => ({ value: v, label: v })),
       active: filters.colors,
@@ -152,7 +156,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
     },
     {
       key: "size",
-      title: "Size",
+      title: tr("search.size"),
       param: "f_size",
       values: sizes.map((v) => ({ value: v, label: v })),
       active: filters.sizes,
@@ -179,7 +183,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
         }}
       />
       <ModaveListing
-        title={`Results for "${query}"`}
+        title={`${tr("search.resultsFor")} "${query}"`}
         crumbs={[
           { label: "Homepage", href: `/${countryCode}` },
           { label: `Search: ${query}` },
@@ -199,7 +203,7 @@ export default async function SearchResults({ params, searchParams }: Params) {
                   href={basePath}
                   className="btn-line py_8"
                 >
-                  Clear all filters
+                  {tr("search.clearAllFilters")}
                 </a>
               </div>
             )}

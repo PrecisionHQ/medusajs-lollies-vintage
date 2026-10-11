@@ -8,6 +8,8 @@ import {
   hasSubscribedNewsletter,
   markNewsletterSubscribed,
 } from "@/lib/util/newsletter";
+import { usePathname } from "next/navigation";
+import { useT } from "@/i18n/translate";
 
 /**
  * Email-capture popup. Shows on every page load (refresh) after a short
@@ -19,6 +21,8 @@ import {
 export default function NewsLetterModal({ products = [] }) {
   const modalElement = useRef();
   const shown = useRef(false);
+  const pathname = usePathname();
+  const t = useT((pathname || "").split("/")[1] || "gb");
 
   useEffect(() => {
     let cancelled = false;
@@ -118,11 +122,10 @@ export default function NewsLetterModal({ products = [] }) {
           </div>
           <div className="modal-bottom text-center">
             <p className="text-btn-uppercase fw-4 font-2">
-              Discounts of up to 40%!
+              {t("newsletter.hook")}
             </p>
             <h5>
-              Subscribe and unlock member-only deals, exclusive offers &amp;
-              more!
+              {t("newsletter.subscribeLong")}
             </h5>
             {picks.length > 0 && (
               <div className="d-flex justify-content-center gap-2 my-3">
@@ -160,10 +163,10 @@ export default function NewsLetterModal({ products = [] }) {
             >
               {success ? (
                 <p style={{ color: "rgb(52, 168, 83)" }}>
-                  You have successfully subscribed.
+                  {t("newsletter.success")}
                 </p>
               ) : (
-                <p style={{ color: "red" }}>Something went wrong</p>
+                <p style={{ color: "red" }}>{t("newsletter.failure")}</p>
               )}
             </div>
             <form
@@ -179,7 +182,7 @@ export default function NewsLetterModal({ products = [] }) {
                   type="email"
                   name="email"
                   id="subscribe-email"
-                  placeholder="Enter your e-mail"
+                  placeholder={t("newsletter.placeholder")}
                   required
                 />
                 <button
@@ -187,7 +190,7 @@ export default function NewsLetterModal({ products = [] }) {
                   id="subscribe-button"
                   className="btn-style-2 radius-12 w-100 justify-content-center"
                 >
-                  <span className="text text-btn-uppercase">SUBSCRIBE</span>
+                  <span className="text text-btn-uppercase">{t("newsletter.subscribe")}</span>
                 </button>
               </div>
               <div id="subscribe-msg" />

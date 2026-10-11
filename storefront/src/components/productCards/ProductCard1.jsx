@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import CountdownTimer from "../common/Countdown";
 import { useContextElement } from "@/context/Context";
+import { usePathname } from "next/navigation";
+import { useT } from "@/i18n/translate";
 export default function ProductCard1({
   product,
   gridClass = "",
@@ -12,6 +14,8 @@ export default function ProductCard1({
   radiusClass = "",
 }) {
   const [currentImage, setCurrentImage] = useState(product.imgSrc);
+  const pathname = usePathname();
+  const t = useT((pathname || "").split("/")[1] || "gb");
 
   const {
     setQuickAddItem,
@@ -202,8 +206,8 @@ export default function ProductCard1({
             <span className="icon icon-heart" />
             <span className="tooltip">
               {isAddedtoWishlist(product.id)
-                ? "Already Wishlished"
-                : "Wishlist"}
+                ? t("product.alreadyWishlisted")
+                : t("nav.wishlist")}
             </span>
           </a>
           <a
@@ -216,8 +220,8 @@ export default function ProductCard1({
             <span className="icon icon-gitDiff" />
             <span className="tooltip">
               {isAddedtoCompareItem(product.id)
-                ? "Already compared"
-                : "Compare"}
+                ? t("product.alreadyCompared")
+                : t("nav.compare")}
             </span>
           </a>
           <a
@@ -227,7 +231,7 @@ export default function ProductCard1({
             className="box-icon quickview tf-btn-loading"
           >
             <span className="icon icon-eye" />
-            <span className="tooltip">Quick View</span>
+            <span className="tooltip">{t("product.quickView")}</span>
           </a>
         </div>
         <div className="list-btn-main">
@@ -242,7 +246,7 @@ export default function ProductCard1({
               onClick={() => setQuickViewItem(product)}
               data-bs-toggle="modal"
             >
-              ADD TO CART
+              {t("product.addToCart")}
             </a>
           ) : product.addToCart == "Quick Add" ? (
             <a
@@ -251,7 +255,7 @@ export default function ProductCard1({
               onClick={() => setQuickAddItem(product.id)}
               data-bs-toggle="modal"
             >
-              Quick Add
+              {t("product.quickAdd")}
             </a>
           ) : (
             <a
@@ -259,8 +263,8 @@ export default function ProductCard1({
               onClick={() => addProductToCart(product.id)}
             >
               {isAddedToCartProducts(product.id)
-                ? "Already Added"
-                : "ADD TO CART"}
+                ? t("product.alreadyAdded")
+                : t("product.addToCart")}
             </a>
           )}
         </div>

@@ -32,6 +32,8 @@ import { getTiles, getSaleImages } from "@/lib/data/listing-tiles"
 import { adaptMedusaProductsToModave } from "@/lib/util/modave-product-adapter"
 import { buildLolliesMenu } from "@/lib/util/lollies-menu"
 import { getStoreName } from "@/lib/util/env"
+import { getLocale } from "@/i18n/config"
+import { t } from "@/i18n/translate"
 import { topPicks as curatedTopPicks } from "@/data/curated"
 
 import "@/app/modave-theme.css"
@@ -114,6 +116,7 @@ export default async function Home({
   params: Promise<{ countryCode: string }>
 }) {
   const { countryCode } = await params
+  const locale = getLocale(countryCode)
   const { menu, shopLinks, catLinks } = buildLolliesMenu(countryCode)
   const { items: liveItems, total: totalProducts } =
     await getLiveCardProducts(countryCode)
@@ -153,21 +156,27 @@ export default async function Home({
         <Hero />
         <Categories
           liveItems={collectionTiles}
+          title={t(locale, "home.exploreCollections")}
           viewAllHref={`/${countryCode}/collections`}
+          viewAllLabel={t(locale, "home.viewAllCollection")}
         />
         <Categories
           liveItems={categoryTiles}
-          title="Shop by Category"
+          title={t(locale, "home.shopByCategory")}
           layout="grid"
           viewAllHref={`/${countryCode}/categories`}
-          viewAllLabel="View All Categories"
+          viewAllLabel={t(locale, "home.viewAllCategories")}
         />
         <Products liveItems={topPicks} />
         <BannerCountdown countryCode={countryCode} images={saleImages} />
-        <MarqueeSection2 parentClass="tf-marquee marquee-white bg-purple-2" />
-        <Lookbook />
+        <MarqueeSection2
+          parentClass="tf-marquee marquee-white bg-purple-2"
+          countryCode={countryCode}
+        />
+        <Lookbook countryCode={countryCode} />
         <Products2
-          title="Top Trending"
+          title={t(locale, "home.topTrending")}
+          subtitle={t(locale, "home.trendingSub")}
           parentClass="flat-spacing pt-0"
           liveItems={trending}
         />

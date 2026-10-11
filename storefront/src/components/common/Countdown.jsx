@@ -1,7 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { useT } from "@/i18n/translate";
 
-const CountdownTimer = ({ style = 1, targetDate = "2025-06-31T23:59:59" }) => {
+const CountdownTimer = ({ style = 1, targetDate = "2025-06-31T23:59:59", countryCode = "gb" }) => {
+  const t = useT(countryCode);
   const [showTimer, setShowTimer] = useState(false);
   useEffect(() => {
     setShowTimer(true);
@@ -31,7 +33,7 @@ const CountdownTimer = ({ style = 1, targetDate = "2025-06-31T23:59:59" }) => {
   }, [targetDate]);
 
   if (!timeLeft) {
-    return <div>Time's up!</div>;
+    return <div>{t("countdown.timesUp")}</div>;
   }
 
   return (
@@ -72,25 +74,25 @@ const CountdownTimer = ({ style = 1, targetDate = "2025-06-31T23:59:59" }) => {
                 <span className="countdown__value countdown__value--0 js-countdown__value--0">
                   {timeLeft.days}
                 </span>
-                <span className="countdown__label">Days</span>
+                <span className="countdown__label">{t("countdown.days")}</span>
               </span>
               <span className="countdown__item">
                 <span className="countdown__value countdown__value--1 js-countdown__value--1">
                   {timeLeft.hours}
                 </span>
-                <span className="countdown__label">Hours</span>
+                <span className="countdown__label">{t("countdown.hours")}</span>
               </span>
               <span className="countdown__item">
                 <span className="countdown__value countdown__value--2 js-countdown__value--2">
                   {timeLeft.minutes}
                 </span>
-                <span className="countdown__label">Mins</span>
+                <span className="countdown__label">{t("countdown.mins")}</span>
               </span>
               <span className="countdown__item">
                 <span className="countdown__value countdown__value--3 js-countdown__value--3">
                   {timeLeft.seconds}
                 </span>
-                <span className="countdown__label">Secs</span>
+                <span className="countdown__label">{t("countdown.secs")}</span>
               </span>
             </div>
           )}
@@ -100,13 +102,13 @@ const CountdownTimer = ({ style = 1, targetDate = "2025-06-31T23:59:59" }) => {
                 <span className="countdown__value countdown__value--0 js-countdown__value--0">
                   {timeLeft.days}
                 </span>
-                <span className="countdown__label">DAYS</span>
+                <span className="countdown__label">{t("countdown.days")}</span>
               </span>
               <span className="countdown__item">
                 <span className="countdown__value countdown__value--1 js-countdown__value--1">
                   {timeLeft.hours}
                 </span>
-                <span className="countdown__label">HOURS</span>
+                <span className="countdown__label">{t("countdown.hours")}</span>
               </span>
               <span className="countdown__item">
                 <span className="countdown__value countdown__value--2 js-countdown__value--2">
