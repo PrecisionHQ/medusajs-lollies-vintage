@@ -194,3 +194,11 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Context wishlist/compare actions now fire `wishlist_add` / `compare_add` (live ids are product handles); review submit + helpful vote fire `review_submitted` / `review_vote`; results-page `search_performed` carries the active facet filters. Same consent gate throughout.
 - Mapper: wishlist_add → AddToWishlist (both networks), compare_add → custom Compare; review events PostHog-only by design (ADR-016).
 - Verified: 6/6 new mapper assertions; typecheck clean; `next build` 196/196 (one transient sitemap-timeout retry, backend healthy); live on prod, pages 200, zero pixel scripts without IDs. Interaction events themselves fire only on real user action + consent, so no-click curl verification possible — code paths wired + unit-tested.
+
+## P9 growth flows — unique codes, cross-sell, price-drop, welcome handoff (2026-10-11, PR: backend/p9-growth)
+- `incentives.ts` mints per-recipient single-use promo clones from the merchant template (7/7 mock assertions); wired into winback + abandoned-2nd with static fallback.
+- Cross-sell (daily 09:00): 2-3-day-old orders → same-collection picks via CAMPAIGN template, guarded (opt-out/cap/idempotent per order).
+- Price-drop (daily 10:00): wishlist items below original per calculated prices (self-HTTP store query — catalog rows carry no compare-at); idempotency key carries the new low for re-alerts; one grouped mail per shopper.
+- Welcome handoff: newsletter confirm sends WELCOME once; signup suppresses on the same claim — no doubles either direction.
+- Recovered 3 create-shape normalizes lost in an earlier stash drop (flows self-seed, loyalty settings/accounts) — prod had been running them uncommitted.
+- Verified: suite 15/15, tsc clean, build exit 0, deployed SUCCESS, boot clean; live reads 200; job runs land 09:00/10:00 (first sends need RESEND keys).

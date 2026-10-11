@@ -31,8 +31,47 @@ const redirectMapCache = {
   redirectMapUpdated: 0,
 }
 
-function normalizeRedirectPath(pathname: string): string {
-  // Mirrors backend normalizeRedirectPath (PR-15): lowercase, leading slash,
+const UTM_KEYS = [
+  "utm_source",
+  "utm_medium",
+  "utm_campaign",
+  "utm_term",
+  "utm_content",
+] as const;
+
+/**
+ * Ads v1 — first-touch attribution capture. Returns the cookie value when
+ * the landing URL carries any utm_* param, else null. Values are encoded
+ * pipe-joined `key=value` pairs; the reader lives next to getConsent in
+ * lib/analytics/posthog.ts (single format, two readers).
+ */
+function readUtmParams(searchParams: URLSearchParams): string | null {
+  const parts: string[] = [];
+  for (const key of UTM_KEYS) {
+    const value = searchParams.get(key);
+    if (value) {
+      parts.push(`${key}=${encodeURIComponent(value)}`);
+    }
+  }
+  return parts.length ? parts.join("|") : null;
+}
+
+function maybeSetUtmCookie(
+  response: NextResponse,
+  utmValue: string | null,
+  hasUtmCookie: boolean
+) {
+  if (utmValue && !hasUtmCookie) {
+    response.cookies.set("_lollies_utm", utmValue, {
+      maxAge: 60 * 60 * 24 * 30,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+    });
+  }
+}
+
+function normalizeRedirectPath(pathname: string): string {  // Mirrors backend normalizeRedirectPath (PR-15): lowercase, leading slash,
   // no trailing slash — both sides must agree on form.
   let p = pathname.toLowerCase()
   if (!p.startsWith("/")) {
@@ -200,6 +239,13 @@ export async function middleware(request: NextRequest) {
   // which is what happens today anyway.
   request.cookies.set("_medusa_cache_id", cacheId)
 
+  // Ads v1 — first-touch UTM capture. Only planted when the landing URL
+  // carries utm_* params and no cookie exists yet (later navigations and
+  // internal links never overwrite attribution). Applied to every response
+  // below via maybeSetUtmCookie (both exits replace `response` wholesale).
+  const utmValue = readUtmParams(searchParams)
+  const hasUtmCookie = Boolean(request.cookies.get("_lollies_utm")?.value)
+
   // check if one of the country codes is in the url
   if (urlHasCountryCode && (!cartId || cartIdCookie)) {
     const response = NextResponse.next({
@@ -214,6 +260,7 @@ export async function middleware(request: NextRequest) {
       )
     }
 
+    maybeSetUtmCookie(response, utmValue, hasUtmCookie)
     return response
   }
 
@@ -244,6 +291,7 @@ export async function middleware(request: NextRequest) {
   if (!cacheIdCookie) {
     response.cookies.set("_medusa_cache_id", cacheId, CACHE_ID_COOKIE_OPTIONS)
   }
+  maybeSetUtmCookie(response, utmValue, hasUtmCookie)
 
   return response
 }
@@ -268,6 +316,6 @@ export const config = {
   // deleted now that Elegant Abode IS the homepage ([countryCode]/page.tsx,
   // region-routed like everything else), so no exemption remains.
   matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg|.*\\.mp4|.*\\.webm).*)",
+    "/((?!api|_next/static|_next/image|feeds|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg|.*\\.mp4|.*\\.webm).*)",
   ],
 }
