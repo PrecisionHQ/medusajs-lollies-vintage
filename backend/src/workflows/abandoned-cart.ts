@@ -14,6 +14,7 @@ import {
   buildRecoveryLink,
   buildUnsubscribeLink,
 } from "../modules/marketing/utils";
+import { mintUniqueCode } from "../modules/marketing/incentives";
 
 /**
  * PR-02 — Abandoned-cart reminders, run hourly by src/jobs/abandoned-cart.ts.
@@ -141,6 +142,7 @@ const sendRemindersStep = createStep(
   ) => {
     const marketing = container.resolve("marketing") as any;
     const notifications = container.resolve(Modules.NOTIFICATION);
+    const promotions = container.resolve(Modules.PROMOTION);
     const logger = container.resolve(ContainerRegistrationKeys.LOGGER);
 
     const now = Date.now();
@@ -210,7 +212,7 @@ const sendRemindersStep = createStep(
 
         const incentiveCode =
           flow === "abandoned-2" && config.incentive_enabled
-            ? config.incentive_code
+            ? await mintUniqueCode(promotions, config.incentive_code, "CART")
             : null;
 
         await notifications.createNotifications({
