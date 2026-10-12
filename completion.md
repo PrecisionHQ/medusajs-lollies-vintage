@@ -218,3 +218,10 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Free open-source path (no DeepL key): Opus-MT/Helsinki-NLP models run locally on CPU (`storefront/scripts/opus-dicts.py`; torch 2.2.2 + transformers pinned to 4.44.2 in /tmp/argosvenv). Dead ends documented: Argos segfaults on this Intel Mac (onnxruntime), gtx endpoint 429s IP-wide, LibreTranslate public needs a key, Ollama/brew broken here (git remote-https). All five scripts kept in `storefront/scripts/`, README names the working one.
 - All 6: 195-key parity, zero `{var}` placeholder mismatches, `<br/>` preserved; worst MT howlers hand-fixed per locale (checkout/add-to-cart/subscribe verbs, nav.home). Full native-speaker review still open.
 - Registered in `dictionaries.ts` + `SUPPORTED_LOCALES` (now 9 locales); /es verified live (Inicio, Carrito, Tramitar pedido, toggle present); `next build` green, bundle still 103KB.
+
+## P11-global RoW run + full deploy (2026-10-12, no PR — ops)
+- No staging env exists (only production) — went straight to prod with the additive-only script.
+- Access path (documented — local PG/redis + `railway run` can't reach `*.railway.internal` from here; SSH tunnels forward TCP but PG handshake stalls): registered SSH key (`railway ssh keys add`), `railway ssh -- <cmd>` into the backend container.
+- Backend: `railway up` redeploy of master (SUCCESS), then `railway ssh -- npx medusa exec ./src/scripts/expand-regions-row.ts` in-container: Rest-of-World (EUR) created with 242 countries + 242 tax regions. Verified: /store/regions = Europe 7 + RoW 242 = 249/249.
+- Storefront: `railway up ../storefront --path-as-root --service storefront` (SUCCESS). Live verified: /fr French + toggle, /es Spanish, /ng /jp /br all 200 (on-demand render path works).
+- Rollback note: RoW is one region row — delete region reg_01M4S4XQERMFVQ0V82E8RNR20Y (+ its tax regions) to revert; Europe untouched throughout.
