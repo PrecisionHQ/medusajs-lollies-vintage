@@ -75,6 +75,9 @@ disclosure copy; account preorder status; cancellation releases auth via workflo
 ## Wave 3 — scale margins
 
 ### PR-10 — Phase-1 regions (DKK/SEK/NOK/CHF)
+**DROPPED 2026-10-12** — EUR-worldwide decision (see SHOPIFY-PARITY.md PR9):
+all countries sell in EUR via Europe + Rest-of-World regions; no currency
+splits. Script kept in repo for reference only.
 **Scope**: same migration-script pattern as PR-01 for DK, SE, NO (new), CH; prices, shipping bands, tax regions,
 payout accounts; country→region redirect map on storefront.
 **Accept**: each country shops in local currency end-to-end.

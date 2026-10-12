@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { search } from "@modules/search/actions";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 const POPULAR = [
   { label: "Dresses", href: "dresses", kind: "category" },
@@ -23,7 +23,7 @@ export default function SearchModal() {
   const pathname = usePathname();
   const router = useRouter();
   const countryCode = (pathname || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const [value, setValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const timer = useRef(null);

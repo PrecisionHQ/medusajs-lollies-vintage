@@ -3,7 +3,9 @@ import Nav from "./Nav";
 import Image from "next/image";
 import Link from "next/link";
 import CartLength from "../common/CartLength";
-import { useT } from "@/i18n/translate";
+import { requestMessages } from "@/i18n/dictionaries";
+import { tWith } from "@/i18n/translate";
+import LocaleToggle from "./LocaleToggle";
 /**
  * @param {object} props
  * @param {boolean} [props.fullWidth]
@@ -13,7 +15,7 @@ import { useT } from "@/i18n/translate";
  * @param {import("@/lib/util/modave-product-adapter").ModaveCardProduct[]} [props.recentProducts]
  * @param {string} [props.countryCode]
  */
-export default function Header1({
+export default async function Header1({
   fullWidth = false,
   // Live Lollies menu (built server-side with the visitor's countryCode).
   // Nav falls back to URL-derived defaults when absent.
@@ -23,7 +25,8 @@ export default function Header1({
   recentProducts,
   countryCode = "gb",
 }) {
-  const t = useT(countryCode);
+  const { locale, messages } = await requestMessages(countryCode);
+  const t = tWith(locale, messages);
   return (
     <header
       id="header"
@@ -97,6 +100,7 @@ export default function Header1({
                   </svg>
                 </a>
               </li>
+              <LocaleToggle />
               <li className="nav-account">
                 <a href="#" className="nav-icon-item">
                   <svg

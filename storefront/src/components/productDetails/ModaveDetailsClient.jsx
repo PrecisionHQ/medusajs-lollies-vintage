@@ -13,7 +13,7 @@ import { notifyCartUpdated } from "@lib/util/cart-events";
 import { getProductPrice } from "@lib/util/get-product-price";
 import { stripHtmlToText } from "@lib/util/sanitize-html";
 import { getProductReviews } from "@lib/data/reviews";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 const optionsAsKeymap = (variantOptions) => {
   return variantOptions?.reduce((acc, varopt) => {
@@ -47,7 +47,7 @@ export default function ModaveDetailsClient({
   countryCode,
 }) {
   const router = useRouter();
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const [options, setOptions] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);

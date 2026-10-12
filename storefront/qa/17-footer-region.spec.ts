@@ -42,6 +42,33 @@ test.describe("Footer region indicator", () => {
     await expect(
       page.locator("footer").getByTestId("footer-region-currency")
     ).toContainText("EUR")
+    // P11-global: the language indicator follows the display locale.
+    await expect(
+      page.locator("footer").getByTestId("footer-region-language")
+    ).toContainText("Deutsch")
+  })
+
+  test("English toggle cookie switches the language indicator", async ({
+    page,
+  }) => {
+    await page.goto("/de/")
+    await page
+      .locator("footer")
+      .getByTestId("footer-region-language")
+      .waitFor()
+    // Toggle to English via the cookie the header switch sets.
+    await page.context().addCookies([
+      {
+        name: "lollies-locale",
+        value: "en",
+        domain: new URL(page.url()).hostname,
+        path: "/",
+      },
+    ])
+    await page.reload()
+    await expect(
+      page.locator("footer").getByTestId("footer-region-language")
+    ).toContainText("English")
   })
 })
 

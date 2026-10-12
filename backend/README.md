@@ -76,6 +76,7 @@ The local `docker-compose.yml` in the repository root provides all four.
 | `src/search/products.ts` | The product search index definition consumed by Medusa 2.19's Search Module. |
 | `src/api/key-exchange/` | Hands the storefront its publishable API key at boot, since the two services deploy independently. |
 | `src/scripts/seed.ts` | The demo store: one Europe region covering gb, de, dk, se, fr, es and it, a sales channel, a publishable key and four products. |
+| `src/scripts/expand-regions-row.ts` | P11-global: idempotent Rest-of-World (EUR) region holding every ISO country not covered elsewhere + tax regions. Run on staging then prod (`medusa exec`); the storefront picks new countries up with zero deploy. |
 | `src/scripts/postBuild.js` | Assembles the production server after `medusa build`. |
 | `src/lib/constants.ts` | Every environment variable this backend reads, in one file, with the fallbacks documented. |
 

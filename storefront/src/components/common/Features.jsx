@@ -4,7 +4,7 @@ import { iconboxItems } from "@/data/features";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { usePathname } from "next/navigation";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 // Static icon + order from data; title/description translate by item id
 // (the data strings stay English as the fallback source of truth).
@@ -17,7 +17,7 @@ const FEATURE_COPY = {
 
 export default function Features({ parentClass = "flat-spacing" }) {
   const countryCode = (usePathname() || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   return (
     <section className={parentClass}>
       <div className="container">

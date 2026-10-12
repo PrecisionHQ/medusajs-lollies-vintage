@@ -11,7 +11,7 @@ import {
 } from "@lib/data/reviews"
 import { track } from "@lib/analytics/posthog"
 import { trackPixel } from "@lib/analytics/pixels"
-import { useT } from "@/i18n/translate"
+import { useLocaleT } from "@/i18n/locale-context"
 
 /**
  * PR-04 — Reviews tab content: approved list with helpful votes plus the
@@ -20,7 +20,7 @@ import { useT } from "@/i18n/translate"
  * a login link (the server action returns { error: "signin" }).
  */
 export default function ReviewsTab({ productId, countryCode = "gb" }: { productId: string; countryCode?: string }) {
-  const t = useT(countryCode)
+  const t = useLocaleT()
   const [reviews, setReviews] = useState<StoreReview[]>([])
   const [loaded, setLoaded] = useState(false)
   const [rating, setRating] = useState(5)

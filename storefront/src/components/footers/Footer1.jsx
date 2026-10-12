@@ -10,7 +10,7 @@ import ToolbarBottom from "../headers/ToolbarBottom";
 import ScrollTop from "../common/ScrollTop";
 import { footerLinks, socialLinks } from "@/data/footerLinks";
 import axios from "axios";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 // Footer link labels are UI chrome (translated); hrefs stay as-is.
 // Headings/items not in these maps (brand-new links) pass through English.
@@ -63,7 +63,7 @@ export default function Footer1({
   const [showMessage, setShowMessage] = useState(false);
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
 
   const handleShowMessage = () => {
     setShowMessage(true);

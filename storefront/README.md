@@ -120,6 +120,35 @@ It also issues the `_medusa_cache_id` cookie that scopes Next cache tags per
 visitor, and forwards a `cart_id` query parameter into a cookie so payment
 provider redirects land back on the checkout.
 
+### Internationalisation
+
+Display language is separate from country/currency routing. `src/i18n/`
+holds the hand-rolled, zero-dependency system:
+
+- `country-locale.ts` — all 249 ISO codes mapped to their primary official
+  language (+ `LOCALE_NAMES`, RTL set). Multilingual v1 choices: CH→German,
+  BE→Dutch, LU→French, CY→Greek, IN→English.
+- `config.ts` — `resolveLocale(countryCode, cookieOverride)`: URL country's
+  official language by default, English when the shopper set the
+  `lollies-locale` cookie (header `LocaleToggle`, Official ↔ English only).
+  Only locales with a shipped dictionary resolve; everything else is English.
+- `dictionaries.ts` (server-only) + `tWith()`/`requestMessages()` for server
+  components; `<LocaleProvider>` (injected by `app/[countryCode]/layout.tsx`)
+  + `useLocaleT()` for client components. Dictionaries never enter the
+  client bundle — First Load JS is unaffected by locale count.
+- `t()` falls back to English per key: untranslated strings degrade, never
+  blank. Catalog content (names, colors, sizes, categories) stays English
+  by design (drives matching/filtering/URLs).
+
+Adding a language: `DEEPL_API_KEY=xxx node scripts/deepl-dicts.mjs <locale>`
+(MT draft, `{var}`/`br` placeholders protected, existing files skipped),
+human-review the draft, then one line in `dictionaries.ts` REGISTRY + the
+code in `SUPPORTED_LOCALES` (dev asserts they match).
+
+Scale note: `generateStaticParams` pre-renders the default region (`gb`)
+only — 195 countries × products would be ~16k pages. Other countries render
+on first visit and cache for an hour (`revalidate = 3600`).
+
 ### Data layer
 
 `lib/data/` holds one file per resource. Reads go through `sdk.client.fetch`

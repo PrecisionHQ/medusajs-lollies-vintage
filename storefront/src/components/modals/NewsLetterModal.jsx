@@ -9,7 +9,7 @@ import {
   markNewsletterSubscribed,
 } from "@/lib/util/newsletter";
 import { usePathname } from "next/navigation";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 /**
  * Email-capture popup. Shows on every page load (refresh) after a short
@@ -22,7 +22,7 @@ export default function NewsLetterModal({ products = [] }) {
   const modalElement = useRef();
   const shown = useRef(false);
   const pathname = usePathname();
-  const t = useT((pathname || "").split("/")[1] || "gb");
+  const t = useLocaleT();
 
   useEffect(() => {
     let cancelled = false;

@@ -5,7 +5,7 @@ import Link from "next/link";
 import CountdownTimer from "../common/Countdown";
 import { useContextElement } from "@/context/Context";
 import { usePathname } from "next/navigation";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 export default function ProductCard1({
   product,
   gridClass = "",
@@ -15,7 +15,7 @@ export default function ProductCard1({
 }) {
   const [currentImage, setCurrentImage] = useState(product.imgSrc);
   const pathname = usePathname();
-  const t = useT((pathname || "").split("/")[1] || "gb");
+  const t = useLocaleT();
 
   const {
     setQuickAddItem,

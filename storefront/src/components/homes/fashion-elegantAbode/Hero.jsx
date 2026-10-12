@@ -1,6 +1,6 @@
 "use client";
 import { heroVideoSlides } from "@/data/heroSlides";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Link from "next/link";
@@ -23,7 +23,7 @@ import { usePathname } from "next/navigation";
 export default function Hero() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const swiperRef = useRef(null);
   const videoRefs = useRef([]);
 

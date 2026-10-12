@@ -6,7 +6,7 @@ import { useContextElement } from "@/context/Context";
 import { allProducts } from "@/data/products";
 import { usePathname } from "next/navigation";
 import { fetchLiveCardsByHandles } from "@/lib/util/live-product";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 /**
  * Wishlist drawer. Resolves ids to cards from static demo data (numeric
@@ -26,7 +26,7 @@ const toCard = (elm) => ({
 export default function Wishlist() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const { removeFromWishlist, wishList } = useContextElement();
   const [items, setItems] = useState([]);
   useEffect(() => {

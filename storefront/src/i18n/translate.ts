@@ -3,7 +3,13 @@ import fr from "./dictionaries/fr.json";
 import de from "./dictionaries/de.json";
 import { DEFAULT_LOCALE, Locale, getLocale } from "./config";
 
-const DICTS: Record<Locale, Record<string, unknown>> = { en, fr, de };
+/**
+ * Baked-in en/fr/de trees. Client-safe (small). Other locales arrive via
+ * <LocaleProvider> messages (server-loaded, see dictionaries.ts) — pass
+ * them as the 4th arg. Server components should prefer
+ * tWith(locale, getDictionary(locale)).
+ */
+const BAKED: Record<string, Record<string, unknown>> = { en, fr, de };
 
 function lookup(dict: Record<string, unknown>, path: string): unknown {
   let node: unknown = dict;
@@ -23,10 +29,11 @@ function lookup(dict: Record<string, unknown>, path: string): unknown {
 export function t(
   locale: Locale,
   key: string,
-  vars?: Record<string, string | number>
+  vars?: Record<string, string | number>,
+  messages?: Record<string, unknown>
 ): string {
-  const hit =
-    lookup(DICTS[locale] ?? {}, key) ?? lookup(DICTS[DEFAULT_LOCALE], key);
+  const tree = messages ?? BAKED[locale] ?? {};
+  const hit = lookup(tree, key) ?? lookup(BAKED.en, key);
   if (typeof hit !== "string") return key;
   if (!vars) return hit;
   return hit.replace(/\{(\w+)\}/g, (_, name) =>
@@ -34,13 +41,23 @@ export function t(
   );
 }
 
-export function getDictionary(locale: Locale): Record<string, unknown> {
-  return DICTS[locale] ?? DICTS[DEFAULT_LOCALE];
+/** Server-component helper: const tr = tWith(locale, getDictionary(locale)). */
+export function tWith(locale: Locale, messages: Record<string, unknown>) {
+  return (key: string, vars?: Record<string, string | number>) =>
+    t(locale, key, vars, messages);
+}
+
+export function getDictionaryBaked(
+  locale: Locale
+): Record<string, unknown> {
+  return BAKED[locale] ?? BAKED[DEFAULT_LOCALE];
 }
 
 /**
- * Client-component helper: const t = useT(countryCode); t("cart.title").
- * Pure computation (no React APIs) — safe anywhere a countryCode exists.
+ * Legacy client-component helper (baked en/fr/de only — no provider
+ * messages). Prefer useLocaleT() from locale-context; kept for
+ * compatibility. Pure computation (no React APIs) — safe anywhere a
+ * countryCode exists.
  */
 export function useT(countryCode?: string | null) {
   const locale = getLocale(countryCode);

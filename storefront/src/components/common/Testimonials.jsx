@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import { testimonialsWithProduct9 } from "@/data/products";
 import { usePathname } from "next/navigation";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 /**
  * Compact social-proof strip: stars + one-line quote + author, no product
@@ -14,7 +14,7 @@ import { useT } from "@/i18n/translate";
  */
 export default function Testimonials({ parentClass = "flat-spacing" }) {
   const countryCode = (usePathname() || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const items = (testimonialsWithProduct9 || []).slice(0, 6);
   if (!items.length) return null;
   return (

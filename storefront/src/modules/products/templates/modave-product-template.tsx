@@ -21,6 +21,7 @@ import SizeGuide from "@/components/modals/SizeGuide"
 import ModaveScripts from "@/components/common/ModaveScripts"
 import { retrieveCollection } from "@lib/data/collections"
 import { buildLolliesMenu } from "@lib/util/lollies-menu"
+import { requestMessages } from "@/i18n/dictionaries"
 import { getBaseURL, getStoreName } from "@lib/util/env"
 import { stripHtmlToText } from "@lib/util/sanitize-html"
 import { getProductPrice } from "@lib/util/get-product-price"
@@ -109,7 +110,12 @@ const ModaveProductTemplate = async ({
     return notFound()
   }
 
-  const { menu, shopLinks, catLinks } = buildLolliesMenu(countryCode)
+  const { locale, messages } = await requestMessages(countryCode)
+  const { menu, shopLinks, catLinks } = buildLolliesMenu(
+    countryCode,
+    locale,
+    messages
+  )
 
   // Breadcrumb parent mirrors ModaveBreadcrumb: category first, else the
   // single collection. Category rides on the product; collection needs one

@@ -202,3 +202,14 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Welcome handoff: newsletter confirm sends WELCOME once; signup suppresses on the same claim — no doubles either direction.
 - Recovered 3 create-shape normalizes lost in an earlier stash drop (flows self-seed, loyalty settings/accounts) — prod had been running them uncommitted.
 - Verified: suite 15/15, tsc clean, build exit 0, deployed SUCCESS, boot clean; live reads 200; job runs land 09:00/10:00 (first sends need RESEND keys).
+
+## P11 i18n v1 — fr/de UI chrome (2026-10-12, PR #63 merged)
+- Hand-rolled zero-dep locale infra (`storefront/src/i18n/`): `getLocale` from countryCode route param (no URL changes), `t()` with per-key English fallback + `{var}` interpolation. 195-key en/fr/de dictionaries, full parity. Wired: homepage sections, header/topbar/menu, search + results, listing, cart drawer, wishlist/compare, quick view, cards, PDP details/tabs/reviews/related, footer + newsletter. Catalog content stays English by design (matching/filtering/URLs); policy prose stays English pending human review.
+- Verified: `next build` passes, eslint clean, tsc only pre-existing gift-card error; live /fr renders French.
+
+## P11-global — 195 countries, official language each, EN toggle (2026-10-12, PR pending, branch `feat/i18n-global`)
+- Decision: EUR worldwide (Phase-1 currency splits DROPPED); every country gets its official language; shopper toggles Official ↔ English.
+- `country-locale.ts` (249 ISO → primary official language, native names, RTL set); server-side dictionary registry (`dictionaries.ts`, never in client bundle — First Load JS still 103KB); `<LocaleProvider>` via new `[countryCode]/layout.tsx`; `resolveLocale()` honors the `lollies-locale` cookie; header `LocaleToggle`; footer language indicator follows locale; searchable country selector (195 entries); gb-only `generateStaticParams` (rest on-demand) so the build doesn't 16k-page itself; DeepL draft script (`storefront/scripts/deepl-dicts.mjs`, placeholders protected, never clobbers review).
+- Backend: idempotent `expand-regions-row.ts` (Rest-of-World EUR + tax regions) — NOT yet run on staging/prod.
+- Verified: tsc/eslint clean; dev-server spot checks — /gb 200 English, /fr French + toggle, cookie override renders English on /fr; QA spec 17 extended (Deutsch indicator + toggle-cookie test).
+- Still needs: DeepL API key (Tier-1: es, it, nl, pt, da, sv), RoW script run on staging→prod, human review per language, RTL CSS audit (ar/he/fa/ur).

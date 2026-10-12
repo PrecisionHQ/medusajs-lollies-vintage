@@ -3,11 +3,11 @@
 import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { usePathname } from "next/navigation";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 export default function Topbar3() {
   const countryCode = (usePathname() || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   return (
     <div className="tf-topbar topbar-white bg-main">
       <div className="container">

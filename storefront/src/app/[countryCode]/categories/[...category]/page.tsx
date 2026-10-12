@@ -2,12 +2,11 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { getCategoryByHandle, listCategories } from "@lib/data/categories"
-import { listRegions } from "@lib/data/regions"
 import { getProductsListWithSort } from "@lib/data/products"
 import { adaptMedusaProductsToModave } from "@lib/util/modave-product-adapter"
 import ModaveListing from "@/components/common/ModaveListing"
 import ModavePageShell from "@/components/common/ModavePageShell"
-import { StoreProductCategory, StoreRegion } from "@medusajs/types"
+import { StoreProductCategory } from "@medusajs/types"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import { getStoreName } from "@lib/util/env"
 import "@/app/modave-theme.css"
@@ -33,9 +32,11 @@ export async function generateStaticParams() {
     return []
   }
 
-  const countryCodes = await listRegions().then((regions: StoreRegion[]) =>
-    regions?.map((r) => r.countries?.map((c) => c.iso_2)).flat()
-  )
+  // P11-global — 195 countries x categories would pre-render tens of
+  // thousands of pages at build time. Pre-render the default region only;
+  // every other country renders on first visit, then caches for an hour
+  // (revalidate above). dynamicParams defaults to true, so no extra flag.
+  const countryCodes = ["gb"]
 
   const categoryHandles = product_categories.map(
     (category: any) => category.handle

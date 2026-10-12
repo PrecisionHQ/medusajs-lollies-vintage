@@ -22,6 +22,8 @@ type CountrySelectProps = {
 
 const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
   const [current, setCurrent] = useState<CountryOption | undefined>(undefined)
+  // P11-global — 195 countries need a filter; plain scroll is unusable.
+  const [query, setQuery] = useState("")
 
   const { countryCode } = useParams()
   const currentPath = usePathname().split(`/${countryCode}`)[1]
@@ -57,8 +59,18 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
 
   const handleChange = (option: CountryOption) => {
     updateRegion(option.country, currentPath)
+    setQuery("")
     close()
   }
+
+  const q = query.trim().toLowerCase()
+  const visible = q
+    ? options.filter(
+        (o) =>
+          o.label.toLowerCase().includes(q) ||
+          o.country.toLowerCase().includes(q)
+      )
+    : options
 
   return (
     <div>
@@ -102,7 +114,17 @@ const CountrySelect = ({ toggleState, regions }: CountrySelectProps) => {
               static
               data-testid="shipping-to-choices"
             >
-              {options.map((o, index) => {
+              <div className="sticky top-0 bg-white px-3 py-2">
+                <input
+                  autoFocus
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search countries..."
+                  className="w-full border border-ui-border-base rounded px-2 py-1 normal-case"
+                  data-testid="shipping-to-search"
+                />
+              </div>
+              {visible.map((o, index) => {
                 return (
                   <Listbox.Option
                     key={index}

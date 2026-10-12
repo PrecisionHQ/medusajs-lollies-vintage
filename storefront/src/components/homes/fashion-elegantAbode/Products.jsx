@@ -6,10 +6,10 @@ import Link from "next/link";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { usePathname } from "next/navigation";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 export default function Products({ liveItems }) {
   const countryCode = (usePathname() || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   // Live Medusa products (already adapted to the Modave card shape) take
   // precedence when the preview page supplies them. Falls back to the static
   // demo slice so the section still renders with the backend down.

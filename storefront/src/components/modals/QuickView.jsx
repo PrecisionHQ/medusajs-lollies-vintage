@@ -12,7 +12,7 @@ import { getProductPrice } from "@/lib/util/get-product-price";
 import { stripHtmlToText } from "@/lib/util/sanitize-html";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 const optionsAsKeymap = (variantOptions) =>
   variantOptions?.reduce((acc, varopt) => {
@@ -30,7 +30,7 @@ const optionsAsKeymap = (variantOptions) =>
 export default function QuickView() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [live, setLive] = useState(null);

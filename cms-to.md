@@ -42,7 +42,7 @@ Preview: draft token → /preview/{handle}?token=… bypasses cache, noindex
 3. **Admin UI**: custom route `src/admin/routes/content/*` (page list, page editor with section add/reorder, link picker querying existing catalog, live preview iframe). Widget optional on collection detail ("footer content for this collection").
 4. **Store API** `src/api/store/content/[handle]/route.ts`: published-only, locale-aware, embeds resolved products/collections (price/region context preserved), cache headers.
 5. **Storefront**: `src/lib/data/content.ts` (mirrors `collections.ts` `cache()` + `getCacheDirectives` pattern), `BlockRenderer` in `modules/content/`, replace `<Hero />` placeholder in `(main)/page.tsx` with content-driven sections. `revalidateTag` webhook from backend workflow. Draft preview route with token auth.
-6. **Cross-cutting**: media → existing S3 provider (no new storage); SEO fields → `metadata` in page.tsx; i18n → `locale` column matching regions (`gb/de/dk/se/fr/es/it` in `seed.ts`); search untouched (CMS copy not indexed in v1 — flag if Meili page indexing wanted later); RBAC via Medusa admin roles; audit via publish events → subscriber.
+6. **Cross-cutting**: media → existing S3 provider (no new storage); SEO fields → `metadata` in page.tsx; i18n → `locale` column matching the storefront locale table (`storefront/src/i18n/country-locale.ts`, 249 ISO codes — the old 7-country `seed.ts` list is superseded); search untouched (CMS copy not indexed in v1 — flag if Meili page indexing wanted later); RBAC via Medusa admin roles; audit via publish events → subscriber.
 
 ## Phases
 

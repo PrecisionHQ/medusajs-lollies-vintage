@@ -12,20 +12,26 @@ import SearchModal from "@/components/modals/SearchModal"
 import NewsLetterModal from "@/components/modals/NewsLetterModal"
 import Wishlist from "@/components/modals/Wishlist"
 import { buildLolliesMenu } from "@lib/util/lollies-menu"
+import { requestMessages } from "@/i18n/dictionaries"
 
 /**
  * Full Modave page shell for routes living outside the `(main)` group
  * (which carries the starter Nav/Footer): theme chrome + commerce modals
  * + Context, mirroring the homepage composition.
  */
-export default function ModavePageShell({
+export default async function ModavePageShell({
   countryCode,
   children,
 }: {
   countryCode: string
   children: React.ReactNode
 }) {
-  const { menu, shopLinks, catLinks } = buildLolliesMenu(countryCode)
+  const { locale, messages } = await requestMessages(countryCode)
+  const { menu, shopLinks, catLinks } = buildLolliesMenu(
+    countryCode,
+    locale,
+    messages
+  )
   return (
     <Context>
       <ModaveScripts />
