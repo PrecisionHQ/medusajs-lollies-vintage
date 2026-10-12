@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 const CountdownTimer = ({ style = 1, targetDate = "2025-06-31T23:59:59", countryCode = "gb" }) => {
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const [showTimer, setShowTimer] = useState(false);
   useEffect(() => {
     setShowTimer(true);

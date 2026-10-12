@@ -13,8 +13,8 @@ import { getCollectionsList } from "@lib/data/collections"
 import { listCategories } from "@lib/data/categories"
 import { sortProducts } from "@lib/util/sort-products"
 import { adaptMedusaProductsToModave } from "@lib/util/modave-product-adapter"
-import { getLocale } from "@/i18n/config"
-import { t } from "@/i18n/translate"
+import { requestMessages } from "@/i18n/dictionaries"
+import { tWith } from "@/i18n/translate"
 import { splitOptionValues } from "@lib/util/search-facets"
 import { SortOptions } from "@modules/store/components/refinement-list/sort-products"
 import "@/app/modave-theme.css"
@@ -46,8 +46,8 @@ export default async function SearchResults({ params, searchParams }: Params) {
   const { query: rawQuery, countryCode } = await params
   const sp = await searchParams
   const query = decodeURI(rawQuery)
-  const locale = getLocale(countryCode)
-  const tr = (key: string) => t(locale, key)
+  const { locale, messages } = await requestMessages(countryCode)
+  const tr = tWith(locale, messages)
   const sort = sp.sortBy || "created_at"
   const pageNumber = Math.max(parseInt(sp.page || "1") || 1, 1)
 

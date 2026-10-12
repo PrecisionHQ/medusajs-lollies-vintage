@@ -1,16 +1,17 @@
 import React from "react";
-import { getLocale } from "@/i18n/config";
-import { t } from "@/i18n/translate";
+import { requestMessages } from "@/i18n/dictionaries";
+import { tWith } from "@/i18n/translate";
 
-export default function MarqueeSection2({ parentClass = "tf-marquee", countryCode = "gb" }) {
-  const locale = getLocale(countryCode);
+export default async function MarqueeSection2({ parentClass = "tf-marquee", countryCode = "gb" }) {
+  const { locale, messages } = await requestMessages(countryCode);
+  const tr = tWith(locale, messages);
   return (
     <section className={parentClass}>
       <div className="marquee-wrapper">
         <div className="initial-child-container">
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeShipping")}
+              {tr( "home.marqueeShipping")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -18,7 +19,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           </div>
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeReturns")}
+              {tr( "home.marqueeReturns")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -27,7 +28,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           {/* 2 */}
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeShipping")}
+              {tr( "home.marqueeShipping")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -35,7 +36,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           </div>
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeReturns")}
+              {tr( "home.marqueeReturns")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -44,7 +45,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           {/* 3 */}
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeShipping")}
+              {tr( "home.marqueeShipping")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -52,7 +53,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           </div>
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeReturns")}
+              {tr( "home.marqueeReturns")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -61,7 +62,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           {/* 4 */}
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeShipping")}
+              {tr( "home.marqueeShipping")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -69,7 +70,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           </div>
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeReturns")}
+              {tr( "home.marqueeReturns")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -78,7 +79,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           {/* 5 */}
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeShipping")}
+              {tr( "home.marqueeShipping")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -86,7 +87,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           </div>
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeReturns")}
+              {tr( "home.marqueeReturns")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -95,7 +96,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           {/* 6 */}
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeShipping")}
+              {tr( "home.marqueeShipping")}
             </p>
           </div>
           <div className="marquee-child-item">
@@ -103,7 +104,7 @@ export default function MarqueeSection2({ parentClass = "tf-marquee", countryCod
           </div>
           <div className="marquee-child-item">
             <p className="text-btn-uppercase">
-              {t(locale, "home.marqueeReturns")}
+              {tr( "home.marqueeReturns")}
             </p>
           </div>
           <div className="marquee-child-item">

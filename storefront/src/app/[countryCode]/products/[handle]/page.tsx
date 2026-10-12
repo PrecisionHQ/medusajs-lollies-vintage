@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 
 import ProductTemplate from "@modules/products/templates/modave-product-template"
 import "@/app/modave-theme.css"
-import { getRegion, listRegions } from "@lib/data/regions"
+import { getRegion } from "@lib/data/regions"
 import { getProductByHandle, getProductsList } from "@lib/data/products"
 import { getStoreName } from "@lib/util/env"
 import { stripHtmlToText } from "@lib/util/sanitize-html"
@@ -17,13 +17,11 @@ type Props = {
 export const revalidate = 3600
 
 export async function generateStaticParams() {
-  const countryCodes = await listRegions().then(
-    (regions) =>
-      regions
-        ?.map((r) => r.countries?.map((c) => c.iso_2))
-        .flat()
-        .filter(Boolean) as string[]
-  )
+  // P11-global — 195 countries x products would pre-render ~16k pages at
+  // build time. Pre-render the default region only; every other country
+  // renders on first visit, then caches for an hour (revalidate above).
+  // dynamicParams defaults to true, so no extra flag.
+  const countryCodes = ["gb"]
 
   // generateStaticParams must return an array; returning null makes the build
   // fail rather than fall back to on-demand rendering.

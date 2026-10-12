@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import ReactCountryFlag from "react-country-flag";
+import { LocaleContext } from "@/i18n/locale-context";
+import { localeName } from "@/i18n/country-locale";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL;
 const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
@@ -10,10 +12,6 @@ const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY;
 // Symbols for the currencies this store actually charges in. Anything else
 // falls back to the bare uppercase code, which is always correct.
 const CURRENCY_SYMBOLS = { eur: "€", gbp: "£", usd: "$" };
-
-// The storefront has no i18n system — every page is English. Stated plainly
-// rather than offering a language choice that would change nothing.
-const STORE_LANGUAGE = "English";
 
 /**
  * Truthful region indicator for the footer. Shows the country, currency and
@@ -29,6 +27,7 @@ const STORE_LANGUAGE = "English";
  */
 export default function FooterRegionDisplay() {
   const params = useParams();
+  const { locale } = useContext(LocaleContext);
   const countryCode = params?.countryCode;
   const [region, setRegion] = useState(null);
 
@@ -90,7 +89,7 @@ export default function FooterRegionDisplay() {
         {symbol ? `${symbol} ${currency}` : currency}
       </span>
       <span className="text-caption-1" data-testid="footer-region-language">
-        {STORE_LANGUAGE}
+        {localeName(locale)}
       </span>
     </div>
   );

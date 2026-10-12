@@ -4,7 +4,7 @@ import Shipping from "./descriptions/Shipping";
 import ReturnPolicies from "./descriptions/ReturnPolicies";
 import ReviewsTab from "@modules/products/components/product-reviews";
 import { sanitizeDescriptionHtml } from "@/lib/util/sanitize-html";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 /**
  * Modave tab shell (Description / Customer Reviews / Shipping & Returns /
@@ -13,7 +13,7 @@ import { useT } from "@/i18n/translate";
  * follow-up).
  */
 export default function ModaveDescriptionTabs({ product, countryCode = "gb" }) {
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const [activeTab, setActiveTab] = useState(1);
   // Merchant HTML, allowlist-sanitized (scripts/styles/attributes stripped,
   // **bold** converted, filler paragraphs dropped).

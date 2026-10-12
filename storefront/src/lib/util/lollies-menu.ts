@@ -49,26 +49,34 @@ const CATEGORY_TILES: { label: string; handle: string }[] = [
   { label: "Signature Edition", handle: "signature-edit" },
 ]
 
-export function buildLolliesMenu(countryCode: string): LolliesMenu {
+export function buildLolliesMenu(
+  countryCode: string,
+  locale?: string,
+  messages?: Record<string, unknown>
+): LolliesMenu {
   const cc = countryCode || "gb"
   // Top-level labels are UI chrome (translated); collection/category
   // mirrors below stay English to match their destination page titles.
-  const locale = getLocale(cc)
+  // Server callers pass the request locale + messages (cookie-aware);
+  // without them we fall back to the country default (baked dictionaries).
+  const loc = locale || getLocale(cc)
+  const tr = (key: string) =>
+    messages ? t(loc, key, undefined, messages) : t(loc, key)
   return {
     menu: [
-      { key: "home", label: t(locale, "nav.home"), href: `/${cc}` },
-      { key: "shop", label: t(locale, "nav.shopAll"), href: `/${cc}/store`, dropdown: true },
-      { key: "sales", label: t(locale, "nav.sales"), href: `/${cc}/categories/sale` },
-      { key: "bridal", label: t(locale, "nav.bridal"), href: `/${cc}/collections/bridal` },
-      { key: "new", label: t(locale, "nav.newIn"), href: `/${cc}/collections/new-in` },
+      { key: "home", label: tr("nav.home"), href: `/${cc}` },
+      { key: "shop", label: tr("nav.shopAll"), href: `/${cc}/store`, dropdown: true },
+      { key: "sales", label: tr("nav.sales"), href: `/${cc}/categories/sale` },
+      { key: "bridal", label: tr("nav.bridal"), href: `/${cc}/collections/bridal` },
+      { key: "new", label: tr("nav.newIn"), href: `/${cc}/collections/new-in` },
     ],
     shopLinks: [
-      { label: t(locale, "home.allProducts"), href: `/${cc}/store` },
+      { label: tr("home.allProducts"), href: `/${cc}/store` },
       { label: "Trending", href: `/${cc}/collections/trending` },
       { label: "Bridal", href: `/${cc}/collections/bridal` },
       { label: "New In", href: `/${cc}/collections/new-in` },
       { label: "Sale", href: `/${cc}/categories/sale` },
-      { label: t(locale, "listing.newestFirst"), href: `/${cc}/store?sortBy=created_at` },
+      { label: tr("listing.newestFirst"), href: `/${cc}/store?sortBy=created_at` },
     ],
     catLinks: CATEGORY_TILES.map((c) => ({
       label: c.label,

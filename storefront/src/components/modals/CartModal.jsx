@@ -12,7 +12,7 @@ import {
 import { convertToLocale } from "@lib/util/money";
 import { getCartRecommendations } from "@/lib/data/recommendations";
 import { onCartUpdated, notifyCartUpdated } from "@lib/util/cart-events";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 /**
  * Shopping cart drawer on the LIVE Medusa cart: lines with quantity
@@ -24,7 +24,7 @@ export default function CartModal() {
   const pathname = usePathname();
   const router = useRouter();
   const countryCode = (pathname || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const [cart, setCart] = useState(null);
   const [recs, setRecs] = useState([]);
   const [coupon, setCoupon] = useState("");

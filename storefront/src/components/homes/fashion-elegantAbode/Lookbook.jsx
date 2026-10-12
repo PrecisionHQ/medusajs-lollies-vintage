@@ -1,6 +1,6 @@
 import React from "react";
-import { getLocale } from "@/i18n/config";
-import { t } from "@/i18n/translate";
+import { requestMessages } from "@/i18n/dictionaries";
+import { tWith } from "@/i18n/translate";
 
 /**
  * Trendsetters' Lookbook — six autoplaying video tiles (muted loop,
@@ -19,15 +19,16 @@ const LOOKBOOK_VIDEOS = [
   { file: "video-gold.mp4", label: "Gold" },
 ];
 
-export default function Lookbook({ countryCode = "gb" }) {
-  const locale = getLocale(countryCode);
+export default async function Lookbook({ countryCode = "gb" }) {
+  const { locale, messages } = await requestMessages(countryCode);
+  const tr = tWith(locale, messages);
   return (
     <section className="flat-spacing">
       <div className="container">
         <div className="heading-section text-center">
-          <h3 className="heading">{t(locale, "lookbook.title")}</h3>
+          <h3 className="heading">{tr( "lookbook.title")}</h3>
           <p className="subheading text-secondary">
-            {t(locale, "lookbook.subtitle")}
+            {tr( "lookbook.subtitle")}
           </p>
         </div>
         <div className="tf-grid-layout tf-col-2 lg-col-3 lookbook-video-grid">

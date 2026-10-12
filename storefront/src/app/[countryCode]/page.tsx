@@ -32,8 +32,8 @@ import { getTiles, getSaleImages } from "@/lib/data/listing-tiles"
 import { adaptMedusaProductsToModave } from "@/lib/util/modave-product-adapter"
 import { buildLolliesMenu } from "@/lib/util/lollies-menu"
 import { getStoreName } from "@/lib/util/env"
-import { getLocale } from "@/i18n/config"
-import { t } from "@/i18n/translate"
+import { requestMessages } from "@/i18n/dictionaries"
+import { tWith } from "@/i18n/translate"
 import { topPicks as curatedTopPicks } from "@/data/curated"
 
 import "@/app/modave-theme.css"
@@ -116,8 +116,9 @@ export default async function Home({
   params: Promise<{ countryCode: string }>
 }) {
   const { countryCode } = await params
-  const locale = getLocale(countryCode)
-  const { menu, shopLinks, catLinks } = buildLolliesMenu(countryCode)
+  const { locale, messages } = await requestMessages(countryCode)
+  const tr = tWith(locale, messages)
+  const { menu, shopLinks, catLinks } = buildLolliesMenu(countryCode, locale)
   const { items: liveItems, total: totalProducts } =
     await getLiveCardProducts(countryCode)
   // Curated frontpage picks (first 4 -> Top Picks, next 4 -> Trending).
@@ -156,16 +157,16 @@ export default async function Home({
         <Hero />
         <Categories
           liveItems={collectionTiles}
-          title={t(locale, "home.exploreCollections")}
+          title={tr( "home.exploreCollections")}
           viewAllHref={`/${countryCode}/collections`}
-          viewAllLabel={t(locale, "home.viewAllCollection")}
+          viewAllLabel={tr( "home.viewAllCollection")}
         />
         <Categories
           liveItems={categoryTiles}
-          title={t(locale, "home.shopByCategory")}
+          title={tr( "home.shopByCategory")}
           layout="grid"
           viewAllHref={`/${countryCode}/categories`}
-          viewAllLabel={t(locale, "home.viewAllCategories")}
+          viewAllLabel={tr( "home.viewAllCategories")}
         />
         <Products liveItems={topPicks} />
         <BannerCountdown countryCode={countryCode} images={saleImages} />
@@ -175,8 +176,8 @@ export default async function Home({
         />
         <Lookbook countryCode={countryCode} />
         <Products2
-          title={t(locale, "home.topTrending")}
-          subtitle={t(locale, "home.trendingSub")}
+          title={tr( "home.topTrending")}
+          subtitle={tr( "home.trendingSub")}
           parentClass="flat-spacing pt-0"
           liveItems={trending}
         />

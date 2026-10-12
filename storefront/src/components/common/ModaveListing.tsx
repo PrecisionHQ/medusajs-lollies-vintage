@@ -8,8 +8,8 @@ import {
 } from "@lib/util/seo-jsonld"
 import { getBaseURL } from "@lib/util/env"
 import { ModaveCardProduct } from "@lib/util/modave-product-adapter"
-import { getLocale } from "@/i18n/config"
-import { t } from "@/i18n/translate"
+import { requestMessages } from "@/i18n/dictionaries"
+import { tWith } from "@/i18n/translate"
 
 export type Crumb = { label: string; href?: string }
 
@@ -55,7 +55,7 @@ function pageHref(
  * breadcrumbs, sort links, live product-card grid, numbered pagination.
  * Server-rendered; sort/pagination are plain links (no JS needed).
  */
-export default function ModaveListing({
+export default async function ModaveListing({
   title,
   subtitle,
   crumbs,
@@ -79,8 +79,10 @@ export default function ModaveListing({
   sidebar?: React.ReactNode
 }) {
   const baseUrl = getBaseURL()
-  const locale = getLocale(basePath.split("/")[1] || "gb")
-  const tr = (key: string) => t(locale, key)
+  const { locale, messages } = await requestMessages(
+    basePath.split("/")[1] || "gb"
+  )
+  const tr = tWith(locale, messages)
   const crumbsJsonLd: JsonLdCrumb[] = crumbs.map((c) => ({
     label: c.label,
     href: c.href,

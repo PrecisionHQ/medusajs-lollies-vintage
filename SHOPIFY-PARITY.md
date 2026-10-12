@@ -109,6 +109,17 @@ backed by PostHog API (embed) — Medusa admin stays operational; analysis lives
 
 ## PR9 — Markets pricing UX + regions/currencies + shipping + tax decision
 
+> **Decision 2026-10-12 (supersedes the phases below): EUR worldwide.** All
+> countries sell in EUR from two regions: the existing Europe region plus a
+> new idempotent Rest-of-World region (`backend/src/scripts/expand-regions-row.ts`,
+> run on staging then prod). UK/GBP split (Phase 0), Nordics/CH splits
+> (Phase 1) and US/CA/AU/JP phases (Phase 2) are DROPPED — one currency,
+> no payout-account or nexus blockers. Display language is independent of
+> currency: every country gets its official language via the storefront
+> i18n system (`storefront/src/i18n/`, DeepL drafts + human review) with a
+> shopper-controlled English fallback. Original phased analysis kept below
+> for reference.
+
 **Core constraint (Medusa ≠ Shopify Markets)**: a Medusa Region holds exactly ONE `currency_code`.
 Shopify shows 130+ presentment currencies on one market; here every currency = a separate Region row
 (region + tax region + shipping options + price list + Stripe payout account). Expansion is therefore

@@ -9,7 +9,7 @@ import {
   fetchLiveCardsByHandles,
   fetchLiveProductByHandle,
 } from "@/lib/util/live-product";
-import { useT } from "@/i18n/translate";
+import { useLocaleT } from "@/i18n/locale-context";
 
 const toCard = (elm) => ({
   id: elm.id,
@@ -30,7 +30,7 @@ const toCard = (elm) => ({
 export default function Compare() {
   const pathname = usePathname();
   const countryCode = (pathname || "").split("/")[1] || "gb";
-  const t = useT(countryCode);
+  const t = useLocaleT();
   const { removeFromCompareItem, compareItem, setCompareItem } =
     useContextElement();
   const [items, setItems] = useState([]);
