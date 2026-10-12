@@ -30,8 +30,7 @@
 
 ## 🔨 Queued — structural
 - [x] P11 — i18n v1 (PR #63 merged): hand-rolled zero-dep locale infra, 195-key en/fr/de dictionaries, full UI-chrome wiring (homepage, header, search, listing, cart, PDP, footer, modals); admin stays English
-- [x] P11-global foundation (PR #64 merged): 195-country table, EN toggle, provider architecture, RoW script, Tier-1 es/it/nl/pt/da/sv live (9 locales)
-  - [ ] Run `medusa exec ./src/scripts/expand-regions-row.ts` on staging then prod (Rest-of-World EUR region); verify /store/regions — needs prod access
+- [x] P11-global foundation (PR #64 merged) + Tier-1 live + RoW + deploys (2026-10-12): 195-country table, EN toggle, provider architecture, es/it/nl/pt/da/sv live (9 locales); `expand-regions-row.ts` RUN on prod (Rest-of-World EUR, 249/249 countries verified via /store/regions); backend + storefront redeployed to Railway, /fr /es /ng /jp /br verified 200
   - [ ] Human review per language, Tier-1 first (MT drafts live; admin stays English)
   - [ ] Tier-2/3 dictionaries via `storefront/scripts/opus-dicts.py` (~60 locales, machine time only)
   - [ ] RTL CSS audit when ar/he/fa/ur land
