@@ -4,6 +4,7 @@ import Shipping from "./descriptions/Shipping";
 import ReturnPolicies from "./descriptions/ReturnPolicies";
 import ReviewsTab from "@modules/products/components/product-reviews";
 import { sanitizeDescriptionHtml } from "@/lib/util/sanitize-html";
+import { useT } from "@/i18n/translate";
 
 /**
  * Modave tab shell (Description / Customer Reviews / Shipping & Returns /
@@ -11,7 +12,8 @@ import { sanitizeDescriptionHtml } from "@/lib/util/sanitize-html";
  * real review module. Shipping/returns copy stays static (store policy
  * follow-up).
  */
-export default function ModaveDescriptionTabs({ product }) {
+export default function ModaveDescriptionTabs({ product, countryCode = "gb" }) {
+  const t = useT(countryCode);
   const [activeTab, setActiveTab] = useState(1);
   // Merchant HTML, allowlist-sanitized (scripts/styles/attributes stripped,
   // **bold** converted, filler paragraphs dropped).
@@ -30,25 +32,25 @@ export default function ModaveDescriptionTabs({ product }) {
                   className={`item-title ${activeTab == 1 ? "active" : ""} `}
                   onClick={() => setActiveTab(1)}
                 >
-                  <span className="inner">Description</span>
+                  <span className="inner">{t("product.description")}</span>
                 </li>
                 <li
                   className={`item-title ${activeTab == 2 ? "active" : ""} `}
                   onClick={() => setActiveTab(2)}
                 >
-                  <span className="inner">Customer Reviews</span>
+                  <span className="inner">{t("product.customerReviews")}</span>
                 </li>
                 <li
                   className={`item-title ${activeTab == 3 ? "active" : ""} `}
                   onClick={() => setActiveTab(3)}
                 >
-                  <span className="inner">Shipping &amp; Returns</span>
+                  <span className="inner">{t("product.shippingReturns")}</span>
                 </li>
                 <li
                   className={`item-title ${activeTab == 4 ? "active" : ""} `}
                   onClick={() => setActiveTab(4)}
                 >
-                  <span className="inner">Return Policies</span>
+                  <span className="inner">{t("product.returnPolicies")}</span>
                 </li>
               </ul>
               <div className="widget-content-tab">
@@ -73,7 +75,7 @@ export default function ModaveDescriptionTabs({ product }) {
                   } `}
                 >
                   <div className="tab-reviews write-cancel-review-wrap">
-                    <ReviewsTab productId={product.id} />
+                    <ReviewsTab productId={product.id} countryCode={countryCode} />
                   </div>
                 </div>
                 <div

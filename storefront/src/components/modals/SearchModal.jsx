@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { search } from "@modules/search/actions";
+import { useT } from "@/i18n/translate";
 
 const POPULAR = [
   { label: "Dresses", href: "dresses", kind: "category" },
@@ -22,6 +23,7 @@ export default function SearchModal() {
   const pathname = usePathname();
   const router = useRouter();
   const countryCode = (pathname || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   const [value, setValue] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const timer = useRef(null);
@@ -58,7 +60,7 @@ export default function SearchModal() {
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content">
           <div className="d-flex justify-content-between align-items-center">
-            <h5>Search</h5>
+            <h5>{t("search.modalTitle")}</h5>
             <span
               className="icon-close icon-close-popup"
               data-bs-dismiss="modal"
@@ -74,7 +76,7 @@ export default function SearchModal() {
             <fieldset className="text">
               <input
                 type="text"
-                placeholder="Searching..."
+                placeholder={t("search.placeholder")}
                 className=""
                 name="text"
                 tabIndex={0}
@@ -133,7 +135,7 @@ export default function SearchModal() {
             </div>
           )}
           <div>
-            <h5 className="mb_16">Popular right now</h5>
+            <h5 className="mb_16">{t("search.popular")}</h5>
             <ul className="list-tags">
               {POPULAR.map((p) => (
                 <li key={p.href}>

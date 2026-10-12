@@ -5,7 +5,11 @@ import React from "react";
 import Link from "next/link";
 import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { usePathname } from "next/navigation";
+import { useT } from "@/i18n/translate";
 export default function Products({ liveItems }) {
+  const countryCode = (usePathname() || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   // Live Medusa products (already adapted to the Modave card shape) take
   // precedence when the preview page supplies them. Falls back to the static
   // demo slice so the section still renders with the backend down.
@@ -15,9 +19,9 @@ export default function Products({ liveItems }) {
     <section className="flat-spacing-3 pt-0">
       <div className="container">
         <div className="heading-section text-center wow fadeInUp">
-          <h3>Today's Top Picks</h3>
+          <h3>{t("home.topPicks")}</h3>
           <p className="subheading text-secondary">
-            Fresh styles just in! Elevate your look.
+            {t("home.topPicksSub")}
           </p>
         </div>
         <Swiper

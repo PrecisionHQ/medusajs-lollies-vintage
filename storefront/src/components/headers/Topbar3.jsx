@@ -2,8 +2,12 @@
 
 import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import { usePathname } from "next/navigation";
+import { useT } from "@/i18n/translate";
 
 export default function Topbar3() {
+  const countryCode = (usePathname() || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   return (
     <div className="tf-topbar topbar-white bg-main">
       <div className="container">
@@ -26,14 +30,13 @@ export default function Topbar3() {
               >
                 <SwiperSlide className="swiper-slide">
                   <p className="top-bar-text text-line-clamp-1 text-btn-uppercase fw-semibold letter-1">
-                    Free shipping on all orders over
+                    {t("topbar.freeShippingOver")}
                     <span className="text-primary">$20.00</span>
                   </p>
                 </SwiperSlide>
                 <SwiperSlide className="swiper-slide">
                   <p className="top-bar-text text-line-clamp-1 text-btn-uppercase fw-semibold letter-1">
-                    Midseason Sale: 20% Off - Auto Applied at Checkout - Limited
-                    Time Only.
+                    {t("topbar.midseasonSale")}
                   </p>
                 </SwiperSlide>
               </Swiper>

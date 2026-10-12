@@ -2,6 +2,8 @@ import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import CountdownTimer from "@/components/common/Countdown";
+import { getLocale } from "@/i18n/config";
+import { t } from "@/i18n/translate";
 
 /**
  * Limited-time deals banner. Background is a live collage of sale-category
@@ -10,6 +12,7 @@ import CountdownTimer from "@/components/common/Countdown";
  * countdown copy readable over any imagery.
  */
 export default function BannerCountdown({ countryCode = "gb", images = [] }) {
+  const locale = getLocale(countryCode);
   return (
     <section
       className="bg-surface flat-spacing-8 flat-countdown-banner-2"
@@ -52,9 +55,9 @@ export default function BannerCountdown({ countryCode = "gb", images = [] }) {
       <div className="container" style={{ position: "relative", zIndex: 1 }}>
         <div className="box-content">
           <div className="box-title">
-            <h3>Limited-Time Deals On!</h3>
+            <h3>{t(locale, "countdown.title")}</h3>
             <p className="text-secondary">
-              Up to 50% Off Selected Styles. Don&apos;t Miss Out.
+              {t(locale, "countdown.subtitle")}
             </p>
           </div>
           <div className="tf-countdown-lg">
@@ -63,7 +66,7 @@ export default function BannerCountdown({ countryCode = "gb", images = [] }) {
               data-timer={1007500}
               data-labels="Days,Hours,Mins,Secs"
             >
-              <CountdownTimer style={2} />
+              <CountdownTimer style={2} countryCode={countryCode} />
             </div>
           </div>
           <div className="btn-banner">
@@ -71,7 +74,7 @@ export default function BannerCountdown({ countryCode = "gb", images = [] }) {
               href={`/${countryCode}/categories/sale`}
               className="tf-btn btn-fill"
             >
-              <span className="text">Shop Now</span>
+              <span className="text">{t(locale, "common.shopNow")}</span>
               <i className="icon icon-arrowUpRight" />
             </Link>
           </div>

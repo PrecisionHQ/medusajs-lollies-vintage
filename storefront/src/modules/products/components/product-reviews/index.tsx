@@ -11,6 +11,7 @@ import {
 } from "@lib/data/reviews"
 import { track } from "@lib/analytics/posthog"
 import { trackPixel } from "@lib/analytics/pixels"
+import { useT } from "@/i18n/translate"
 
 /**
  * PR-04 — Reviews tab content: approved list with helpful votes plus the
@@ -18,7 +19,8 @@ import { trackPixel } from "@lib/analytics/pixels"
  * client component. Posting requires an account: unauthenticated submits get
  * a login link (the server action returns { error: "signin" }).
  */
-export default function ReviewsTab({ productId }: { productId: string }) {
+export default function ReviewsTab({ productId, countryCode = "gb" }: { productId: string; countryCode?: string }) {
+  const t = useT(countryCode)
   const [reviews, setReviews] = useState<StoreReview[]>([])
   const [loaded, setLoaded] = useState(false)
   const [rating, setRating] = useState(5)
@@ -66,9 +68,9 @@ export default function ReviewsTab({ productId }: { productId: string }) {
     <div className="text-small-regular py-8 flex flex-col gap-y-8">
       <div className="flex flex-col gap-y-4">
         {!loaded ? (
-          <p className="text-ui-fg-subtle">Loading reviews…</p>
+          <p className="text-ui-fg-subtle">{t("product.loadingReviews")}</p>
         ) : reviews.length === 0 ? (
-          <p className="text-ui-fg-subtle">No reviews yet — yours could be the first.</p>
+          <p className="text-ui-fg-subtle">{t("product.noReviews")}</p>
         ) : (
           reviews.map((r) => (
             <div key={r.id} className="border-b border-ui-border-base pb-4">
@@ -78,7 +80,7 @@ export default function ReviewsTab({ productId }: { productId: string }) {
               </p>
               <p>{r.body}</p>
               <p className="text-ui-fg-subtle text-small-regular">
-                {r.name} {r.verified ? "· verified purchase" : null} ·{" "}
+                {r.name} {r.verified ? `· ${t("product.verified")}` : null} ·{" "}
                 {new Date(r.created_at).toLocaleDateString()}
               </p>
               <button
@@ -86,7 +88,7 @@ export default function ReviewsTab({ productId }: { productId: string }) {
                 disabled={voted.has(r.id)}
                 onClick={() => onHelpful(r.id)}
               >
-                Helpful ({r.helpful_count})
+                {t("product.helpful")} ({r.helpful_count})
               </button>
             </div>
           ))
@@ -94,41 +96,41 @@ export default function ReviewsTab({ productId }: { productId: string }) {
       </div>
 
       <div className="border-t border-ui-border-base pt-6">
-        <h3 className="font-semibold mb-2">Write a review</h3>
+        <h3 className="font-semibold mb-2">{t("product.writeReview")}</h3>
         {state === "sent" ? (
-          <p>Thanks — your review is awaiting moderation.</p>
+          <p>{t("product.reviewThanks")}</p>
         ) : (
           <form onSubmit={onSubmit} className="flex flex-col gap-y-3 max-w-md">
             <label className="flex flex-col gap-y-1">
-              Rating
+              {t("product.rating")}
               <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="border border-ui-border-base rounded p-2">
                 {[5, 4, 3, 2, 1].map((n) => (
                   <option key={n} value={n}>
-                    {n} star{n === 1 ? "" : "s"}
+                    {n} {n === 1 ? t("product.star") : t("product.stars")}
                   </option>
                 ))}
               </select>
             </label>
             <label className="flex flex-col gap-y-1">
-              Title (optional)
+              {t("product.reviewTitleOptional")}
               <input value={title} onChange={(e) => setTitle(e.target.value)} className="border border-ui-border-base rounded p-2" maxLength={120} />
             </label>
             <label className="flex flex-col gap-y-1">
-              Review
+              {t("product.reviewBody")}
               <textarea value={body} onChange={(e) => setBody(e.target.value)} required rows={4} className="border border-ui-border-base rounded p-2" maxLength={2000} />
             </label>
             <button type="submit" disabled={state === "sending"} className="bg-ui-fg-base text-ui-fg-on-inverted rounded px-4 py-2 disabled:opacity-50">
-              {state === "sending" ? "Sending…" : "Submit review"}
+              {state === "sending" ? t("product.sending") : t("product.submitReview")}
             </button>
             {state === "signin" ? (
               <p>
                 <LocalizedClientLink href="/account" className="underline">
-                  Sign in
+                  {t("product.signin")}
                 </LocalizedClientLink>{" "}
-                to write a review.
+                {t("product.toWriteReview")}
               </p>
             ) : null}
-            {state === "failed" ? <p>Sending failed — please try again.</p> : null}
+            {state === "failed" ? <p>{t("product.sendFailed")}</p> : null}
           </form>
         )}
       </div>

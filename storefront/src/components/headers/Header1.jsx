@@ -3,6 +3,7 @@ import Nav from "./Nav";
 import Image from "next/image";
 import Link from "next/link";
 import CartLength from "../common/CartLength";
+import { useT } from "@/i18n/translate";
 /**
  * @param {object} props
  * @param {boolean} [props.fullWidth]
@@ -22,6 +23,7 @@ export default function Header1({
   recentProducts,
   countryCode = "gb",
 }) {
+  const t = useT(countryCode);
   return (
     <header
       id="header"
@@ -127,15 +129,15 @@ export default function Header1({
                       href={`/${countryCode}/account`}
                       className="tf-btn btn-reset"
                     >
-                      Login
+                      {t("nav.login")}
                     </Link>
                     <p className="text-center text-secondary-2">
-                      Don’t have an account?{" "}
-                      <Link href={`/${countryCode}/account`}>Register</Link>
+                      {t("common.dontHaveAccount")}{" "}
+                      <Link href={`/${countryCode}/account`}>{t("nav.register")}</Link>
                     </p>
                   </div>
                   <div className="sub-bot">
-                    <span className="body-text-">Support</span>
+                    <span className="body-text-">{t("nav.support")}</span>
                   </div>
                 </div>
               </li>

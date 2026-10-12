@@ -12,6 +12,7 @@ import {
 import { convertToLocale } from "@lib/util/money";
 import { getCartRecommendations } from "@/lib/data/recommendations";
 import { onCartUpdated, notifyCartUpdated } from "@lib/util/cart-events";
+import { useT } from "@/i18n/translate";
 
 /**
  * Shopping cart drawer on the LIVE Medusa cart: lines with quantity
@@ -23,6 +24,7 @@ export default function CartModal() {
   const pathname = usePathname();
   const router = useRouter();
   const countryCode = (pathname || "").split("/")[1] || "gb";
+  const t = useT(countryCode);
   const [cart, setCart] = useState(null);
   const [recs, setRecs] = useState([]);
   const [coupon, setCoupon] = useState("");
@@ -92,7 +94,7 @@ export default function CartModal() {
       setCoupon("");
       await refresh();
     } catch (err) {
-      setCouponError(err?.message || "That code didn't work.");
+      setCouponError(err?.message || t("cart.invalidCode"));
     }
   };
 
@@ -118,7 +120,7 @@ export default function CartModal() {
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="tf-minicart-recommendations">
-            <h6 className="title">You May Also Like</h6>
+            <h6 className="title">{t("cart.youMayLike")}</h6>
             <div className="wrap-recommendations">
               <div className="list-cart">
                 {recs.map((product, index) => (
@@ -149,7 +151,7 @@ export default function CartModal() {
                           className="link text-button"
                           href={product.href || "#"}
                         >
-                          View
+                          {t("cart.view")}
                         </Link>
                       </div>
                     </div>
@@ -160,7 +162,7 @@ export default function CartModal() {
           </div>
           <div className="d-flex flex-column flex-grow-1 h-100">
             <div className="header">
-              <h5 className="title">Shopping Cart</h5>
+              <h5 className="title">{t("cart.title")}</h5>
               <span
                 className="icon-close icon-close-popup"
                 data-bs-dismiss="modal"
@@ -202,7 +204,7 @@ export default function CartModal() {
                                   className="text-button tf-btn-remove remove"
                                   onClick={() => removeLine(line.id)}
                                 >
-                                  Remove
+                                  {t("cart.remove")}
                                 </div>
                               </div>
                               <div className="d-flex align-items-center justify-content-between flex-wrap gap-12">
@@ -221,7 +223,7 @@ export default function CartModal() {
                                   onClick={() =>
                                     setQty(line.id, (line.quantity || 1) - 1)
                                   }
-                                  aria-label="Decrease quantity"
+                                  aria-label={t("cart.decreaseQty")}
                                 >
                                   <span className="text-title">-</span>
                                 </button>
@@ -235,7 +237,7 @@ export default function CartModal() {
                                   onClick={() =>
                                     setQty(line.id, (line.quantity || 1) + 1)
                                   }
-                                  aria-label="Increase quantity"
+                                  aria-label={t("cart.increaseQty")}
                                 >
                                   <span className="text-title">+</span>
                                 </button>
@@ -246,13 +248,12 @@ export default function CartModal() {
                       </div>
                     ) : (
                       <div className="p-4">
-                        Your Cart is empty. Start adding favorite products to
-                        cart!{" "}
+                        {t("cart.emptySubAlt")}{" "}
                         <Link
                           className="btn-line"
                           href={`/${countryCode}/store`}
                         >
-                          Explore Products
+                          {t("cart.exploreProducts")}
                         </Link>
                       </div>
                     )}
@@ -264,12 +265,12 @@ export default function CartModal() {
                       className="tf-mini-cart-tool-btn btn-add-coupon"
                       onClick={() => setCurrentOpenPopup("add-coupon")}
                     >
-                      <div className="text-caption-1">Coupon</div>
+                      <div className="text-caption-1">{t("cart.coupon")}</div>
                     </div>
                   </div>
                   <div className="tf-mini-cart-bottom-wrap">
                     <div className="tf-cart-totals-discounts">
-                      <h5>Subtotal</h5>
+                      <h5>{t("cart.subtotal")}</h5>
                       <h5 className="tf-totals-total-value">
                         {money(cart?.subtotal ?? cart?.total ?? 0)}
                       </h5>
@@ -279,13 +280,13 @@ export default function CartModal() {
                         href={`/${countryCode}/cart`}
                         className="tf-btn w-100 btn-white radius-4 has-border"
                       >
-                        <span className="text">View cart</span>
+                        <span className="text">{t("cart.viewCart")}</span>
                       </Link>
                       <Link
                         href={`/${countryCode}/cart`}
                         className="tf-btn w-100 btn-fill radius-4"
                       >
-                        <span className="text">Check Out</span>
+                        <span className="text">{t("cart.checkout")}</span>
                       </Link>
                     </div>
                     <div className="text-center">
@@ -293,7 +294,7 @@ export default function CartModal() {
                         className="link text-btn-uppercase"
                         href={`/${countryCode}/store`}
                       >
-                        Or continue shopping
+                        {t("cart.continueShopping")}
                       </Link>
                     </div>
                   </div>
@@ -304,20 +305,20 @@ export default function CartModal() {
                   } `}
                 >
                   <div className="tf-mini-cart-tool-content">
-                    <label className="tf-mini-cart-tool-text">
-                      <span className="text-title">Add A Coupon Code</span>
-                    </label>
+                      <label className="tf-mini-cart-tool-text">
+                        <span className="text-title">{t("cart.addCoupon")}</span>
+                      </label>
                     <form
                       className="form-add-coupon tf-mini-cart-tool-wrap"
                       onSubmit={applyCoupon}
                     >
                       <fieldset className="">
                         <div className="text-caption-1 text-secondary mb_8">
-                          Enter Code
+                          {t("cart.enterCode")}
                         </div>
                         <input
                           type="text"
-                          placeholder="Discount code"
+                          placeholder={t("cart.enterCode")}
                           value={coupon}
                           onChange={(e) => setCoupon(e.target.value)}
                         />
@@ -327,13 +328,13 @@ export default function CartModal() {
                       )}
                       <div className="tf-cart-tool-btns">
                         <button type="submit" className="btn-style-2 w-100">
-                          <span className="text text-btn-uppercase">Save</span>
+                          <span className="text text-btn-uppercase">{t("common.save")}</span>
                         </button>
                         <div
                           className="text-center w-100 text-btn-uppercase tf-mini-cart-tool-close"
                           onClick={() => setCurrentOpenPopup("")}
                         >
-                          Cancel
+                          {t("common.cancel")}
                         </div>
                       </div>
                     </form>

@@ -3,6 +3,8 @@ import ModaveRelatedCarousel from "@/components/productDetails/ModaveRelatedCaro
 import { getRegion } from "@lib/data/regions"
 import { getRelatedProducts } from "@lib/util/recommendations"
 import { adaptMedusaProductsToModave } from "@lib/util/modave-product-adapter"
+import { getLocale } from "@/i18n/config"
+import { t } from "@/i18n/translate"
 import { HttpTypes } from "@medusajs/types"
 
 /**
@@ -28,9 +30,9 @@ async function RelatedCards({
   return (
     <>
       <div className="heading-section text-center wow fadeInUp">
-        <h3 className="heading">Related Products</h3>
+        <h3 className="heading">{t(getLocale(countryCode), "product.relatedProducts")}</h3>
         <p className="subheading text-secondary">
-          You might also want to check out these products.
+          {t(getLocale(countryCode), "product.relatedSubtitle")}
         </p>
       </div>
       <ModaveRelatedCarousel cards={cards} />

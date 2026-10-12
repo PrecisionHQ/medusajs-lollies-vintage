@@ -7,6 +7,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 export default function Products2({
   title = "Best Selling",
+  subtitle = "Browse our Top Trending: the hottest picks loved by all.",
   parentClass = "",
   liveItems,
 }) {
@@ -20,7 +21,7 @@ export default function Products2({
         <div className="heading-section text-center wow fadeInUp">
           <h3 className="heading">{title}</h3>
           <p className="subheading text-secondary">
-            Browse our Top Trending: the hottest picks loved by all.
+            {subtitle}
           </p>
         </div>
         <Swiper

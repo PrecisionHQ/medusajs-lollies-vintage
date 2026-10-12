@@ -182,7 +182,7 @@ const ModaveProductTemplate = async ({
           region={region}
           countryCode={countryCode}
         />
-        <ModaveDescriptionTabs product={product} />
+        <ModaveDescriptionTabs product={product} countryCode={countryCode} />
         <div data-testid="related-products-container">
           <Suspense fallback={<SkeletonRelatedProducts />}>
             <ModaveRelatedProducts
