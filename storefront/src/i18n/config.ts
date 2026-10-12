@@ -31,7 +31,17 @@ export const TOGGLE_LOCALE = "en" as const;
  * .json + registry line in dictionaries.ts AND the code here (both
  * one-liners; dictionaries.ts asserts they match in dev).
  */
-export const SUPPORTED_LOCALES: string[] = ["en", "fr", "de"];
+export const SUPPORTED_LOCALES: string[] = [
+  "en",
+  "fr",
+  "de",
+  "es",
+  "it",
+  "nl",
+  "pt",
+  "da",
+  "sv",
+];
 
 export function isSupportedLocale(locale?: string | null): boolean {
   return !!locale && SUPPORTED_LOCALES.includes(locale);

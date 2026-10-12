@@ -3,6 +3,12 @@ import { cookies } from "next/headers";
 import en from "./dictionaries/en.json";
 import fr from "./dictionaries/fr.json";
 import de from "./dictionaries/de.json";
+import es from "./dictionaries/es.json";
+import it from "./dictionaries/it.json";
+import nl from "./dictionaries/nl.json";
+import pt from "./dictionaries/pt.json";
+import da from "./dictionaries/da.json";
+import sv from "./dictionaries/sv.json";
 import { LOCALE_COOKIE, SUPPORTED_LOCALES, resolveLocale } from "./config";
 
 /**
@@ -18,7 +24,17 @@ import { LOCALE_COOKIE, SUPPORTED_LOCALES, resolveLocale } from "./config";
  * REGISTRY below + the code in SUPPORTED_LOCALES (config.ts).
  */
 
-const REGISTRY: Record<string, Record<string, unknown>> = { en, fr, de };
+const REGISTRY: Record<string, Record<string, unknown>> = {
+  en,
+  fr,
+  de,
+  es,
+  it,
+  nl,
+  pt,
+  da,
+  sv,
+};
 
 export const SUPPORTED_LOCALES_SERVER: string[] = Object.keys(REGISTRY);
 

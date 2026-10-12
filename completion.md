@@ -213,3 +213,8 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
 - Backend: idempotent `expand-regions-row.ts` (Rest-of-World EUR + tax regions) — NOT yet run on staging/prod.
 - Verified: tsc/eslint clean; dev-server spot checks — /gb 200 English, /fr French + toggle, cookie override renders English on /fr; QA spec 17 extended (Deutsch indicator + toggle-cookie test).
 - Still needs: DeepL API key (Tier-1: es, it, nl, pt, da, sv), RoW script run on staging→prod, human review per language, RTL CSS audit (ar/he/fa/ur).
+
+## P11-global Tier-1 dictionaries — es/it/nl/pt/da/sv live (2026-10-12, same branch)
+- Free open-source path (no DeepL key): Opus-MT/Helsinki-NLP models run locally on CPU (`storefront/scripts/opus-dicts.py`; torch 2.2.2 + transformers pinned to 4.44.2 in /tmp/argosvenv). Dead ends documented: Argos segfaults on this Intel Mac (onnxruntime), gtx endpoint 429s IP-wide, LibreTranslate public needs a key, Ollama/brew broken here (git remote-https). All five scripts kept in `storefront/scripts/`, README names the working one.
+- All 6: 195-key parity, zero `{var}` placeholder mismatches, `<br/>` preserved; worst MT howlers hand-fixed per locale (checkout/add-to-cart/subscribe verbs, nav.home). Full native-speaker review still open.
+- Registered in `dictionaries.ts` + `SUPPORTED_LOCALES` (now 9 locales); /es verified live (Inicio, Carrito, Tramitar pedido, toggle present); `next build` green, bundle still 103KB.

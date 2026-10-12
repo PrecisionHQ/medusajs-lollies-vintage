@@ -140,10 +140,16 @@ holds the hand-rolled, zero-dependency system:
   blank. Catalog content (names, colors, sizes, categories) stays English
   by design (drives matching/filtering/URLs).
 
-Adding a language: `DEEPL_API_KEY=xxx node scripts/deepl-dicts.mjs <locale>`
-(MT draft, `{var}`/`br` placeholders protected, existing files skipped),
-human-review the draft, then one line in `dictionaries.ts` REGISTRY + the
-code in `SUPPORTED_LOCALES` (dev asserts they match).
+Adding a language: `/tmp/argosvenv/bin/python scripts/opus-dicts.py <locale>`
+(free open-source Opus-MT/Helsinki-NLP models, run locally — venv setup +
+model downloads on first run; `{var}`/`<br/>` placeholders protected,
+existing files skipped, >95%-unchanged guard refuses misfires), hand-fix
+the obvious MT howlers (especially checkout/add-to-cart/subscribe verbs),
+human-review the rest, then one line in `dictionaries.ts` REGISTRY + the
+code in `SUPPORTED_LOCALES` (dev asserts they match). Alternatives kept in
+`scripts/`: `deepl-dicts.mjs` (needs `DEEPL_API_KEY`), `argos-dicts.py`
+(segfaults on old Intel Macs — do not use here), `google-dicts.py`
+(gtx endpoint 429s from this IP), `ollama-dicts.py` (needs a model pull).
 
 Scale note: `generateStaticParams` pre-renders the default region (`gb`)
 only — 195 countries × products would be ~16k pages. Other countries render

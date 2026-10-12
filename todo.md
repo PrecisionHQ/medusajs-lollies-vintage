@@ -33,7 +33,7 @@
   - [x] `country-locale.ts` (249 ISO codes → primary official language) + `resolveLocale()` + per-locale server dictionaries + `<LocaleProvider>` (client bundle stays 103KB)
   - [x] Official↔English header toggle (`lollies-locale` cookie; routing/currency untouched) + footer language indicator follows locale
   - [x] Build-scale fix (gb-only `generateStaticParams`, rest on-demand) + searchable country selector + DeepL draft script (`storefront/scripts/deepl-dicts.mjs`)
-  - [ ] NEEDS DeepL API key → run script for Tier-1 (es, it, nl, pt, da, sv) then register locales
+  - [x] NEEDS DeepL API key → replaced 2026-10-12: free open-source path works (Opus-MT/Helsinki-NLP locally via `storefront/scripts/opus-dicts.py`; Argos segfaults on this machine, gtx endpoint 429s, DeepL script kept as alternative). Tier-1 DONE: es, it, nl, pt, da, sv (195-key parity, zero placeholder mismatches, worst MT howlers hand-fixed). Registered + live.
   - [ ] Run `medusa exec ./src/scripts/expand-regions-row.ts` on staging then prod (Rest-of-World EUR region); verify /store/regions
   - [ ] Human review per language (MT draft + review; admin stays English); RTL CSS audit for ar/he/fa/ur
 - [ ] P12 — Caching leftovers (bulk-fetch paging, revalidation webhook)
