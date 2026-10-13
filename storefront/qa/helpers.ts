@@ -208,6 +208,41 @@ export const dismissPopups = async (page: Page) => {
 }
 
 /**
+ * Opens the first product's QuickView by hovering its card and clicking
+ * the card's OWN trigger. Scoped per card on purpose: every card renders
+ * two quickview triggers (hover icon + main button) and carousel cards
+ * can match a global `:visible` while sitting off-screen, so a global
+ * first-match click sometimes lands on nothing and the modal never
+ * opens — flaky only under load, which is exactly when QA matters.
+ */
+export const openFirstQuickView = async (page: Page) => {
+  const cards = page.locator(".card-product")
+  const count = await cards.count()
+  for (let i = 0; i < count; i++) {
+    const card = cards.nth(i)
+    if (!(await card.isVisible().catch(() => false))) {
+      continue
+    }
+    await card.hover().catch(() => {})
+    const trigger = card.locator('a[href="#quickView"]').first()
+    if (!(await trigger.isVisible().catch(() => false))) {
+      continue
+    }
+    await trigger.click({ force: true, timeout: 5000 }).catch(() => {})
+    if (
+      await page
+        .locator("#quickView.show")
+        .waitFor({ state: "attached", timeout: 2000 })
+        .then(() => true)
+        .catch(() => false)
+    ) {
+      return
+    }
+  }
+  await expect(page.locator("#quickView.show")).toBeVisible({ timeout: 10000 })
+}
+
+/**
  * Clicks a Bootstrap overlay trigger until its target opens. The bundle
  * loads async after first paint, so a fast click can land before
  * data-bs-toggle is live and do nothing — retry instead of failing.
