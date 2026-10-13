@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Thumbs } from "swiper/modules";
 import { useContextElement } from "@/context/Context";
 import SizeGuide from "@/components/modals/SizeGuide";
+import ShippingReturnsModal from "@/components/modals/ShippingReturnsModal";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
 import { openCartModal } from "@/components/common/cart-modal";
@@ -518,6 +519,7 @@ export default function ModaveDetailsClient({
                             href="#delivery_return"
                             data-bs-toggle="modal"
                             className="tf-product-extra-icon"
+                            data-testid="delivery-return-link"
                           >
                             <div className="icon">
                               <i className="icon-shipping" />
@@ -626,6 +628,7 @@ export default function ModaveDetailsClient({
         </div>
       </div>
       <SizeGuide />
+      <ShippingReturnsModal />
     </section>
   );
 }
