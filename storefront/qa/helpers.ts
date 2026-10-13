@@ -211,6 +211,9 @@ export const dismissPopups = async (page: Page) => {
  * Clicks a Bootstrap overlay trigger until its target opens. The bundle
  * loads async after first paint, so a fast click can land before
  * data-bs-toggle is live and do nothing — retry instead of failing.
+ * Each click is caught: a click that opens the modal under the cursor
+ * can itself time out on post-action stability while the open animation
+ * runs, so the visibility poll (not the click) decides success.
  */
 export const openOverlay = async (
   page: Page,
@@ -218,7 +221,11 @@ export const openOverlay = async (
   target: string
 ) => {
   for (let attempt = 0; attempt < 3; attempt++) {
-    await page.locator(trigger).first().click()
+    await page
+      .locator(trigger)
+      .first()
+      .click({ timeout: 8000 })
+      .catch(() => {})
     if (
       await page
         .locator(target)
