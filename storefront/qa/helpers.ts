@@ -211,31 +211,52 @@ export const dismissPopups = async (page: Page) => {
  * Clicks a Bootstrap overlay trigger until its target opens. The bundle
  * loads async after first paint, so a fast click can land before
  * data-bs-toggle is live and do nothing — retry instead of failing.
- * Each click is caught: a click that opens the modal under the cursor
- * can itself time out on post-action stability while the open animation
- * runs, so the visibility poll (not the click) decides success.
+ *
+ * Live QA showed two distinct traps: a click that opens the modal under
+ * the cursor times out on post-click stability while the fade animation
+ * covers the trigger, and the NEXT retry click is then intercepted by
+ * the open modal. So: each retry first closes any overlay left open,
+ * and success is decided by the target's `.show` class being attached
+ * (Bootstrap adds it synchronously on show()), never by visibility —
+ * the fade delays computed visibility while the page is already
+ * blocked, which is what turned a pass into a 30s timeout.
  */
 export const openOverlay = async (
   page: Page,
   trigger: string,
   target: string
 ) => {
+  const targetLocator = page.locator(target)
   for (let attempt = 0; attempt < 3; attempt++) {
+    if ((await page.locator(".modal.show, .offcanvas.show").count()) > 0) {
+      await page.keyboard.press("Escape").catch(() => {})
+      await page
+        .locator(".modal.show .icon-close, .offcanvas.show .icon-close")
+        .first()
+        .click({ force: true, timeout: 3000 })
+        .catch(() => {})
+      await page
+        .locator(".modal.show, .offcanvas.show")
+        .first()
+        .waitFor({ state: "detached", timeout: 3000 })
+        .catch(() => {})
+    }
     await page
       .locator(trigger)
       .first()
       .click({ timeout: 8000 })
       .catch(() => {})
     if (
-      await page
-        .locator(target)
-        .isVisible({ timeout: 4000 })
+      await targetLocator
+        .first()
+        .waitFor({ state: "attached", timeout: 1500 })
+        .then(() => true)
         .catch(() => false)
     ) {
       return
     }
   }
-  await expect(page.locator(target)).toBeVisible({ timeout: 5000 })
+  await expect(targetLocator).toBeVisible({ timeout: 5000 })
 }
 
 export { qaEnv }
