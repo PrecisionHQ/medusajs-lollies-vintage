@@ -179,24 +179,30 @@ export const parseMoney = (value: string | null): number => {
 }
 
 /**
- * Suppress the newsletter auto-popup for the whole test. The modal checks
- * its subscribed flag synchronously at mount, so the flag must be present
- * BEFORE page scripts run — post-load evaluate() always loses that race.
- * Call once before the first goto(); it persists across navigations.
+ * Suppress the auto-popups that cover the page: the newsletter modal
+ * (checks its subscribed flag synchronously at mount) and the GDPR
+ * consent banner (renders whenever the consent cookie is missing — i.e.
+ * every fresh context, and it is fixed to the bottom of the viewport
+ * where it swallows clicks, including force-clicks on card triggers).
+ * Both flags must be present BEFORE page scripts run — post-load
+ * evaluate() always loses that race. Call once before the first
+ * goto(); it persists across navigations in the context.
  */
 export const suppressPopups = async (page: Page) => {
   await page.addInitScript(() => {
     try {
       localStorage.setItem("lollies_newsletter_subscribed", "1")
+      document.cookie =
+        "lollies_consent=rejected; Max-Age=31536000; Path=/; SameSite=Lax"
     } catch {
-      // Private mode: the popup shows; dismissPopups closes it.
+      // Private mode: the popups show; dismissPopups closes them.
     }
   })
 }
 
 /**
- * Close the newsletter modal if it opened (unsuppressed contexts,
- * mid-test reloads that predate suppression). Belt-and-braces next to
+ * Close the popups if they opened anyway (unsuppressed contexts, mid-test
+ * reloads that predate suppression). Belt-and-braces next to
  * suppressPopups, not a replacement.
  */
 export const dismissPopups = async (page: Page) => {
@@ -204,6 +210,11 @@ export const dismissPopups = async (page: Page) => {
   if (await popup.isVisible({ timeout: 3000 }).catch(() => false)) {
     await popup.locator(".icon-close").first().click({ force: true })
     await expect(popup).toBeHidden({ timeout: 5000 })
+  }
+  const consent = page.locator('[aria-label="Cookie consent"]')
+  if (await consent.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await consent.getByRole("button", { name: "Reject" }).click()
+    await expect(consent).toBeHidden({ timeout: 5000 })
   }
 }
 
