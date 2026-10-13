@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 import fs from "fs"
 import path from "path"
-import { dismissPopups, qaEnv, url } from "./helpers"
+import { dismissPopups, suppressPopups, qaEnv, url } from "./helpers"
 import { convertToLocale } from "../src/lib/util/money"
 
 /**
@@ -54,6 +54,7 @@ test.describe("Variant price parity", () => {
   }) => {
     const pk = readPublishableKey()
     test.skip(!pk, "no publishable key available")
+    await suppressPopups(page)
 
     const headers = { "x-publishable-api-key": pk }
     const regionsRes = await request.get(`${qaEnv.backendURL}/store/regions`, {

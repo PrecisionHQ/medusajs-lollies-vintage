@@ -1,5 +1,11 @@
 import { test, expect, type Page } from "@playwright/test"
-import { dismissPopups, openOverlay, suppressPopups, url } from "./helpers"
+import {
+  dismissPopups,
+  openFirstQuickView,
+  openOverlay,
+  suppressPopups,
+  url,
+} from "./helpers"
 
 /**
  * Overlay lifecycle (#6, #7, #15). The Modave theme drives modals through
@@ -73,16 +79,7 @@ test.describe("Overlay lifecycle", () => {
     await suppressPopups(page)
     await page.goto(url())
     await dismissPopups(page)
-    // Quick-view is hover-revealed on the card: hover the first VISIBLE
-    // card (carousel/offscreen cards report hidden).
-    const cards = page.locator(".card-product")
-    for (let i = 0; i < (await cards.count()); i++) {
-      if (await cards.nth(i).isVisible()) {
-        await cards.nth(i).hover()
-        break
-      }
-    }
-    await openOverlay(page, 'a[href="#quickView"]:visible', "#quickView.show")
+    await openFirstQuickView(page)
     await expect(page.locator("#quickView.show")).toBeVisible()
     // Let the open fade settle before clicking through the modal.
     await page.waitForTimeout(600)
