@@ -9,6 +9,7 @@ import { buildUnsubscribeLink } from "./utils";
 import {
   alreadySent,
   claimSend,
+  isFlowEnabled,
   isOptedOut,
 } from "./flow-guards";
 
@@ -37,6 +38,9 @@ export async function runPriceDrop(
   container: any
 ): Promise<{ sent: number; skipped: number }> {
   const marketing = container.resolve("marketing") as any;
+  if (!(await isFlowEnabled(marketing, "price_drop"))) {
+    return { sent: 0, skipped: 0 };
+  }
   const notifications = container.resolve(Modules.NOTIFICATION);
   const wishlist = container.resolve("wishlist") as any;
   const customerModule = container.resolve(Modules.CUSTOMER);

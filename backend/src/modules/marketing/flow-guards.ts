@@ -57,3 +57,37 @@ export async function claimSend(
     sent_at: new Date().toISOString(),
   });
 }
+
+/**
+ * Toggle-only flows (#5 board): price-drop, cross-sell and back-in-stock
+ * send mail but historically had no on/off switch and no board presence.
+ * `key` is the FlowConfig row; `flow` is the FlowLog flow value used for
+ * the sent counter. Single source of truth shared by the runners (gate),
+ * the admin API (board rows) and the unit test (no silent flows).
+ */
+export const TOGGLE_FLOWS = [
+  { key: "price_drop", flow: "pricedrop" },
+  { key: "cross_sell", flow: "cross-sell" },
+  { key: "back_in_stock", flow: "back-in-stock" },
+] as const;
+
+/**
+ * Toggle gate for the TOGGLE_FLOWS runners. No config row yet means ON
+ * (preserves historical behavior until an admin flips the switch); a
+ * config read failure also fails open so a sick query can never silence
+ * every flow at once.
+ */
+export async function isFlowEnabled(
+  marketing: any,
+  key: string
+): Promise<boolean> {
+  try {
+    const rows = await marketing.listFlowConfigs({ key });
+    if (!rows.length) {
+      return true;
+    }
+    return rows[0].enabled !== false;
+  } catch {
+    return true;
+  }
+}

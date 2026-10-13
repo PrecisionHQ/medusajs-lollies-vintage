@@ -3,6 +3,7 @@ import { INotificationModuleService } from '@medusajs/framework/types';
 import { SubscriberArgs, SubscriberConfig } from '@medusajs/medusa';
 import { EmailTemplates } from '../modules/email-notifications/templates';
 import { RESEND_FROM_EMAIL, STOREFRONT_URL } from '../lib/constants';
+import { claimSend, isFlowEnabled } from '../modules/marketing/flow-guards';
 import { ContainerRegistrationKeys } from '@medusajs/framework/utils';
 
 /**
@@ -39,6 +40,9 @@ export default async function backInStockHandler({
     container.resolve(Modules.NOTIFICATION);
 
   try {
+    if (!(await isFlowEnabled(marketing, 'back_in_stock'))) {
+      return;
+    }
     const { data: levels }: { data: { stocked_quantity: number; reserved_quantity: number }[] } =
       await query.graph({
         entity: 'inventory_level',
@@ -101,6 +105,13 @@ export default async function backInStockHandler({
             preview: 'Back in stock',
           },
         });
+        // Observability only (notified_at above is the real guard): makes
+        // the send visible on the Marketing Automation board counter.
+        try {
+          await claimSend(marketing, 'back-in-stock', sub.id, sub.email);
+        } catch {
+          // Never fail a delivered notification on bookkeeping.
+        }
       } catch (error) {
         logger.warn(
           `back-in-stock: skipping subscription ${sub.id}: ${(error as Error).message}`
