@@ -20,6 +20,8 @@ test.describe("Overlay lifecycle", () => {
   const assertInteractive = async (page: Page) => {
     await expect(page.locator(".modal-backdrop")).toHaveCount(0)
     await expect(page.locator(".offcanvas-backdrop")).toHaveCount(0)
+    await expect(page.locator(".modal.show")).toHaveCount(0)
+    await expect(page.locator(".offcanvas.show")).toHaveCount(0)
     await expect(page.locator("body.modal-open")).toHaveCount(0)
     // Reopening a modal proves clicks actually land on the page.
     await openOverlay(page, 'a[href="#search"]', "#search.show")

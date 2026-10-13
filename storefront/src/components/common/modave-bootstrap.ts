@@ -16,46 +16,56 @@ export function loadBootstrap(): Promise<any> {
 }
 
 /**
- * Synchronously tear down every Bootstrap overlay (modal / offcanvas
- * backdrops, `modal-open` body lock). Next.js client-side navigation does
- * not run Bootstrap's hide path, so without this a nav away from inside an
- * open QuickView / search / compare / cart overlay leaves a stale backdrop
- * + `overflow: hidden` on the new page — the page looks fine but is
- * unclickable until a full refresh.
+ * Synchronously tear down every Bootstrap overlay. Next.js client-side
+ * navigation does not run Bootstrap's hide path, so without this a nav
+ * away from inside an open QuickView / search / compare / cart overlay
+ * leaves the destination page unclickable until a full refresh.
  *
- * Strategy is belt-and-braces: ask the Bootstrap instances to hide (so
- * internal state stays consistent for the next open), then sweep the DOM
- * synchronously so no backdrop survives even if the bundle is still
- * loading or a fade transition is mid-flight.
+ * Live QA proved a backdrop-only sweep is NOT enough: the open modal
+ * element itself (still carrying .show → display:block) survives inside
+ * persistent layouts and keeps covering the new page. So this removes
+ * .show from every open modal/offcanvas as well — the next data-bs-toggle
+ * open re-shows cleanly through Bootstrap's own show() path.
+ *
+ * Strategy is belt-and-braces: force-hide in the DOM synchronously (the
+ * guarantee), then ask the Bootstrap instances to hide too (keeps their
+ * internal state consistent for the next open).
  */
 export function dismissBootstrapOverlays(): void {
   if (typeof document === "undefined") {
     return
   }
+  let open: Element[] = []
   try {
-    const open = Array.from(
+    open = Array.from(
       document.querySelectorAll(".modal.show, .offcanvas.show")
     )
-    if (open.length) {
-      loadBootstrap()
-        .then((bs) => {
-          try {
-            for (const el of open) {
-              const inst =
-                bs?.Modal?.getInstance?.(el) ??
-                bs?.Offcanvas?.getInstance?.(el)
-              inst?.hide?.()
-            }
-          } catch {
-            // DOM sweep below is the guarantee; instance hide is best-effort.
-          }
-        })
-        .catch(() => {
-          // Bundle failed to load — DOM sweep below still frees the page.
-        })
-    }
   } catch {
     // Never let overlay cleanup break navigation.
+  }
+  for (const el of open) {
+    el.classList.remove("show")
+    ;(el as HTMLElement).style.display = "none"
+    el.setAttribute("aria-hidden", "true")
+  }
+  if (open.length) {
+    loadBootstrap()
+      .then((bs) => {
+        try {
+          for (const el of open) {
+            const inst =
+              bs?.Modal?.getInstance?.(el) ??
+              bs?.Offcanvas?.getInstance?.(el)
+            inst?.hide?.()
+            inst?.dispose?.()
+          }
+        } catch {
+          // DOM sweep above is the guarantee; instance hide is best-effort.
+        }
+      })
+      .catch(() => {
+        // Bundle failed to load — DOM sweep above still frees the page.
+      })
   }
   for (const backdrop of Array.from(
     document.querySelectorAll(".modal-backdrop, .offcanvas-backdrop")
