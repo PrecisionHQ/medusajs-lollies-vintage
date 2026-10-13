@@ -146,7 +146,13 @@ export default async function Header1({
                 </div>
               </li>
               <li className="nav-wishlist">
-                <Link href={`/wish-list`} className="nav-icon-item">
+                {/* No /wish-list route exists: open the wishlist drawer. */}
+                <a
+                  href="#wishlist"
+                  data-bs-toggle="modal"
+                  className="nav-icon-item"
+                  aria-label={t("nav.wishlist")}
+                >
                   <svg
                     className="icon"
                     width={24}
@@ -163,7 +169,7 @@ export default async function Header1({
                       strokeLinejoin="round"
                     />
                   </svg>
-                </Link>
+                </a>
               </li>
               <li className="nav-cart">
                 <a
