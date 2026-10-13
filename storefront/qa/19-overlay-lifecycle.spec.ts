@@ -46,11 +46,19 @@ test.describe("Overlay lifecycle", () => {
   test("quick-view full details opens an interactive PDP", async ({
     page,
   }) => {
+    await suppressPopups(page)
     await page.goto(url())
     await dismissPopups(page)
-    // Quick-view is hover-revealed on the card: hover first.
-    await page.locator(".card-product").first().hover()
-    await openOverlay(page, 'a[href="#quickView"]', "#quickView.show")
+    // Quick-view is hover-revealed on the card: hover the first VISIBLE
+    // card (carousel/offscreen cards report hidden).
+    const cards = page.locator(".card-product")
+    for (let i = 0; i < (await cards.count()); i++) {
+      if (await cards.nth(i).isVisible()) {
+        await cards.nth(i).hover()
+        break
+      }
+    }
+    await openOverlay(page, 'a[href="#quickView"]:visible', "#quickView.show")
     await expect(page.locator("#quickView.show")).toBeVisible()
 
     await page
