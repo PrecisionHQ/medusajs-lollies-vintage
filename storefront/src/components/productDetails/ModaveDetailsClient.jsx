@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Thumbs } from "swiper/modules";
 import { useContextElement } from "@/context/Context";
 import SizeGuide from "@/components/modals/SizeGuide";
+import ShareModal from "@/components/modals/ShareModal";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
 import { getProductPrice } from "@lib/util/get-product-price";
@@ -496,6 +497,7 @@ export default function ModaveDetailsClient({
                             href="#share_social"
                             data-bs-toggle="modal"
                             className="tf-product-extra-icon"
+                            data-testid="share-link"
                           >
                             <div className="icon">
                               <i className="icon-share" />
@@ -590,6 +592,7 @@ export default function ModaveDetailsClient({
         </div>
       </div>
       <SizeGuide />
+      <ShareModal productId={product.id} productTitle={product.title} />
     </section>
   );
 }
