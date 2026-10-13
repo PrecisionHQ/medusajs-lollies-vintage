@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-import { url } from "./helpers"
+import { dismissPopups, url } from "./helpers"
 
 /**
  * Overlay lifecycle (#6, #7, #15). The Modave theme drives modals through
@@ -13,6 +13,11 @@ import { url } from "./helpers"
  * receives clicks (reopening the search modal proves interactivity).
  */
 test.describe("Overlay lifecycle", () => {
+  const openSearch = async (page: Page) => {
+    await page.locator('a[href="#search"]').first().click()
+    await expect(page.locator("#search.show")).toBeVisible()
+  }
+
   const assertInteractive = async (page: Page) => {
     await expect(page.locator(".modal-backdrop")).toHaveCount(0)
     await expect(page.locator(".offcanvas-backdrop")).toHaveCount(0)
@@ -25,8 +30,8 @@ test.describe("Overlay lifecycle", () => {
 
   test("search suggestion opens an interactive PDP", async ({ page }) => {
     await page.goto(url())
-    await page.locator('a[href="#search"]').first().click()
-    await expect(page.locator("#search.show")).toBeVisible()
+    await dismissPopups(page)
+    await openSearch(page)
 
     await page.locator('#search input[name="text"]').fill("dress")
     const suggestion = page.locator('#search a[href*="/products/"]').first()
@@ -41,6 +46,7 @@ test.describe("Overlay lifecycle", () => {
     page,
   }) => {
     await page.goto(url())
+    await dismissPopups(page)
     await page.locator('a[href="#quickView"]').first().click()
     await expect(page.locator("#quickView.show")).toBeVisible()
 
@@ -55,8 +61,8 @@ test.describe("Overlay lifecycle", () => {
   test("product drill-down stays interactive", async ({ page }) => {
     // Reach a PDP through search, then drill into a related product.
     await page.goto(url())
-    await page.locator('a[href="#search"]').first().click()
-    await expect(page.locator("#search.show")).toBeVisible()
+    await dismissPopups(page)
+    await openSearch(page)
 
     await page.locator('#search input[name="text"]').fill("dress")
     const suggestion = page.locator('#search a[href*="/products/"]').first()

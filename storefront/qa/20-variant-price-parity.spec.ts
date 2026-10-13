@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 import fs from "fs"
 import path from "path"
-import { qaEnv, url } from "./helpers"
+import { dismissPopups, qaEnv, url } from "./helpers"
 import { convertToLocale } from "../src/lib/util/money"
 
 /**
@@ -97,6 +97,7 @@ test.describe("Variant price parity", () => {
     test.skip(optionTitles.length === 0, "variants carry no options")
 
     await page.goto(url(`products/${candidate.handle}`))
+    await dismissPopups(page)
 
     // Nothing selected yet: honest "From <cheapest>" state, never a
     // variant price masquerading as the price.
