@@ -4,6 +4,7 @@ import Link from "next/link";
 import FooterRegionDisplay from "../common/FooterRegionDisplay";
 import { buildLolliesMenu } from "@/lib/util/lollies-menu";
 import { usePathname } from "next/navigation";
+import { dismissBootstrapOverlays } from "../common/modave-bootstrap";
 
 /**
  * Mobile menu mirroring the Lollies header menu (Home, Shop All, Sales,
@@ -80,6 +81,7 @@ export default function MobileMenu({ menu, shopLinks, catLinks } = {}) {
                 <Link
                   href={topItems[0]?.href || `/${countryCode}`}
                   className="mb-menu-link"
+                  onClick={() => dismissBootstrapOverlays()}
                 >
                   <span>{topItems[0]?.label || "Home"}</span>
                 </Link>
@@ -107,6 +109,7 @@ export default function MobileMenu({ menu, shopLinks, catLinks } = {}) {
                             className={`sub-nav-link ${
                               isActive(link.href) ? "active" : ""
                             } `}
+                            onClick={() => dismissBootstrapOverlays()}
                           >
                             {link.label}
                           </Link>
@@ -123,7 +126,11 @@ export default function MobileMenu({ menu, shopLinks, catLinks } = {}) {
                     isActive(item.href) ? "active" : ""
                   }`}
                 >
-                  <Link href={item.href} className="mb-menu-link">
+                  <Link
+                    href={item.href}
+                    className="mb-menu-link"
+                    onClick={() => dismissBootstrapOverlays()}
+                  >
                     <span>{item.label}</span>
                   </Link>
                 </li>
@@ -150,6 +157,7 @@ export default function MobileMenu({ menu, shopLinks, catLinks } = {}) {
                           className={`sub-nav-link ${
                             isActive(link.href) ? "active" : ""
                           } `}
+                          onClick={() => dismissBootstrapOverlays()}
                         >
                           {link.label}
                         </Link>
@@ -165,6 +173,7 @@ export default function MobileMenu({ menu, shopLinks, catLinks } = {}) {
               <Link
                 href={`/${countryCode}/account`}
                 className="site-nav-icon"
+                onClick={() => dismissBootstrapOverlays()}
               >
                 <svg
                   className="icon"

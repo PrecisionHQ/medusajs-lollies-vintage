@@ -296,7 +296,7 @@ export default function DetailsColorRounded({ product }) {
                       </li>
                     </ul>
                     <div className="tf-product-info-guranteed">
-                      <div className="text-title">Guranteed safe checkout:</div>
+                      <div className="text-title">Guaranteed safe checkout:</div>
                       <div className="tf-payment">
                         <a href="#">
                           <Image

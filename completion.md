@@ -135,6 +135,61 @@ Universal rule, no flags/toggles: every percentage-off-items promo tops up to it
   beside this file. Outer worktree has no remote, so all three live locally.
   Other workstreams' open PRs (#5–12, #15, #17) were left untouched.
 
+## Merges 2026-09-29: PR #30 (test suite) + PR #31 (bucket proxy)
+
+- PR #30 needed a rebase (master had moved); `pnpm-lock.yaml` conflict
+  resolved with master's version + `pnpm install --lockfile-only`
+  regeneration (pnpm-native, verified importer intact). The companion
+  `ci.yml` secrets-scan/unit-test jobs still need a token with `workflow`
+  scope (OAuth App restriction) — apply via web UI or
+  `gh auth refresh -s workflow`.
+- PR #31 merged clean. Local `master` synced, branches pruned, tree clean.
+- Test suite (15 tests) and proxy code now on `master`, matching production.
+
+## Manual-payment checkout proof (2026-09-29)
+
+- Full cart→order pipeline proven live without PSP keys (proves everything
+  every payment method shares): cart + item + email/addresses + Standard
+  shipping (€10) + payment collection (€20) + `pp_system_default` session +
+  `POST /store/carts/:id/complete` → order created (pending, €20).
+- Note: there is no `POST .../payment-sessions/authorize` route (got HTML
+  404); manual authorizes implicitly on complete. QA order canceled
+  afterwards for a clean prod DB.
+- Remaining PSP-specific surface (redirect handshake, webhook completion)
+  still needs real Polar/Dodo/Stripe keys — nothing further provable
+  without them.
+
+## Dormant-integration audit (2026-09-29)
+
+- No email provider: every order logs `Could not find a notification
+  provider for channel: email` (caught by the subscriber — no crash, but
+  order confirmations are silently lost). Resolves the moment Resend keys
+  land. No code fix needed or made.
+- Europe region has **zero** payment providers assigned (manual
+  `pp_system_default` works regardless). When Stripe/Polar/Dodo keys land,
+  each provider must ALSO be enabled on the region in Admin → Settings →
+  Regions, or checkout can't select it. Noted here so it's not forgotten.
+
+## Durable file storage via Railway bucket (2026-09-27)
+
+- Bucket `medusajs-lollies-vintage-media-3uzqc` (sjc) + read-only proxy
+  service `bucket-proxy` (`bucket-proxy-production-e85a.up.railway.app`).
+  Railway buckets serve nothing publicly, so the proxy answers GET/HEAD from
+  the bucket and 404s everything else (never writes).
+- Gotchas: volume-style pitfall avoided — bucket needed no volume; Meili-style
+  `MEILI_DB_PATH` lesson applied in reverse (bucket path is direct). Proxy
+  needed explicit domain target port? No — plain Node service on PORT, worked
+  first try after env set. Initial 404s were Railway edge (no healthy
+  upstream mid-deploy), not app errors.
+- Backend `S3_*` wired (`REGION=auto`, no ACL/path-style per Railway guidance);
+  no partial-config warnings at boot. Storefront `NEXT_PUBLIC_MEDIA_HOSTNAME`
+  set (remotePatterns already supported it — no code change needed there).
+- Verified end-to-end: admin upload → bucket object → proxy fetch 200 with
+  byte-identical PNG + correct content-type/cache headers. One 70-byte test
+  file remains in the bucket (no delete path exercised).
+- Keys live in Railway variables + this session only — never committed.
+  R2 migration later = same `S3_*` slots, different values.
+
 ## Arbitrary-amount spike results (Polar vs Dodo)
 
 - **Polar: SOLVED.** Ad-hoc prices: `checkouts.create({ products: [...], prices: { productId: [{ amountType: "fixed", priceAmount, priceCurrency }] } })` — arbitrary cart totals with one generic Polar product, no catalog sync. Clean fit.

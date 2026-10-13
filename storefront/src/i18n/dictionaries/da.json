@@ -107,6 +107,8 @@
     "quantity": "Mængde:",
     "addToCart": "LÆG I VAREKURVEN",
     "selectOptions": "Vælg tilvalg",
+    "from": "Fra",
+    "priceUnavailable": "Pris ikke tilgængelig for denne variant",
     "outOfStock": "Ikke på lager",
     "buyNow": "Køb det nu",
     "colors": "Farver:",

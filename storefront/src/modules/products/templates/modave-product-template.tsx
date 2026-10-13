@@ -20,6 +20,7 @@ import Wishlist from "@/components/modals/Wishlist"
 import SizeGuide from "@/components/modals/SizeGuide"
 import ModaveScripts from "@/components/common/ModaveScripts"
 import { retrieveCollection } from "@lib/data/collections"
+import { listCartPaymentMethods } from "@lib/data/payment"
 import { buildLolliesMenu } from "@lib/util/lollies-menu"
 import { requestMessages } from "@/i18n/dictionaries"
 import { getBaseURL, getStoreName } from "@lib/util/env"
@@ -117,6 +118,13 @@ const ModaveProductTemplate = async ({
     messages
   )
 
+  // Trust-row badges follow the providers actually enabled for the
+  // region. Null (fetch failed) falls back to the static set in
+  // SafeCheckoutBadges — never an empty row.
+  const paymentProviders = region?.id
+    ? await listCartPaymentMethods(region.id)
+    : null
+
   // Breadcrumb parent mirrors ModaveBreadcrumb: category first, else the
   // single collection. Category rides on the product; collection needs one
   // cached fetch.
@@ -187,6 +195,7 @@ const ModaveProductTemplate = async ({
           product={product}
           region={region}
           countryCode={countryCode}
+          paymentProviderIds={(paymentProviders ?? []).map((p) => p.id)}
         />
         <ModaveDescriptionTabs product={product} countryCode={countryCode} />
         <div data-testid="related-products-container">

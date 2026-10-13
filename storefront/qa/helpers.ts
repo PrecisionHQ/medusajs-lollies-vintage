@@ -178,4 +178,64 @@ export const parseMoney = (value: string | null): number => {
   return Number.parseFloat(cleaned)
 }
 
+/**
+ * Suppress the newsletter auto-popup for the whole test. The modal checks
+ * its subscribed flag synchronously at mount, so the flag must be present
+ * BEFORE page scripts run — post-load evaluate() always loses that race.
+ * Call once before the first goto(); it persists across navigations.
+ */
+export const suppressPopups = async (page: Page) => {
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("lollies_newsletter_subscribed", "1")
+    } catch {
+      // Private mode: the popup shows; dismissPopups closes it.
+    }
+  })
+}
+
+/**
+ * Close the newsletter modal if it opened (unsuppressed contexts,
+ * mid-test reloads that predate suppression). Belt-and-braces next to
+ * suppressPopups, not a replacement.
+ */
+export const dismissPopups = async (page: Page) => {
+  const popup = page.locator("#newsletterPopup.show")
+  if (await popup.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await popup.locator(".icon-close").first().click({ force: true })
+    await expect(popup).toBeHidden({ timeout: 5000 })
+  }
+}
+
+/**
+ * Clicks a Bootstrap overlay trigger until its target opens. The bundle
+ * loads async after first paint, so a fast click can land before
+ * data-bs-toggle is live and do nothing — retry instead of failing.
+ * Each click is caught: a click that opens the modal under the cursor
+ * can itself time out on post-action stability while the open animation
+ * runs, so the visibility poll (not the click) decides success.
+ */
+export const openOverlay = async (
+  page: Page,
+  trigger: string,
+  target: string
+) => {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page
+      .locator(trigger)
+      .first()
+      .click({ timeout: 8000 })
+      .catch(() => {})
+    if (
+      await page
+        .locator(target)
+        .isVisible({ timeout: 4000 })
+        .catch(() => false)
+    ) {
+      return
+    }
+  }
+  await expect(page.locator(target)).toBeVisible({ timeout: 5000 })
+}
+
 export { qaEnv }

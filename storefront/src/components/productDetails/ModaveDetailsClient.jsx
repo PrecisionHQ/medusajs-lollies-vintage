@@ -9,12 +9,15 @@ import { Thumbs } from "swiper/modules";
 import { useContextElement } from "@/context/Context";
 import SizeGuide from "@/components/modals/SizeGuide";
 import AskQuestionModal from "@/components/modals/AskQuestionModal";
+import ShippingReturnsModal from "@/components/modals/ShippingReturnsModal";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
+import { openCartModal } from "@/components/common/cart-modal";
 import { getProductPrice } from "@lib/util/get-product-price";
 import { stripHtmlToText } from "@lib/util/sanitize-html";
 import { getProductReviews } from "@lib/data/reviews";
 import { useLocaleT } from "@/i18n/locale-context";
+import SafeCheckoutBadges from "@/components/productDetails/safe-checkout-badges";
 
 const optionsAsKeymap = (variantOptions) => {
   return variantOptions?.reduce((acc, varopt) => {
@@ -46,6 +49,7 @@ export default function ModaveDetailsClient({
   product,
   region,
   countryCode,
+  paymentProviderIds,
 }) {
   const router = useRouter();
   const t = useLocaleT();
@@ -114,11 +118,22 @@ export default function ModaveDetailsClient({
         product,
         variantId: selectedVariant?.id,
       });
-      return variantPrice ?? cheapestPrice;
+      // A selected variant shows its EXACT backend price or nothing at all.
+      // Falling back to the cheapest variant here displayed another
+      // variant's price as this one's (the price visibly "jumped" only
+      // after adding to cart). Unselected state shows the cheapest as a
+      // "From" price at the render site below.
+      if (selectedVariant?.id) return variantPrice ?? null;
+      return cheapestPrice;
     } catch {
       return null;
     }
   }, [product, selectedVariant]);
+
+  // Variant resolved but the backend has no price for it in this region:
+  // purchasable-looking but unorderable, so block add-to-cart and say so.
+  const priceMissing =
+    !needsSelection && !!selectedVariant && !priceInfo;
 
   const optionValues = (title) => {
     const vals = [];
@@ -142,6 +157,10 @@ export default function ModaveDetailsClient({
 
   const doAddToCart = async (qty) => {
     if (!selectedVariant?.id) return false;
+    if (priceMissing) {
+      setError(t("product.priceUnavailable"));
+      return false;
+    }
     setError(null);
     const res = await addToCart({
       variantId: selectedVariant.id,
@@ -159,17 +178,22 @@ export default function ModaveDetailsClient({
   const handleAddToCart = async () => {
     setIsAdding(true);
     try {
-      await doAddToCart(quantity);
+      const ok = await doAddToCart(quantity);
+      // Land on the cart surface (same drawer the header cart icon
+      // opens): the item, the badge and the View-cart page stay in sync.
+      if (ok) openCartModal();
     } finally {
       setIsAdding(false);
     }
   };
 
+  // Buy It Now: skip the cart page and land straight in the checkout flow
+  // with the item present. Failures stay on the PDP with the error shown.
   const handleBuyNow = async () => {
     setBuyingNow(true);
     try {
       const ok = await doAddToCart(quantity);
-      if (ok) router.push(`/${countryCode}/cart`);
+      if (ok) router.push(`/${countryCode}/checkout?step=address`);
     } finally {
       setBuyingNow(false);
     }
@@ -263,20 +287,37 @@ export default function ModaveDetailsClient({
                       </div>
                       <div className="tf-product-info-desc">
                         <div className="tf-product-info-price">
-                          <h5 className="price-on-sale font-2">
-                            {priceInfo?.calculated_price ?? ""}
-                          </h5>
-                          {priceInfo?.percentage_diff &&
-                          parseFloat(priceInfo.percentage_diff) > 0 ? (
+                          {needsSelection && priceInfo ? (
                             <>
-                              <div className="compare-at-price font-2">
-                                {priceInfo.original_price}
-                              </div>
-                              <div className="badges-on-sale text-btn-uppercase">
-                                -{priceInfo.percentage_diff}%
-                              </div>
+                              <span className="price-from-label text-caption-1">
+                                {t("product.from")}{" "}
+                              </span>
+                              <h5 className="price-on-sale font-2">
+                                {priceInfo.calculated_price}
+                              </h5>
                             </>
-                          ) : null}
+                          ) : priceMissing || !priceInfo ? (
+                            <span className="price-unavailable text-caption-1">
+                              {t("product.priceUnavailable")}
+                            </span>
+                          ) : (
+                            <>
+                              <h5 className="price-on-sale font-2">
+                                {priceInfo?.calculated_price ?? ""}
+                              </h5>
+                              {priceInfo?.percentage_diff &&
+                              parseFloat(priceInfo.percentage_diff) > 0 ? (
+                                <>
+                                  <div className="compare-at-price font-2">
+                                    {priceInfo.original_price}
+                                  </div>
+                                  <div className="badges-on-sale text-btn-uppercase">
+                                    -{priceInfo.percentage_diff}%
+                                  </div>
+                                </>
+                              ) : null}
+                            </>
+                          )}
                         </div>
                         {shortDescription ? <p>{shortDescription}</p> : null}
                       </div>
@@ -410,7 +451,8 @@ export default function ModaveDetailsClient({
                         <div className="tf-product-info-by-btn mb_10">
                           <a
                             onClick={() => {
-                              if (!needsSelection && inStock) handleAddToCart();
+                              if (!needsSelection && inStock && !priceMissing)
+                                handleAddToCart();
                             }}
                             className="btn-style-2 flex-grow-1 text-btn-uppercase fw-6 btn-add-to-cart"
                           >
@@ -419,6 +461,8 @@ export default function ModaveDetailsClient({
                                 ? (noneAvailable
                                   ? t("product.outOfStock")
                                   : t("product.selectOptions"))
+                                : priceMissing
+                                ? t("product.priceUnavailable")
                                 : !inStock
                                 ? t("product.outOfStock")
                                 : isAdding
@@ -462,6 +506,7 @@ export default function ModaveDetailsClient({
                             if (!needsSelection && inStock) handleBuyNow();
                           }}
                           className="btn-style-3 text-btn-uppercase"
+                          data-testid="buy-it-now-button"
                         >
                           {buyingNow ? t("product.adding") : t("product.buyNow")}
                         </a>
@@ -475,6 +520,7 @@ export default function ModaveDetailsClient({
                             href="#delivery_return"
                             data-bs-toggle="modal"
                             className="tf-product-extra-icon"
+                            data-testid="delivery-return-link"
                           >
                             <div className="icon">
                               <i className="icon-shipping" />
@@ -568,19 +614,11 @@ export default function ModaveDetailsClient({
                         <div className="text-title">
                           {t("product.safeCheckout")}
                         </div>
-                        <div className="tf-payment">
-                          {["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"].map(
-                            (img) => (
-                              <span key={img}>
-                                <Image
-                                  alt=""
-                                  src={`/modave/images/payment/${img}.png`}
-                                  width={100}
-                                  height={64}
-                                />
-                              </span>
-                            )
-                          )}
+                        <div
+                          className="tf-payment"
+                          data-testid="safe-checkout-badges"
+                        >
+                          <SafeCheckoutBadges providerIds={paymentProviderIds} />
                         </div>
                       </div>
                     </div>
@@ -593,6 +631,7 @@ export default function ModaveDetailsClient({
       </div>
       <SizeGuide />
       <AskQuestionModal productId={product.id} />
+      <ShippingReturnsModal />
     </section>
   );
 }
