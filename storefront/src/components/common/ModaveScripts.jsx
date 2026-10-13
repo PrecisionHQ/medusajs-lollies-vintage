@@ -1,7 +1,13 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { dismissBootstrapOverlays, loadBootstrap } from "./modave-bootstrap";
+
+// Module-level last path: ModaveScripts remounts on page changes (it
+// renders inside pages, not the shared layout), so a ref would re-arm
+// the first-mount skip on every navigation and the dismiss would never
+// run. A module singleton survives remounts within the SPA session.
+let lastPathname = null;
 
 /**
  * Loads Bootstrap's JS bundle on Modave-themed pages. The theme drives every
@@ -18,7 +24,6 @@ import { dismissBootstrapOverlays, loadBootstrap } from "./modave-bootstrap";
  */
 export default function ModaveScripts() {
   const pathname = usePathname();
-  const firstPath = useRef(true);
   useEffect(() => {
     let cancelled = false;
     loadBootstrap().then(() => {
@@ -33,12 +38,13 @@ export default function ModaveScripts() {
     };
   }, []);
   useEffect(() => {
-    // Skip the initial mount — there is no previous page to clean up after.
-    if (firstPath.current) {
-      firstPath.current = false;
-      return;
+    // Skip only the very first mount of the session — there is no
+    // previous page to clean up after. Every later change (including
+    // across remounts) dismisses stray overlays.
+    if (lastPathname !== null && lastPathname !== pathname) {
+      dismissBootstrapOverlays();
     }
-    dismissBootstrapOverlays();
+    lastPathname = pathname;
   }, [pathname]);
   return null;
 }
