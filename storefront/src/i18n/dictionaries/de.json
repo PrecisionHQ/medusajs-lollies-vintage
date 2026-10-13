@@ -107,6 +107,8 @@
     "quantity": "Menge:",
     "addToCart": "IN DEN WARENKORB",
     "selectOptions": "Optionen wählen",
+    "from": "Ab",
+    "priceUnavailable": "Preis für diese Variante nicht verfügbar",
     "outOfStock": "Ausverkauft",
     "buyNow": "Jetzt kaufen",
     "colors": "Farben:",

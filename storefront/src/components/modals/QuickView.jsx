@@ -88,6 +88,8 @@ export default function QuickView() {
     );
   }, [live, options]);
 
+  const needsSelection = (live?.variants?.length ?? 0) > 1 && !selectedVariant;
+
   const priceInfo = useMemo(() => {
     if (!live) return null;
     try {
@@ -95,11 +97,17 @@ export default function QuickView() {
         product: live,
         variantId: selectedVariant?.id,
       });
-      return variantPrice ?? cheapestPrice;
+      // Same exact-price rule as the PDP: a selected variant shows its own
+      // backend price or nothing — never another variant's cheapest price.
+      if (selectedVariant?.id) return variantPrice ?? null;
+      return cheapestPrice;
     } catch {
       return null;
     }
   }, [live, selectedVariant]);
+
+  const priceMissing =
+    !needsSelection && !!selectedVariant && !priceInfo;
 
   const optionEntries = useMemo(() => {
     if (!live?.options?.length) return [];
@@ -115,7 +123,7 @@ export default function QuickView() {
   }, [live]);
 
   const handleAdd = async () => {
-    if (!selectedVariant?.id) return;
+    if (!selectedVariant?.id || priceMissing) return;
     setAdding(true);
     setError(null);
     try {
@@ -205,12 +213,29 @@ export default function QuickView() {
                 </div>
                 <div className="tf-product-info-desc">
                   <div className="tf-product-info-price">
-                    <h5 className="price-on-sale font-2">
-                      {loading
-                        ? "…"
-                        : priceInfo?.calculated_price ?? ""}
-                    </h5>
-                    {priceInfo?.percentage_diff &&
+                    {loading ? (
+                      <h5 className="price-on-sale font-2">…</h5>
+                    ) : needsSelection && priceInfo ? (
+                      <>
+                        <span className="price-from-label text-caption-1">
+                          {t("product.from")}{" "}
+                        </span>
+                        <h5 className="price-on-sale font-2">
+                          {priceInfo.calculated_price}
+                        </h5>
+                      </>
+                    ) : priceMissing || !priceInfo ? (
+                      <span className="price-unavailable text-caption-1">
+                        {t("product.priceUnavailable")}
+                      </span>
+                    ) : (
+                      <h5 className="price-on-sale font-2">
+                        {priceInfo.calculated_price}
+                      </h5>
+                    )}
+                    {!loading &&
+                    !needsSelection &&
+                    priceInfo?.percentage_diff &&
                     parseFloat(priceInfo.percentage_diff) > 0 ? (
                       <>
                         <div className="compare-at-price font-2">
@@ -293,6 +318,8 @@ export default function QuickView() {
                       <span>
                         {!selectedVariant
                           ? t("product.selectOptions")
+                          : priceMissing
+                          ? t("product.priceUnavailable")
                           : adding
                           ? t("product.adding")
                           : t("product.addToCart") + " -"}

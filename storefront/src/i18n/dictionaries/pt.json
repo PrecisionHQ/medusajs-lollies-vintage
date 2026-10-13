@@ -107,6 +107,8 @@
     "quantity": "Quantidade:",
     "addToCart": "ADICIONAR AO CARRINHO",
     "selectOptions": "Seleccionar opções",
+    "from": "Desde",
+    "priceUnavailable": "Preço indisponível para esta variante",
     "outOfStock": "Fora de stock",
     "buyNow": "Compre agora",
     "colors": "Cores:",
