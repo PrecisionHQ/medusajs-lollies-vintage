@@ -99,7 +99,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
 
   const reviews = req.scope.resolve("review") as any;
   const verified = await isVerifiedPurchase(req.scope, customerId, productId);
-  const [created] = await reviews.createReviews({
+  // create* returns a single object for single input (an array only for
+  // array input) — destructuring the object throws "not iterable".
+  const createdRaw = await reviews.createReviews({
     product_id: productId,
     customer_id: customerId,
     name: displayName,
@@ -109,6 +111,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     status: "pending",
     verified,
   });
+  const created = Array.isArray(createdRaw) ? createdRaw[0] : createdRaw;
 
   res.status(201).json({
     review: { id: created.id, status: created.status, verified },
