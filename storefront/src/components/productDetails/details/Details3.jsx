@@ -301,7 +301,7 @@ export default function Details3({ product = allProducts[0] }) {
                       </ul>
                       <div className="tf-product-info-guranteed">
                         <div className="text-title">
-                          Guranteed safe checkout:
+                          Guaranteed safe checkout:
                         </div>
                         <div className="tf-payment">
                           <a href="#">

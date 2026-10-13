@@ -15,6 +15,7 @@ import { getProductPrice } from "@lib/util/get-product-price";
 import { stripHtmlToText } from "@lib/util/sanitize-html";
 import { getProductReviews } from "@lib/data/reviews";
 import { useLocaleT } from "@/i18n/locale-context";
+import SafeCheckoutBadges from "@/components/productDetails/safe-checkout-badges";
 
 const optionsAsKeymap = (variantOptions) => {
   return variantOptions?.reduce((acc, varopt) => {
@@ -46,6 +47,7 @@ export default function ModaveDetailsClient({
   product,
   region,
   countryCode,
+  paymentProviderIds,
 }) {
   const router = useRouter();
   const t = useLocaleT();
@@ -609,19 +611,11 @@ export default function ModaveDetailsClient({
                         <div className="text-title">
                           {t("product.safeCheckout")}
                         </div>
-                        <div className="tf-payment">
-                          {["img-1", "img-2", "img-3", "img-4", "img-5", "img-6"].map(
-                            (img) => (
-                              <span key={img}>
-                                <Image
-                                  alt=""
-                                  src={`/modave/images/payment/${img}.png`}
-                                  width={100}
-                                  height={64}
-                                />
-                              </span>
-                            )
-                          )}
+                        <div
+                          className="tf-payment"
+                          data-testid="safe-checkout-badges"
+                        >
+                          <SafeCheckoutBadges providerIds={paymentProviderIds} />
                         </div>
                       </div>
                     </div>
