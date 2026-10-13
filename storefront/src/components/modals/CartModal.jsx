@@ -13,6 +13,7 @@ import { convertToLocale } from "@lib/util/money";
 import { getCartRecommendations } from "@/lib/data/recommendations";
 import { onCartUpdated, notifyCartUpdated } from "@lib/util/cart-events";
 import { useLocaleT } from "@/i18n/locale-context";
+import { dismissBootstrapOverlays } from "../common/modave-bootstrap";
 
 /**
  * Shopping cart drawer on the LIVE Medusa cart: lines with quantity
@@ -139,6 +140,7 @@ export default function CartModal() {
                         <Link
                           className="link text-line-clamp-1"
                           href={product.href || "#"}
+                          onClick={() => dismissBootstrapOverlays()}
                         >
                           {product.title}
                         </Link>
@@ -150,6 +152,7 @@ export default function CartModal() {
                         <Link
                           className="link text-button"
                           href={product.href || "#"}
+                          onClick={() => dismissBootstrapOverlays()}
                         >
                           {t("cart.view")}
                         </Link>
@@ -196,6 +199,7 @@ export default function CartModal() {
                                   <Link
                                     href={lineHref(line)}
                                     className="link text-line-clamp-1"
+                                    onClick={() => dismissBootstrapOverlays()}
                                   >
                                     {lineTitle(line)}
                                   </Link>
@@ -252,6 +256,7 @@ export default function CartModal() {
                         <Link
                           className="btn-line"
                           href={`/${countryCode}/store`}
+                          onClick={() => dismissBootstrapOverlays()}
                         >
                           {t("cart.exploreProducts")}
                         </Link>
@@ -279,12 +284,14 @@ export default function CartModal() {
                       <Link
                         href={`/${countryCode}/cart`}
                         className="tf-btn w-100 btn-white radius-4 has-border"
+                        onClick={() => dismissBootstrapOverlays()}
                       >
                         <span className="text">{t("cart.viewCart")}</span>
                       </Link>
                       <Link
                         href={`/${countryCode}/cart`}
                         className="tf-btn w-100 btn-fill radius-4"
+                        onClick={() => dismissBootstrapOverlays()}
                       >
                         <span className="text">{t("cart.checkout")}</span>
                       </Link>
@@ -293,6 +300,7 @@ export default function CartModal() {
                       <Link
                         className="link text-btn-uppercase"
                         href={`/${countryCode}/store`}
+                        onClick={() => dismissBootstrapOverlays()}
                       >
                         {t("cart.continueShopping")}
                       </Link>

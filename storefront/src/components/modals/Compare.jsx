@@ -10,6 +10,7 @@ import {
   fetchLiveProductByHandle,
 } from "@/lib/util/live-product";
 import { useLocaleT } from "@/i18n/locale-context";
+import { dismissBootstrapOverlays } from "../common/modave-bootstrap";
 
 const toCard = (elm) => ({
   id: elm.id,
@@ -113,7 +114,11 @@ export default function Compare() {
                             style={{ cursor: "pointer" }}
                             onClick={() => removeFromCompareItem(elm.id)}
                           />
-                          <Link href={elm.href} className="image">
+                          <Link
+                            href={elm.href}
+                            className="image"
+                            onClick={() => dismissBootstrapOverlays()}
+                          >
                             <Image
                               className="lazyload"
                               alt={elm.title}
@@ -127,6 +132,7 @@ export default function Compare() {
                               <Link
                                 className="link text-line-clamp-2"
                                 href={elm.href}
+                                onClick={() => dismissBootstrapOverlays()}
                               >
                                 {elm.title}
                               </Link>
