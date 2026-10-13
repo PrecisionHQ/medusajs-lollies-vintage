@@ -202,4 +202,28 @@ export const dismissPopups = async (page: Page) => {
   }
 }
 
+/**
+ * Clicks a Bootstrap overlay trigger until its target opens. The bundle
+ * loads async after first paint, so a fast click can land before
+ * data-bs-toggle is live and do nothing — retry instead of failing.
+ */
+export const openOverlay = async (
+  page: Page,
+  trigger: string,
+  target: string
+) => {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    await page.locator(trigger).first().click()
+    if (
+      await page
+        .locator(target)
+        .isVisible({ timeout: 4000 })
+        .catch(() => false)
+    ) {
+      return
+    }
+  }
+  await expect(page.locator(target)).toBeVisible({ timeout: 5000 })
+}
+
 export { qaEnv }

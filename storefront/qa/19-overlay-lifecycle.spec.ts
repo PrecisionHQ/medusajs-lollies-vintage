@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-import { dismissPopups, url } from "./helpers"
+import { dismissPopups, openOverlay, url } from "./helpers"
 
 /**
  * Overlay lifecycle (#6, #7, #15). The Modave theme drives modals through
@@ -14,8 +14,7 @@ import { dismissPopups, url } from "./helpers"
  */
 test.describe("Overlay lifecycle", () => {
   const openSearch = async (page: Page) => {
-    await page.locator('a[href="#search"]').first().click()
-    await expect(page.locator("#search.show")).toBeVisible()
+    await openOverlay(page, 'a[href="#search"]', "#search.show")
   }
 
   const assertInteractive = async (page: Page) => {
@@ -23,8 +22,7 @@ test.describe("Overlay lifecycle", () => {
     await expect(page.locator(".offcanvas-backdrop")).toHaveCount(0)
     await expect(page.locator("body.modal-open")).toHaveCount(0)
     // Reopening a modal proves clicks actually land on the page.
-    await page.locator('a[href="#search"]').first().click()
-    await expect(page.locator("#search.show")).toBeVisible()
+    await openOverlay(page, 'a[href="#search"]', "#search.show")
     await page.keyboard.press("Escape")
   }
 
@@ -49,9 +47,7 @@ test.describe("Overlay lifecycle", () => {
     await dismissPopups(page)
     // Quick-view is hover-revealed on the card: hover first.
     await page.locator(".card-product").first().hover()
-    const qv = page.locator('a[href="#quickView"]').first()
-    await expect(qv).toBeVisible({ timeout: 10000 })
-    await qv.click()
+    await openOverlay(page, 'a[href="#quickView"]', "#quickView.show")
     await expect(page.locator("#quickView.show")).toBeVisible()
 
     await page
