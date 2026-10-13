@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
+import { FlowsIcon } from "../../components/module-icons";
 import {
   Button,
   Container,
@@ -234,6 +235,7 @@ const FlowsPage = () => {
 };
 
 export const config = defineRouteConfig({
+  icon: FlowsIcon,
   label: "Marketing Automation",
 });
 

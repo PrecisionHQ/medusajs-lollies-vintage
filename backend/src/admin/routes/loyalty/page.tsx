@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
+import { LoyaltyIcon } from "../../components/module-icons";
 import { Button, Container, Heading, Input, Text } from "@medusajs/ui";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -109,6 +110,7 @@ const LoyaltyPage = () => {
 };
 
 export const config = defineRouteConfig({
+  icon: LoyaltyIcon,
   label: "Loyalty",
 });
 

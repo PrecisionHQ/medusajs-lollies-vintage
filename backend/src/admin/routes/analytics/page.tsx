@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
+import { AnalyticsIcon } from "../../components/module-icons";
 import { Container, Heading, Input, Text } from "@medusajs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -121,6 +122,7 @@ const AnalyticsPage = () => {
 };
 
 export const config = defineRouteConfig({
+  icon: AnalyticsIcon,
   label: "Analytics",
 });
 
