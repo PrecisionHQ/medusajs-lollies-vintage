@@ -10,6 +10,7 @@ import { useContextElement } from "@/context/Context";
 import SizeGuide from "@/components/modals/SizeGuide";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
+import { openCartModal } from "@/components/common/cart-modal";
 import { getProductPrice } from "@lib/util/get-product-price";
 import { stripHtmlToText } from "@lib/util/sanitize-html";
 import { getProductReviews } from "@lib/data/reviews";
@@ -173,20 +174,26 @@ export default function ModaveDetailsClient({
   const handleAddToCart = async () => {
     setIsAdding(true);
     try {
-      await doAddToCart(quantity);
+      const ok = await doAddToCart(quantity);
+      // Land on the cart surface (same drawer the header cart icon
+      // opens): the item, the badge and the View-cart page stay in sync.
+      if (ok) openCartModal();
     } finally {
       setIsAdding(false);
     }
   };
 
+  // Buy It Now: skip the cart page and land straight in the checkout flow
+  // with the item present. Failures stay on the PDP with the error shown.
   const handleBuyNow = async () => {
     setBuyingNow(true);
     try {
       const ok = await doAddToCart(quantity);
-      if (ok) router.push(`/${countryCode}/cart`);
+      if (ok) router.push(`/${countryCode}/checkout?step=address`);
     } finally {
       setBuyingNow(false);
     }
+  };
   };
 
   const cardId = product.handle || product.id;
@@ -496,6 +503,7 @@ export default function ModaveDetailsClient({
                             if (!needsSelection && inStock) handleBuyNow();
                           }}
                           className="btn-style-3 text-btn-uppercase"
+                          data-testid="buy-it-now-button"
                         >
                           {buyingNow ? t("product.adding") : t("product.buyNow")}
                         </a>

@@ -141,6 +141,35 @@ export default function QuickView() {
     }
   };
 
+  // Buy It Now: close this modal first (its backdrop would otherwise
+  // survive the client-side nav), then land straight in checkout.
+  const handleBuyNow = async () => {
+    if (!selectedVariant?.id) return;
+    setAdding(true);
+    setError(null);
+    try {
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity,
+        countryCode,
+      });
+      notifyCartUpdated();
+      try {
+        const bs = await loadBootstrap().catch(() => null);
+        bs?.Modal?.getInstance?.(
+          document.getElementById("quickView")
+        )?.hide?.();
+      } catch {
+        // Route watcher + overlay sweep are the backstop; never block nav.
+      }
+      router.push(`/${countryCode}/checkout?step=address`);
+    } catch (e) {
+      setError(e?.message ?? "Could not add to cart.");
+    } finally {
+      setAdding(false);
+    }
+  };
+
   // Static demo fallback (legacy numeric items without a handle).
   if (!handle) {
     const item = quickViewItem || {};
@@ -357,6 +386,15 @@ export default function QuickView() {
                     </a>
                   </div>
                   {error && <div className="text-danger mb_10">{error}</div>}
+                  {selectedVariant && (
+                    <a
+                      className="btn-style-3 text-btn-uppercase mb_10"
+                      onClick={() => handleBuyNow()}
+                      data-testid="quick-view-buy-it-now"
+                    >
+                      {adding ? t("product.adding") : t("product.buyNow")}
+                    </a>
+                  )}
                   <Link
                     href={`/${countryCode}/products/${handle}`}
                     className="btn-style-3 text-btn-uppercase"
