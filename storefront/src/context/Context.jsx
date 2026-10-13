@@ -120,6 +120,22 @@ export default function Context({ children }) {
   useEffect(() => {
     localStorage.setItem("wishlist", JSON.stringify(wishList));
   }, [wishList]);
+  // Compare persists like the wishlist (was session-only: a reload wiped
+  // the tray while the wishlist beside it survived).
+  useEffect(() => {
+    try {
+      const items = JSON.parse(localStorage.getItem("compare"));
+      if (items?.length) {
+        setCompareItem(items.slice(0, 2));
+      }
+    } catch {
+      // Corrupt storage must never break the page.
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("compare", JSON.stringify(compareItem));
+  }, [compareItem]);
 
   const contextElement = {
     cartProducts,

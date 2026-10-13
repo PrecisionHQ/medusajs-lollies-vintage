@@ -56,7 +56,12 @@ export default function Compare() {
         const byHandle = new Map(liveCards.map((c) => [String(c.id), c]));
         for (const p of full) {
           if (!p) continue;
-          const card = byHandle.get(p.handle) || toCard({ ...p, id: p.handle });
+          // Adapter miss (draft/unpriced product) still links the live PDP —
+          // never the dead /product-detail/ fallback inside toCard.
+          const card = byHandle.get(p.handle) || {
+            ...toCard({ ...p, id: p.handle }),
+            href: `/${countryCode}/products/${p.handle}`,
+          };
           const colors = [];
           const sizes = [];
           for (const v of p.variants || []) {
