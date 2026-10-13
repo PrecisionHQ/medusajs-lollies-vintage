@@ -2,6 +2,7 @@ import {
   AuthenticatedMedusaRequest,
   MedusaResponse,
 } from "@medusajs/framework/http";
+import { TOGGLE_FLOWS } from "../../../../modules/marketing/flow-guards";
 
 /**
  * PR-02/03 — Admin API for the Flows page (src/admin/routes/flows).
@@ -66,6 +67,15 @@ const FLOW_DEFS = [
     },
     countFlows: ["welcome"],
   },
+  // Toggle-only flows share one source of truth with the runners
+  // (flow-guards TOGGLE_FLOWS): no delays/incentives, just on/off + sent.
+  ...TOGGLE_FLOWS.map(({ key, flow }) => ({
+    key,
+    defaults: {
+      enabled: true,
+    },
+    countFlows: [flow],
+  })),
 ] as const;
 
 export const GET = async (

@@ -26,7 +26,13 @@ type FlowsResponse = { flows: FlowRow[]; optOuts: number };
 
 const FLOW_META: Record<
   string,
-  { title: string; blurb: string; delayLabel: string; showSecond: boolean }
+  {
+    title: string;
+    blurb: string;
+    delayLabel: string;
+    showSecond: boolean;
+    simple?: boolean;
+  }
 > = {
   abandoned_cart: {
     title: "Abandoned cart",
@@ -55,6 +61,30 @@ const FLOW_META: Record<
       "Sent immediately on account signup. The code is static text — create the matching promotion in Promotions.",
     delayLabel: "Delay (hours)",
     showSecond: false,
+  },
+  price_drop: {
+    title: "Price drop",
+    blurb:
+      "Wishlist alerts when a watched variant drops to a new low. Runs with the price-drop job; no cap (alerts are the point).",
+    delayLabel: "",
+    showSecond: false,
+    simple: true,
+  },
+  cross_sell: {
+    title: "Cross-sell",
+    blurb:
+      "Post-purchase 'complete the look' mail for orders placed 2-3 days ago. Runs daily at 09:00.",
+    delayLabel: "",
+    showSecond: false,
+    simple: true,
+  },
+  back_in_stock: {
+    title: "Back in stock",
+    blurb:
+      "Fires per subscription when variant availability crosses the restock threshold. One mail per subscription, ever.",
+    delayLabel: "",
+    showSecond: false,
+    simple: true,
   },
 };
 
@@ -127,6 +157,7 @@ const FlowsPage = () => {
           blurb: "",
           delayLabel: "Delay (hours)",
           showSecond: false,
+          simple: false,
         };
         return (
           <Container key={key} className="divide-y p-0">
@@ -145,6 +176,12 @@ const FlowsPage = () => {
             </div>
 
             <div className="px-6 py-4 flex flex-wrap items-end gap-4">
+              {meta.simple ? (
+                <Text className="pb-2 text-ui-fg-subtle">
+                  On/off only — timing lives in the job/subscriber.
+                </Text>
+              ) : (
+              <>
               <div className="w-64">
                 <Text className="mb-1">{meta.delayLabel}</Text>
                 <Input
@@ -214,6 +251,8 @@ const FlowsPage = () => {
               <Text className="pb-2">
                 Sent: <strong>{sent}</strong>
               </Text>
+              </>
+              )}
             </div>
           </Container>
         );
