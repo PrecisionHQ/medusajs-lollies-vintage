@@ -38,11 +38,17 @@ const GiftCardCode: React.FC<GiftCardCodeProps> = ({
   const refresh = React.useCallback(() => {
     setLoading(true)
     listAppliedGiftCards(
-      cart.credit_lines as {
-        reference?: string | null
-        reference_id?: string | null
-        amount?: number | null
-      }[]
+      (
+        cart as unknown as {
+          credit_lines?:
+            | {
+                reference?: string | null
+                reference_id?: string | null
+                amount?: number | null
+              }[]
+            | null
+        }
+      ).credit_lines ?? []
     )
       .then(setApplied)
       .catch(() => setApplied([]))
