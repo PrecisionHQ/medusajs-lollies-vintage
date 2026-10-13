@@ -47,7 +47,11 @@ test.describe("Overlay lifecycle", () => {
   }) => {
     await page.goto(url())
     await dismissPopups(page)
-    await page.locator('a[href="#quickView"]').first().click()
+    // Quick-view is hover-revealed on the card: hover first.
+    await page.locator(".card-product").first().hover()
+    const qv = page.locator('a[href="#quickView"]').first()
+    await expect(qv).toBeVisible({ timeout: 10000 })
+    await qv.click()
     await expect(page.locator("#quickView.show")).toBeVisible()
 
     await page
