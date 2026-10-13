@@ -10,6 +10,7 @@ import {
   fetchLiveProductByHandle,
 } from "@/lib/util/live-product";
 import { useLocaleT } from "@/i18n/locale-context";
+import { dismissBootstrapOverlays } from "../common/modave-bootstrap";
 
 const toCard = (elm) => ({
   id: elm.id,
@@ -56,7 +57,12 @@ export default function Compare() {
         const byHandle = new Map(liveCards.map((c) => [String(c.id), c]));
         for (const p of full) {
           if (!p) continue;
-          const card = byHandle.get(p.handle) || toCard({ ...p, id: p.handle });
+          // Adapter miss (draft/unpriced product) still links the live PDP —
+          // never the dead /product-detail/ fallback inside toCard.
+          const card = byHandle.get(p.handle) || {
+            ...toCard({ ...p, id: p.handle }),
+            href: `/${countryCode}/products/${p.handle}`,
+          };
           const colors = [];
           const sizes = [];
           for (const v of p.variants || []) {
@@ -113,7 +119,11 @@ export default function Compare() {
                             style={{ cursor: "pointer" }}
                             onClick={() => removeFromCompareItem(elm.id)}
                           />
-                          <Link href={elm.href} className="image">
+                          <Link
+                            href={elm.href}
+                            className="image"
+                            onClick={() => dismissBootstrapOverlays()}
+                          >
                             <Image
                               className="lazyload"
                               alt={elm.title}
@@ -127,6 +137,7 @@ export default function Compare() {
                               <Link
                                 className="link text-line-clamp-2"
                                 href={elm.href}
+                                onClick={() => dismissBootstrapOverlays()}
                               >
                                 {elm.title}
                               </Link>

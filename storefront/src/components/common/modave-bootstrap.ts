@@ -14,3 +14,72 @@ export function loadBootstrap(): Promise<any> {
   }
   return loaded
 }
+
+/**
+ * Synchronously tear down every Bootstrap overlay. Next.js client-side
+ * navigation does not run Bootstrap's hide path, so without this a nav
+ * away from inside an open QuickView / search / compare / cart overlay
+ * leaves the destination page unclickable until a full refresh.
+ *
+ * Live QA proved a backdrop-only sweep is NOT enough: the open modal
+ * element itself (still carrying .show → display:block) survives inside
+ * persistent layouts and keeps covering the new page. So this removes
+ * .show from every open modal/offcanvas as well — the next data-bs-toggle
+ * open re-shows cleanly through Bootstrap's own show() path.
+ *
+ * Strategy: force-hide in the DOM synchronously (the guarantee — the page
+ * is free the moment navigation lands), then dispose the Bootstrap
+ * instances so the next data-bs-toggle open gets a fresh instance with
+ * clean transition state.
+ *
+ * Deliberately NOT calling instance.hide(): with the element already
+ * display:none, Bootstrap's deferred hide continuation throws
+ * asynchronously ("Cannot read properties of null") outside our
+ * try/catch — pageerror noise on every overlay nav. Dispose alone is
+ * both quiet and leaves correct state behind.
+ */
+export function dismissBootstrapOverlays(): void {
+  if (typeof document === "undefined") {
+    return
+  }
+  let open: Element[] = []
+  try {
+    open = Array.from(
+      document.querySelectorAll(".modal.show, .offcanvas.show")
+    )
+  } catch {
+    // Never let overlay cleanup break navigation.
+  }
+  for (const el of open) {
+    el.classList.remove("show")
+    ;(el as HTMLElement).style.display = "none"
+    el.setAttribute("aria-hidden", "true")
+  }
+  if (open.length) {
+    loadBootstrap()
+      .then((bs) => {
+        try {
+          for (const el of open) {
+            const inst =
+              bs?.Modal?.getInstance?.(el) ??
+              bs?.Offcanvas?.getInstance?.(el)
+            inst?.dispose?.()
+          }
+        } catch {
+          // DOM sweep above is the guarantee; dispose is best-effort.
+        }
+      })
+      .catch(() => {
+        // Bundle failed to load — DOM sweep above still frees the page.
+      })
+  }
+  for (const backdrop of Array.from(
+    document.querySelectorAll(".modal-backdrop, .offcanvas-backdrop")
+  )) {
+    backdrop.remove()
+  }
+  document.body.classList.remove("modal-open")
+  document.body.style.overflow = ""
+  document.body.style.paddingRight = ""
+  document.documentElement.style.overflow = ""
+}

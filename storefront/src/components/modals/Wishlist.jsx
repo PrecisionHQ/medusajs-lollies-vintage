@@ -7,6 +7,7 @@ import { allProducts } from "@/data/products";
 import { usePathname } from "next/navigation";
 import { fetchLiveCardsByHandles } from "@/lib/util/live-product";
 import { useLocaleT } from "@/i18n/locale-context";
+import { dismissBootstrapOverlays } from "../common/modave-bootstrap";
 
 /**
  * Wishlist drawer. Resolves ids to cards from static demo data (numeric
@@ -93,6 +94,7 @@ export default function Wishlist() {
                                 <Link
                                   href={elm.href}
                                   className="link text-line-clamp-1"
+                                  onClick={() => dismissBootstrapOverlays()}
                                 >
                                   {elm.title}
                                 </Link>
@@ -119,6 +121,7 @@ export default function Wishlist() {
                       <Link
                         className="btn-line"
                         href={`/${countryCode}/store`}
+                        onClick={() => dismissBootstrapOverlays()}
                       >
                         {t("cart.exploreProducts")}
                       </Link>
@@ -130,6 +133,7 @@ export default function Wishlist() {
                 <Link
                   href={`/${countryCode}/store`}
                   className="text-btn-uppercase"
+                  onClick={() => dismissBootstrapOverlays()}
                 >
                   {t("cart.continueShopping")}
                 </Link>

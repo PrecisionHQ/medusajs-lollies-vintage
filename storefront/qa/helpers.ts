@@ -178,4 +178,131 @@ export const parseMoney = (value: string | null): number => {
   return Number.parseFloat(cleaned)
 }
 
+/**
+ * Suppress the auto-popups that cover the page: the newsletter modal
+ * (checks its subscribed flag synchronously at mount) and the GDPR
+ * consent banner (renders whenever the consent cookie is missing — i.e.
+ * every fresh context, and it is fixed to the bottom of the viewport
+ * where it swallows clicks, including force-clicks on card triggers).
+ * Both flags must be present BEFORE page scripts run — post-load
+ * evaluate() always loses that race. Call once before the first
+ * goto(); it persists across navigations in the context.
+ */
+export const suppressPopups = async (page: Page) => {
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("lollies_newsletter_subscribed", "1")
+      document.cookie =
+        "lollies_consent=rejected; Max-Age=31536000; Path=/; SameSite=Lax"
+    } catch {
+      // Private mode: the popups show; dismissPopups closes them.
+    }
+  })
+}
+
+/**
+ * Close the popups if they opened anyway (unsuppressed contexts, mid-test
+ * reloads that predate suppression). Belt-and-braces next to
+ * suppressPopups, not a replacement.
+ */
+export const dismissPopups = async (page: Page) => {
+  const popup = page.locator("#newsletterPopup.show")
+  if (await popup.isVisible({ timeout: 3000 }).catch(() => false)) {
+    await popup.locator(".icon-close").first().click({ force: true })
+    await expect(popup).toBeHidden({ timeout: 5000 })
+  }
+  const consent = page.locator('[aria-label="Cookie consent"]')
+  if (await consent.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await consent.getByRole("button", { name: "Reject" }).click()
+    await expect(consent).toBeHidden({ timeout: 5000 })
+  }
+}
+
+/**
+ * Opens the first product's QuickView by hovering its card and clicking
+ * the card's OWN trigger. Scoped per card on purpose: every card renders
+ * two quickview triggers (hover icon + main button) and carousel cards
+ * can match a global `:visible` while sitting off-screen, so a global
+ * first-match click sometimes lands on nothing and the modal never
+ * opens — flaky only under load, which is exactly when QA matters.
+ */
+export const openFirstQuickView = async (page: Page) => {
+  const cards = page.locator(".card-product")
+  const count = await cards.count()
+  for (let i = 0; i < count; i++) {
+    const card = cards.nth(i)
+    if (!(await card.isVisible().catch(() => false))) {
+      continue
+    }
+    await card.hover().catch(() => {})
+    const trigger = card.locator('a[href="#quickView"]').first()
+    if (!(await trigger.isVisible().catch(() => false))) {
+      continue
+    }
+    await trigger.click({ force: true, timeout: 5000 }).catch(() => {})
+    if (
+      await page
+        .locator("#quickView.show")
+        .waitFor({ state: "attached", timeout: 2000 })
+        .then(() => true)
+        .catch(() => false)
+    ) {
+      return
+    }
+  }
+  await expect(page.locator("#quickView.show")).toBeVisible({ timeout: 10000 })
+}
+
+/**
+ * Clicks a Bootstrap overlay trigger until its target opens. The bundle
+ * loads async after first paint, so a fast click can land before
+ * data-bs-toggle is live and do nothing — retry instead of failing.
+ *
+ * Live QA showed two distinct traps: a click that opens the modal under
+ * the cursor times out on post-click stability while the fade animation
+ * covers the trigger, and the NEXT retry click is then intercepted by
+ * the open modal. So: each retry first closes any overlay left open,
+ * and success is decided by the target's `.show` class being attached
+ * (Bootstrap adds it synchronously on show()), never by visibility —
+ * the fade delays computed visibility while the page is already
+ * blocked, which is what turned a pass into a 30s timeout.
+ */
+export const openOverlay = async (
+  page: Page,
+  trigger: string,
+  target: string
+) => {
+  const targetLocator = page.locator(target)
+  for (let attempt = 0; attempt < 3; attempt++) {
+    if ((await page.locator(".modal.show, .offcanvas.show").count()) > 0) {
+      await page.keyboard.press("Escape").catch(() => {})
+      await page
+        .locator(".modal.show .icon-close, .offcanvas.show .icon-close")
+        .first()
+        .click({ force: true, timeout: 3000 })
+        .catch(() => {})
+      await page
+        .locator(".modal.show, .offcanvas.show")
+        .first()
+        .waitFor({ state: "detached", timeout: 3000 })
+        .catch(() => {})
+    }
+    await page
+      .locator(trigger)
+      .first()
+      .click({ timeout: 8000 })
+      .catch(() => {})
+    if (
+      await targetLocator
+        .first()
+        .waitFor({ state: "attached", timeout: 1500 })
+        .then(() => true)
+        .catch(() => false)
+    ) {
+      return
+    }
+  }
+  await expect(targetLocator).toBeVisible({ timeout: 5000 })
+}
+
 export { qaEnv }

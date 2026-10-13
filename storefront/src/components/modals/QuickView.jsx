@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { isEqual } from "lodash";
 import { useContextElement } from "@/context/Context";
 import QuantitySelect from "../productDetails/QuantitySelect";
-import { loadBootstrap } from "../common/modave-bootstrap";
+import { dismissBootstrapOverlays, loadBootstrap } from "../common/modave-bootstrap";
 import { fetchLiveProductByHandle } from "@/lib/util/live-product";
 import { getProductPrice } from "@/lib/util/get-product-price";
 import { stripHtmlToText } from "@/lib/util/sanitize-html";
@@ -88,6 +88,8 @@ export default function QuickView() {
     );
   }, [live, options]);
 
+  const needsSelection = (live?.variants?.length ?? 0) > 1 && !selectedVariant;
+
   const priceInfo = useMemo(() => {
     if (!live) return null;
     try {
@@ -95,11 +97,17 @@ export default function QuickView() {
         product: live,
         variantId: selectedVariant?.id,
       });
-      return variantPrice ?? cheapestPrice;
+      // Same exact-price rule as the PDP: a selected variant shows its own
+      // backend price or nothing — never another variant's cheapest price.
+      if (selectedVariant?.id) return variantPrice ?? null;
+      return cheapestPrice;
     } catch {
       return null;
     }
   }, [live, selectedVariant]);
+
+  const priceMissing =
+    !needsSelection && !!selectedVariant && !priceInfo;
 
   const optionEntries = useMemo(() => {
     if (!live?.options?.length) return [];
@@ -115,7 +123,7 @@ export default function QuickView() {
   }, [live]);
 
   const handleAdd = async () => {
-    if (!selectedVariant?.id) return;
+    if (!selectedVariant?.id || priceMissing) return;
     setAdding(true);
     setError(null);
     try {
@@ -126,6 +134,35 @@ export default function QuickView() {
       });
       notifyCartUpdated();
       router.refresh();
+    } catch (e) {
+      setError(e?.message ?? "Could not add to cart.");
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  // Buy It Now: close this modal first (its backdrop would otherwise
+  // survive the client-side nav), then land straight in checkout.
+  const handleBuyNow = async () => {
+    if (!selectedVariant?.id) return;
+    setAdding(true);
+    setError(null);
+    try {
+      await addToCart({
+        variantId: selectedVariant.id,
+        quantity,
+        countryCode,
+      });
+      notifyCartUpdated();
+      try {
+        const bs = await loadBootstrap().catch(() => null);
+        bs?.Modal?.getInstance?.(
+          document.getElementById("quickView")
+        )?.hide?.();
+      } catch {
+        // Route watcher + overlay sweep are the backstop; never block nav.
+      }
+      router.push(`/${countryCode}/checkout?step=address`);
     } catch (e) {
       setError(e?.message ?? "Could not add to cart.");
     } finally {
@@ -205,12 +242,29 @@ export default function QuickView() {
                 </div>
                 <div className="tf-product-info-desc">
                   <div className="tf-product-info-price">
-                    <h5 className="price-on-sale font-2">
-                      {loading
-                        ? "…"
-                        : priceInfo?.calculated_price ?? ""}
-                    </h5>
-                    {priceInfo?.percentage_diff &&
+                    {loading ? (
+                      <h5 className="price-on-sale font-2">…</h5>
+                    ) : needsSelection && priceInfo ? (
+                      <>
+                        <span className="price-from-label text-caption-1">
+                          {t("product.from")}{" "}
+                        </span>
+                        <h5 className="price-on-sale font-2">
+                          {priceInfo.calculated_price}
+                        </h5>
+                      </>
+                    ) : priceMissing || !priceInfo ? (
+                      <span className="price-unavailable text-caption-1">
+                        {t("product.priceUnavailable")}
+                      </span>
+                    ) : (
+                      <h5 className="price-on-sale font-2">
+                        {priceInfo.calculated_price}
+                      </h5>
+                    )}
+                    {!loading &&
+                    !needsSelection &&
+                    priceInfo?.percentage_diff &&
                     parseFloat(priceInfo.percentage_diff) > 0 ? (
                       <>
                         <div className="compare-at-price font-2">
@@ -293,6 +347,8 @@ export default function QuickView() {
                       <span>
                         {!selectedVariant
                           ? t("product.selectOptions")
+                          : priceMissing
+                          ? t("product.priceUnavailable")
                           : adding
                           ? t("product.adding")
                           : t("product.addToCart") + " -"}
@@ -330,9 +386,19 @@ export default function QuickView() {
                     </a>
                   </div>
                   {error && <div className="text-danger mb_10">{error}</div>}
+                  {selectedVariant && (
+                    <a
+                      className="btn-style-3 text-btn-uppercase mb_10"
+                      onClick={() => handleBuyNow()}
+                      data-testid="quick-view-buy-it-now"
+                    >
+                      {adding ? t("product.adding") : t("product.buyNow")}
+                    </a>
+                  )}
                   <Link
                     href={`/${countryCode}/products/${handle}`}
                     className="btn-style-3 text-btn-uppercase"
+                    onClick={() => dismissBootstrapOverlays()}
                   >
                     {t("product.viewFullDetails")}
                   </Link>
