@@ -196,7 +196,6 @@ export default function ModaveDetailsClient({
       setBuyingNow(false);
     }
   };
-  };
 
   const cardId = product.handle || product.id;
   const eyebrow =
