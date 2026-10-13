@@ -107,6 +107,8 @@
     "quantity": "Mängd:",
     "addToCart": "LÄGG I VARUKORGEN",
     "selectOptions": "Välj alternativ",
+    "from": "Från",
+    "priceUnavailable": "Pris inte tillgängligt för denna variant",
     "outOfStock": "Ej i lager",
     "buyNow": "Köp det nu.",
     "colors": "Färger:",

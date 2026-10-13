@@ -113,11 +113,22 @@ export default function ModaveDetailsClient({
         product,
         variantId: selectedVariant?.id,
       });
-      return variantPrice ?? cheapestPrice;
+      // A selected variant shows its EXACT backend price or nothing at all.
+      // Falling back to the cheapest variant here displayed another
+      // variant's price as this one's (the price visibly "jumped" only
+      // after adding to cart). Unselected state shows the cheapest as a
+      // "From" price at the render site below.
+      if (selectedVariant?.id) return variantPrice ?? null;
+      return cheapestPrice;
     } catch {
       return null;
     }
   }, [product, selectedVariant]);
+
+  // Variant resolved but the backend has no price for it in this region:
+  // purchasable-looking but unorderable, so block add-to-cart and say so.
+  const priceMissing =
+    !needsSelection && !!selectedVariant && !priceInfo;
 
   const optionValues = (title) => {
     const vals = [];
@@ -141,6 +152,10 @@ export default function ModaveDetailsClient({
 
   const doAddToCart = async (qty) => {
     if (!selectedVariant?.id) return false;
+    if (priceMissing) {
+      setError(t("product.priceUnavailable"));
+      return false;
+    }
     setError(null);
     const res = await addToCart({
       variantId: selectedVariant.id,
@@ -262,20 +277,37 @@ export default function ModaveDetailsClient({
                       </div>
                       <div className="tf-product-info-desc">
                         <div className="tf-product-info-price">
-                          <h5 className="price-on-sale font-2">
-                            {priceInfo?.calculated_price ?? ""}
-                          </h5>
-                          {priceInfo?.percentage_diff &&
-                          parseFloat(priceInfo.percentage_diff) > 0 ? (
+                          {needsSelection && priceInfo ? (
                             <>
-                              <div className="compare-at-price font-2">
-                                {priceInfo.original_price}
-                              </div>
-                              <div className="badges-on-sale text-btn-uppercase">
-                                -{priceInfo.percentage_diff}%
-                              </div>
+                              <span className="price-from-label text-caption-1">
+                                {t("product.from")}{" "}
+                              </span>
+                              <h5 className="price-on-sale font-2">
+                                {priceInfo.calculated_price}
+                              </h5>
                             </>
-                          ) : null}
+                          ) : priceMissing || !priceInfo ? (
+                            <span className="price-unavailable text-caption-1">
+                              {t("product.priceUnavailable")}
+                            </span>
+                          ) : (
+                            <>
+                              <h5 className="price-on-sale font-2">
+                                {priceInfo?.calculated_price ?? ""}
+                              </h5>
+                              {priceInfo?.percentage_diff &&
+                              parseFloat(priceInfo.percentage_diff) > 0 ? (
+                                <>
+                                  <div className="compare-at-price font-2">
+                                    {priceInfo.original_price}
+                                  </div>
+                                  <div className="badges-on-sale text-btn-uppercase">
+                                    -{priceInfo.percentage_diff}%
+                                  </div>
+                                </>
+                              ) : null}
+                            </>
+                          )}
                         </div>
                         {shortDescription ? <p>{shortDescription}</p> : null}
                       </div>
@@ -409,7 +441,8 @@ export default function ModaveDetailsClient({
                         <div className="tf-product-info-by-btn mb_10">
                           <a
                             onClick={() => {
-                              if (!needsSelection && inStock) handleAddToCart();
+                              if (!needsSelection && inStock && !priceMissing)
+                                handleAddToCart();
                             }}
                             className="btn-style-2 flex-grow-1 text-btn-uppercase fw-6 btn-add-to-cart"
                           >
@@ -418,6 +451,8 @@ export default function ModaveDetailsClient({
                                 ? (noneAvailable
                                   ? t("product.outOfStock")
                                   : t("product.selectOptions"))
+                                : priceMissing
+                                ? t("product.priceUnavailable")
                                 : !inStock
                                 ? t("product.outOfStock")
                                 : isAdding
