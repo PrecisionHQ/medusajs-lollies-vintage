@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { search } from "@modules/search/actions";
 import { useLocaleT } from "@/i18n/locale-context";
+import { dismissBootstrapOverlays } from "../common/modave-bootstrap";
 
 const POPULAR = [
   { label: "Dresses", href: "dresses", kind: "category" },
@@ -52,6 +53,10 @@ export default function SearchModal() {
     const query = (q ?? value).trim();
     if (!query) return;
     setSuggestions([]);
+    // Navigating with the #search modal open strands its backdrop +
+    // body lock on the results page (route watcher is the backstop;
+    // dismissing first avoids even a one-frame stuck overlay).
+    dismissBootstrapOverlays();
     router.push(`/${countryCode}/results/${encodeURIComponent(query)}`);
   };
 
@@ -118,7 +123,10 @@ export default function SearchModal() {
                   key={hit.id || hit.handle}
                   href={`/${countryCode}/products/${hit.handle}`}
                   className="d-flex align-items-center gap-2 mb-2 link"
-                  onClick={() => setSuggestions([])}
+                  onClick={() => {
+                    setSuggestions([]);
+                    dismissBootstrapOverlays();
+                  }}
                 >
                   {hit.thumbnail ? (
                     <Image
@@ -144,6 +152,7 @@ export default function SearchModal() {
                       p.kind === "collection" ? "collections" : "categories"
                     }/${p.href}`}
                     className="radius-60 link"
+                    onClick={() => dismissBootstrapOverlays()}
                   >
                     {p.label}
                   </Link>

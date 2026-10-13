@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { isEqual } from "lodash";
 import { useContextElement } from "@/context/Context";
 import QuantitySelect from "../productDetails/QuantitySelect";
-import { loadBootstrap } from "../common/modave-bootstrap";
+import { dismissBootstrapOverlays, loadBootstrap } from "../common/modave-bootstrap";
 import { fetchLiveProductByHandle } from "@/lib/util/live-product";
 import { getProductPrice } from "@/lib/util/get-product-price";
 import { stripHtmlToText } from "@/lib/util/sanitize-html";
@@ -333,6 +333,7 @@ export default function QuickView() {
                   <Link
                     href={`/${countryCode}/products/${handle}`}
                     className="btn-style-3 text-btn-uppercase"
+                    onClick={() => dismissBootstrapOverlays()}
                   >
                     {t("product.viewFullDetails")}
                   </Link>

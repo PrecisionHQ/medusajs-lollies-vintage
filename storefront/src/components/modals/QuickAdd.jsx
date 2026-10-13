@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import ColorSelect from "../productDetails/ColorSelect";
 import SizeSelect from "../productDetails/SizeSelect";
 import QuantitySelect from "../productDetails/QuantitySelect";
+import { dismissBootstrapOverlays } from "../common/modave-bootstrap";
 export default function QuickAdd() {
   const [quantity, setQuantity] = useState(1);
   const {
@@ -44,7 +45,12 @@ export default function QuickAdd() {
                   <Image alt="" src={item.imgSrc} width={600} height={800} />
                 </div>
                 <div className="content">
-                  <Link href={`/product-detail/${item.id}`}>{item.title}</Link>
+                  <Link
+                    href={`/product-detail/${item.id}`}
+                    onClick={() => dismissBootstrapOverlays()}
+                  >
+                    {item.title}
+                  </Link>
                   <div className="tf-product-info-price">
                     <h5 className="price-on-sale font-2">
                       ${item.price.toFixed(2)}

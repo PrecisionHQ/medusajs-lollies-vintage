@@ -1,6 +1,7 @@
 "use client";
-import { useEffect } from "react";
-import { loadBootstrap } from "./modave-bootstrap";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
+import { dismissBootstrapOverlays, loadBootstrap } from "./modave-bootstrap";
 
 /**
  * Loads Bootstrap's JS bundle on Modave-themed pages. The theme drives every
@@ -9,8 +10,15 @@ import { loadBootstrap } from "./modave-bootstrap";
  * vendored with the theme). Dynamically imported client-side only, rendered
  * inside `.modave-scope` pages (homepage, PDP) so the starter-layout pages
  * are untouched.
+ *
+ * Also dismisses any open Bootstrap overlay on route change: client-side nav
+ * from inside a modal (QuickView "view full details", search suggestions,
+ * compare tray, cart modal) never runs Bootstrap's hide path, which used to
+ * strand a backdrop + body scroll-lock on the destination page until refresh.
  */
 export default function ModaveScripts() {
+  const pathname = usePathname();
+  const firstPath = useRef(true);
   useEffect(() => {
     let cancelled = false;
     loadBootstrap().then(() => {
@@ -24,5 +32,13 @@ export default function ModaveScripts() {
       cancelled = true;
     };
   }, []);
+  useEffect(() => {
+    // Skip the initial mount — there is no previous page to clean up after.
+    if (firstPath.current) {
+      firstPath.current = false;
+      return;
+    }
+    dismissBootstrapOverlays();
+  }, [pathname]);
   return null;
 }
