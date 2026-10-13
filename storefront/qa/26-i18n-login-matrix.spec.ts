@@ -1,5 +1,11 @@
 import { test, expect, type Page } from "@playwright/test"
-import { assertSignedIn, newCustomer, type TestCustomer } from "./helpers"
+import {
+  assertSignedIn,
+  dismissPopups,
+  newCustomer,
+  suppressPopups,
+  type TestCustomer,
+} from "./helpers"
 import { resolveLocale } from "../src/i18n/config"
 import { countryLocale } from "../src/i18n/country-locale"
 import en from "../src/i18n/dictionaries/en.json"
@@ -26,14 +32,18 @@ const COUNTRIES = ["gb", "de", "fr", "es", "it", "nl", "se", "dk", "ie", "pt"]
 const modalTitle = (page: Page) => page.locator("#search h5").first()
 
 async function gotoCountry(page: Page, cc: string): Promise<boolean> {
+  await suppressPopups(page)
   await page.goto(`/${cc}`)
+  await dismissPopups(page)
   // Unknown-to-the-backend countries 307 to the default region.
   return page.url().includes(`/${cc}`)
 }
 
 /** Country-scoped registration (the shared helper pins qaEnv.region). */
 async function registerAt(page: Page, cc: string, customer: TestCustomer) {
+  await suppressPopups(page)
   await page.goto(`/${cc}/account`)
+  await dismissPopups(page)
   await page.getByTestId("register-button").click()
   await expect(page.getByTestId("register-page")).toBeVisible()
   await page.getByTestId("first-name-input").fill(customer.firstName)
@@ -64,6 +74,7 @@ for (const cc of COUNTRIES) {
       // Registration stays in-country and keeps the locale chrome.
       expect(page.url()).toContain(`/${cc}/account`)
       await page.goto(`/${cc}`)
+      await dismissPopups(page)
       await page.locator('a[href="#search"]').first().click()
       await expect(page.locator("#search.show")).toBeVisible()
       await expect(modalTitle(page)).toHaveText(
@@ -91,6 +102,7 @@ for (const cc of COUNTRIES) {
       // Back to official: clear the cookie, chrome follows.
       await page.context().clearCookies({ name: "lollies-locale" })
       await page.reload()
+      await dismissPopups(page)
       await page.locator('a[href="#search"]').first().click()
       await expect(page.locator("#search.show")).toBeVisible()
       await expect(modalTitle(page)).toHaveText(
