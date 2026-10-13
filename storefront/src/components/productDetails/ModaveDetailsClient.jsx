@@ -8,6 +8,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Thumbs } from "swiper/modules";
 import { useContextElement } from "@/context/Context";
 import SizeGuide from "@/components/modals/SizeGuide";
+import AskQuestionModal from "@/components/modals/AskQuestionModal";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
 import { getProductPrice } from "@lib/util/get-product-price";
@@ -486,6 +487,7 @@ export default function ModaveDetailsClient({
                             href="#ask_question"
                             data-bs-toggle="modal"
                             className="tf-product-extra-icon"
+                            data-testid="ask-question-link"
                           >
                             <div className="icon">
                               <i className="icon-question" />
@@ -590,6 +592,7 @@ export default function ModaveDetailsClient({
         </div>
       </div>
       <SizeGuide />
+      <AskQuestionModal productId={product.id} />
     </section>
   );
 }

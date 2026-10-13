@@ -82,6 +82,10 @@ const medusaConfig = {
       resolve: './src/modules/reviews',
     },
     {
+      // Q&A: guest-capable product questions + admin answers. No options.
+      resolve: './src/modules/questions',
+    },
+    {
       // PR-07: customer wishlists. No options.
       resolve: './src/modules/wishlist',
     },
