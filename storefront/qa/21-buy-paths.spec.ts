@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-import { url } from "./helpers"
+import { dismissPopups, url } from "./helpers"
 
 /**
  * Buy paths (#2, #10). Add-to-cart opens the live cart drawer (the same
@@ -10,11 +10,13 @@ import { url } from "./helpers"
 
 const openFirstProduct = async (page: Page) => {
   await page.goto(url("store"))
+  await dismissPopups(page)
   const link = page.locator('a[href*="/products/"]').first()
   await expect(link).toBeVisible({ timeout: 20000 })
   const title = (await link.textContent())?.trim()
   await link.click()
   await expect(page).toHaveURL(/\/products\//)
+  await dismissPopups(page)
   return title
 }
 

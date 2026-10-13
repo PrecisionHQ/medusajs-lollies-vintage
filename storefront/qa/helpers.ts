@@ -178,4 +178,17 @@ export const parseMoney = (value: string | null): number => {
   return Number.parseFloat(cleaned)
 }
 
+/**
+ * Fresh loads pop the newsletter modal, which eats pointer events until
+ * dismissed. Call after goto() before clicking theme chrome. Absent
+ * popups resolve in ~1s via the short timeout, never the 30s default.
+ */
+export const dismissPopups = async (page: Page) => {
+  const popup = page.locator("#newsletterPopup.show")
+  if (await popup.isVisible({ timeout: 5000 }).catch(() => false)) {
+    await popup.locator(".icon-close").first().click({ force: true })
+    await expect(popup).toBeHidden({ timeout: 5000 })
+  }
+}
+
 export { qaEnv }
