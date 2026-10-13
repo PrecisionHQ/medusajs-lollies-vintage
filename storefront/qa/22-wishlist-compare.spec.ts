@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-import { url } from "./helpers"
+import { dismissPopups, suppressPopups, url } from "./helpers"
 
 /**
  * Wishlist + compare state store (#9). Both lists live in Context with
@@ -9,7 +9,9 @@ import { url } from "./helpers"
  */
 
 const openFirstProduct = async (page: Page) => {
+  await suppressPopups(page)
   await page.goto(url("store"))
+  await dismissPopups(page)
   const link = page.locator('a[href*="/products/"]').first()
   await expect(link).toBeVisible({ timeout: 20000 })
   await link.click()
@@ -28,6 +30,7 @@ test.describe("Wishlist and compare", () => {
     await page.keyboard.press("Escape")
 
     await page.reload()
+    await dismissPopups(page)
     await page.locator('a[href="#wishlist"]').first().click()
     await expect(page.locator("#wishlist.show")).toBeVisible()
     await expect(

@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { url } from "./helpers"
+import { dismissPopups, suppressPopups, url } from "./helpers"
 
 /**
  * Share modal (#13). The PDP trigger used to point at a modal that did
@@ -10,7 +10,9 @@ import { url } from "./helpers"
 test.describe("Share modal", () => {
   test("share offers WhatsApp and copy-link", async ({ page, context }) => {
     await context.grantPermissions(["clipboard-write", "clipboard-read"])
+    await suppressPopups(page)
     await page.goto(url("store"))
+    await dismissPopups(page)
     const link = page.locator('a[href*="/products/"]').first()
     await expect(link).toBeVisible({ timeout: 20000 })
     await link.click()

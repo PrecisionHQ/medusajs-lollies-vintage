@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { url } from "./helpers"
+import { dismissPopups, suppressPopups, url } from "./helpers"
 
 /**
  * PDP help modals (#12). The Delivery & Return trigger has always been on
@@ -8,7 +8,9 @@ import { url } from "./helpers"
  */
 test.describe("Shipping modal", () => {
   test("delivery & return opens and closes", async ({ page }) => {
+    await suppressPopups(page)
     await page.goto(url("store"))
+    await dismissPopups(page)
     const link = page.locator('a[href*="/products/"]').first()
     await expect(link).toBeVisible({ timeout: 20000 })
     await link.click()

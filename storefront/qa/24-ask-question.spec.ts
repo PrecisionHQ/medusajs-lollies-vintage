@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test"
-import { url } from "./helpers"
+import { dismissPopups, suppressPopups, url } from "./helpers"
 
 /**
  * Ask a Question (#11). The PDP trigger used to point at a modal that did
@@ -8,7 +8,9 @@ import { url } from "./helpers"
  */
 test.describe("Ask a question", () => {
   test("guest can ask and sees validation", async ({ page }) => {
+    await suppressPopups(page)
     await page.goto(url("store"))
+    await dismissPopups(page)
     const link = page.locator('a[href*="/products/"]').first()
     await expect(link).toBeVisible({ timeout: 20000 })
     await link.click()
@@ -18,14 +20,16 @@ test.describe("Ask a question", () => {
     const modal = page.getByTestId("ask-modal")
     await expect(modal).toBeVisible({ timeout: 15000 })
 
-    // Too-short question trips backend validation inline.
+    // A well-formed email with a too-short question trips OUR validation
+    // inline. (An invalid email is caught by the browser's native
+    // constraint validation before the handler runs, so it can't be used
+    // to exercise the server-side message.)
     await page.getByTestId("ask-name-input").fill("Quinn Tester")
-    await page.getByTestId("ask-email-input").fill("not-an-email")
+    await page.getByTestId("ask-email-input").fill("quinn@example.com")
     await page.getByTestId("ask-question-input").fill("Hi?")
     await page.getByTestId("ask-submit").click()
     await expect(page.getByTestId("ask-error")).toBeVisible()
 
-    await page.getByTestId("ask-email-input").fill("quinn@example.com")
     await page
       .getByTestId("ask-question-input")
       .fill("What fabric is this made of, and is it machine washable?")
