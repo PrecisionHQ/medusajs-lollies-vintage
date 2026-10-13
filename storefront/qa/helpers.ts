@@ -180,11 +180,21 @@ export const parseMoney = (value: string | null): number => {
 
 /**
  * Fresh loads pop the newsletter modal ~2.5s in, which eats pointer events
- * until dismissed. Call after goto() before clicking theme chrome. Waits
- * for the delayed popup first — checking immediately would race it and
- * lose every time.
+ * until dismissed. Suppress it via its own subscribed flag (so it never
+ * shows again in this context) AND close it if it already opened — the
+ * flag alone races an already-visible popup, closing alone races the
+ * delayed show.
  */
 export const dismissPopups = async (page: Page) => {
+  await page
+    .evaluate(() => {
+      try {
+        localStorage.setItem("lollies_newsletter_subscribed", "1")
+      } catch {
+        // Private mode: fall through to closing what is visible.
+      }
+    })
+    .catch(() => {})
   const popup = page.locator("#newsletterPopup.show")
   if (await popup.isVisible({ timeout: 10000 }).catch(() => false)) {
     await popup.locator(".icon-close").first().click({ force: true })
