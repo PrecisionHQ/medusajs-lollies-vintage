@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-import { dismissPopups, openOverlay, url } from "./helpers"
+import { dismissPopups, openOverlay, suppressPopups, url } from "./helpers"
 
 /**
  * Overlay lifecycle (#6, #7, #15). The Modave theme drives modals through
@@ -27,6 +27,7 @@ test.describe("Overlay lifecycle", () => {
   }
 
   test("search suggestion opens an interactive PDP", async ({ page }) => {
+    await suppressPopups(page)
     await page.goto(url())
     await dismissPopups(page)
     await openSearch(page)
@@ -60,6 +61,7 @@ test.describe("Overlay lifecycle", () => {
 
   test("product drill-down stays interactive", async ({ page }) => {
     // Reach a PDP through search, then drill into a related product.
+    await suppressPopups(page)
     await page.goto(url())
     await dismissPopups(page)
     await openSearch(page)

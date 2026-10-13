@@ -179,24 +179,29 @@ export const parseMoney = (value: string | null): number => {
 }
 
 /**
- * Fresh loads pop the newsletter modal ~2.5s in, which eats pointer events
- * until dismissed. Suppress it via its own subscribed flag (so it never
- * shows again in this context) AND close it if it already opened — the
- * flag alone races an already-visible popup, closing alone races the
- * delayed show.
+ * Suppress the newsletter auto-popup for the whole test. The modal checks
+ * its subscribed flag synchronously at mount, so the flag must be present
+ * BEFORE page scripts run — post-load evaluate() always loses that race.
+ * Call once before the first goto(); it persists across navigations.
+ */
+export const suppressPopups = async (page: Page) => {
+  await page.addInitScript(() => {
+    try {
+      localStorage.setItem("lollies_newsletter_subscribed", "1")
+    } catch {
+      // Private mode: the popup shows; dismissPopups closes it.
+    }
+  })
+}
+
+/**
+ * Close the newsletter modal if it opened (unsuppressed contexts,
+ * mid-test reloads that predate suppression). Belt-and-braces next to
+ * suppressPopups, not a replacement.
  */
 export const dismissPopups = async (page: Page) => {
-  await page
-    .evaluate(() => {
-      try {
-        localStorage.setItem("lollies_newsletter_subscribed", "1")
-      } catch {
-        // Private mode: fall through to closing what is visible.
-      }
-    })
-    .catch(() => {})
   const popup = page.locator("#newsletterPopup.show")
-  if (await popup.isVisible({ timeout: 10000 }).catch(() => false)) {
+  if (await popup.isVisible({ timeout: 3000 }).catch(() => false)) {
     await popup.locator(".icon-close").first().click({ force: true })
     await expect(popup).toBeHidden({ timeout: 5000 })
   }
