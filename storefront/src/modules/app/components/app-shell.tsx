@@ -5,10 +5,18 @@ import { appLogout, getToken } from "@modules/app/backend"
 import { ShellStyles } from "@modules/app/components/ui"
 import LoginForm from "@modules/app/components/login-form"
 import Board from "@modules/app/components/board"
+import Orders from "@modules/app/components/orders"
 import Moderation from "@modules/app/components/moderation"
 import PushSettings from "@modules/app/components/push-settings"
 
-type Tab = "status" | "moderate" | "alerts"
+type Tab = "status" | "orders" | "moderate" | "alerts"
+
+const TAB_LABELS: Record<Tab, string> = {
+  status: "Status",
+  orders: "Orders",
+  moderate: "Moderate",
+  alerts: "Alerts",
+}
 
 /**
  * Owner PWA root — login gate, tab shell, service-worker registration.
@@ -54,7 +62,7 @@ export default function AppShell() {
           <button className="la-btn-ghost" onClick={logout}>Sign out</button>
         </div>
         <nav className="la-tabs" aria-label="Owner app" role="tablist">
-          {(["status", "moderate", "alerts"] as Tab[]).map((t) => (
+          {(Object.keys(TAB_LABELS) as Tab[]).map((t) => (
             <button
               key={t}
               className="la-tab"
@@ -62,11 +70,12 @@ export default function AppShell() {
               aria-selected={tab === t}
               onClick={() => setTab(t)}
             >
-              {t === "status" ? "Status" : t === "moderate" ? "Moderate" : "Alerts"}
+              {TAB_LABELS[t]}
             </button>
           ))}
         </nav>
         {tab === "status" ? <Board onAuthLost={onAuthLost} /> : null}
+        {tab === "orders" ? <Orders onAuthLost={onAuthLost} /> : null}
         {tab === "moderate" ? <Moderation onAuthLost={onAuthLost} /> : null}
         {tab === "alerts" ? <PushSettings /> : null}
       </div>

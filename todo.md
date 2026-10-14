@@ -48,6 +48,22 @@
 - [ ] Deploy: set `VAPID_PUBLIC_KEY/PRIVATE_KEY/SUBJECT` on Railway, ensure `ADMIN_CORS` includes storefront origin, redeploy backend + storefront
 - [ ] Distribute per `docs/owner-app.md` (owner devices, install, test send)
 
+## 📱 Shopify-mobile parity — back office in `/app` (2026-10-14)
+
+Goal: every routine back-office task doable from the phone, matching Shopify's
+mobile admin (orders → money → catalog → customers). Each phase = backend PR
+(if needed) + PWA PR; most phases need PWA UI only, calling Medusa core
+`/admin/*` directly with the existing admin JWT.
+
+- [x] **0 — Spike (half day, first):** DONE 2026-10-14, see `docs/parity-spike.md` — every endpoint exists in Medusa core 2.19 (`orders`+fulfillments/shipments/cancel, `payments` capture/refund, inventory location-levels, products/variants, promotions+codes, customers, draft-orders, full RMA). **Zero backend wrappers needed:** phases A–F are PWA UI calling core `/admin/*` with the existing admin JWT.
+- [x] **A — Order ops (highest value):** Orders tab (newest 50, Action/All/Unfulfilled/Unpaid, fail-open filters) + detail + one-tap fulfill/tracking/capture/cancel; **new-order push ping** via `order.placed` subscriber (PR #102 + UI PR)
+- [ ] **B — Money:** refunds (full/partial line + amount, reason note); discount codes (list, create %/fixed with usage limit, monitor redemptions); draft orders (create + send link — only if the shop actually takes phone orders).
+- [ ] **C — Catalog quick edits:** inventory adjust (+/−, reason) from the stock-alert row; price quick-edit; publish/hide toggle; barcode path (camera scan → variant lookup → jump to its stock/price row).
+- [ ] **D — Customers + returns:** customer list/search + detail (orders, lifetime value, contact link); returns/exchanges (receive, approve, restock) via Medusa RMA flow.
+- [ ] **E — Marketing automation (flows exist, phone UI doesn't):** flow list with on/off switches in-app (today read-only via summary; reuse `/admin/marketing/flows` toggle API); campaign list + sent/open stats; send-now + test-send from the phone; paused-flow push nudge (e.g. winback disabled >30 days — reuse `adminOnly` ping pattern).
+- [ ] **F — Board+ (only after A–E earn it):** week/month revenue chart, top products, fulfillment-SLA row (unfulfilled >48h).
+- [ ] **OUT (deliberate):** POS/hardware, shipping-label purchase (no carrier account), theme/blog editor, home-screen widgets + watch (iOS doesn't grant those to PWAs), Sidekick-style AI.
+
 ## ⏳ Ops / verification
 - [ ] Redeploy backend, confirm hourly job errors gone (migrations from #51 now merged)
 - [ ] Watch Railway CPU/memory on image-optimization burst (post-#45)
