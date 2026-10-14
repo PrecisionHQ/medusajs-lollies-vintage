@@ -6,14 +6,16 @@ import { ShellStyles } from "@modules/app/components/ui"
 import LoginForm from "@modules/app/components/login-form"
 import Board from "@modules/app/components/board"
 import Orders from "@modules/app/components/orders"
+import Discounts from "@modules/app/components/discounts"
 import Moderation from "@modules/app/components/moderation"
 import PushSettings from "@modules/app/components/push-settings"
 
-type Tab = "status" | "orders" | "moderate" | "alerts"
+type Tab = "status" | "orders" | "discounts" | "moderate" | "alerts"
 
 const TAB_LABELS: Record<Tab, string> = {
   status: "Status",
   orders: "Orders",
+  discounts: "Codes",
   moderate: "Moderate",
   alerts: "Alerts",
 }
@@ -76,6 +78,7 @@ export default function AppShell() {
         </nav>
         {tab === "status" ? <Board onAuthLost={onAuthLost} /> : null}
         {tab === "orders" ? <Orders onAuthLost={onAuthLost} /> : null}
+        {tab === "discounts" ? <Discounts onAuthLost={onAuthLost} /> : null}
         {tab === "moderate" ? <Moderation onAuthLost={onAuthLost} /> : null}
         {tab === "alerts" ? <PushSettings /> : null}
       </div>

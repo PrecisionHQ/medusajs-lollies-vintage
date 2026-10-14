@@ -66,6 +66,10 @@ export default function Orders({ onAuthLost }: { onAuthLost: () => void }) {
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
   const [tracking, setTracking] = useState<Record<string, string>>({})
+  const [reasons, setReasons] = useState<{ id: string; label?: string }[]>([])
+  const [refundAmount, setRefundAmount] = useState<Record<string, string>>({})
+  const [refundReason, setRefundReason] = useState("")
+  const [refundNote, setRefundNote] = useState("")
 
   const fail = useCallback(
     (e: unknown) => {
@@ -101,6 +105,15 @@ export default function Orders({ onAuthLost }: { onAuthLost: () => void }) {
         )
         setSelected(res.order)
         setError(null)
+        // Refund reasons are best-effort: no reasons just means no dropdown.
+        try {
+          const rr = await appFetch<{ refund_reasons: { id: string; label?: string }[] }>(
+            "/admin/refund-reasons?limit=100&fields=id,label"
+          )
+          setReasons(rr.refund_reasons ?? [])
+        } catch {
+          setReasons([])
+        }
       } catch (e) {
         fail(e)
       } finally {
@@ -146,6 +159,13 @@ export default function Orders({ onAuthLost }: { onAuthLost: () => void }) {
   const payments =
     selected?.payment_collections?.flatMap((c) => c.payments ?? []) ?? []
   const uncaptured = payments.filter((p) => !p.captured_at)
+  const captured = payments.filter((p) => p.captured_at)
+
+  const toMinor = (major: string): number | null => {
+    const n = Number(major.replace(",", "."))
+    if (!Number.isFinite(n) || n <= 0) return null
+    return Math.round(n * 100)
+  }
 
   const label = (o: OrderRow) =>
     `#${o.display_id ?? o.id.slice(-6)} · ${o.email ?? "no email"} · ${money(Number(o.total ?? 0), o.currency_code ?? "eur")}`
@@ -258,6 +278,64 @@ export default function Orders({ onAuthLost }: { onAuthLost: () => void }) {
               </button>
             ) : null}
           </div>
+
+          {captured.map((p) => (
+            <div key={p.id} className="la-item">
+              <p className="la-muted">
+                Paid {money(Number(p.amount ?? 0), selected.currency_code ?? "eur")} · refund:
+              </p>
+              <div style={{ display: "flex", gap: 8 }}>
+                <input
+                  className="la-input"
+                  inputMode="decimal"
+                  placeholder={((Number(p.amount ?? 0) / 100).toFixed(2))}
+                  value={refundAmount[p.id] ?? ""}
+                  onChange={(e) => setRefundAmount((r) => ({ ...r, [p.id]: e.target.value }))}
+                />
+                <button
+                  className="la-btn-ghost"
+                  disabled={busy !== null || toMinor(refundAmount[p.id] ?? "") === null}
+                  onClick={() => {
+                    const amount = toMinor(refundAmount[p.id] ?? "")
+                    if (amount === null) return
+                    mutate(`refund-${p.id}`, () =>
+                      appFetch(`/admin/payments/${p.id}/refund`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                          amount,
+                          ...(refundReason ? { refund_reason_id: refundReason } : {}),
+                          ...(refundNote.trim() ? { note: refundNote.trim() } : {}),
+                        }),
+                      })
+                    )
+                  }}
+                >
+                  Refund
+                </button>
+              </div>
+              <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
+                {reasons.length ? (
+                  <select
+                    className="la-input"
+                    value={refundReason}
+                    onChange={(e) => setRefundReason(e.target.value)}
+                    aria-label="Refund reason"
+                  >
+                    <option value="">No reason</option>
+                    {reasons.map((r) => (
+                      <option key={r.id} value={r.id}>{r.label ?? r.id}</option>
+                    ))}
+                  </select>
+                ) : null}
+                <input
+                  className="la-input"
+                  placeholder="Note (optional)"
+                  value={refundNote}
+                  onChange={(e) => setRefundNote(e.target.value)}
+                />
+              </div>
+            </div>
+          ))}
 
           {(selected.fulfillments ?? []).map((f) => (
             <div key={f.id} className="la-item">
