@@ -3,6 +3,7 @@ import {
   overDailyCap,
   validateQuestionInput,
 } from "../../../../../modules/questions/validation";
+import { notifyPushSubscribers } from "../../../../../modules/push/push-sender";
 
 /**
  * Store product Q&A (#11). Guests may ask — pre-purchase shoppers often
@@ -81,6 +82,14 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     locale: typeof locale === "string" ? locale.slice(0, 12) : null,
   });
   const created = Array.isArray(createdRaw) ? createdRaw[0] : createdRaw;
+
+  // Admin ping (best-effort, never fails the ask): bound admin installs
+  // only — customer devices never see moderation activity.
+  notifyPushSubscribers(
+    req.scope,
+    { title: "New question", body: "A shopper asked a question — open the app to answer." },
+    { adminOnly: true }
+  ).catch(() => {});
 
   res.status(201).json({ question: { id: created.id, status: created.status } });
 };

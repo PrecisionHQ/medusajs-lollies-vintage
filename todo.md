@@ -40,6 +40,14 @@
 - [ ] P12 — Caching leftovers (bulk-fetch paging, revalidation webhook)
 - [ ] CMS page builder: OUT per decision. P10 image migration: STASHED. Phase-1 currency splits (DKK/SEK/NOK/CHF): DROPPED per 2026-10-12 decision (EUR worldwide instead).
 
+## 📱 Phone PWA + push (owner app at `/app`) — 2026-10-14, PRs #99/#100/#101
+
+- [x] Backend push infra (PR #99): `push` module (`push_subscription`), store subscribe/unsubscribe/vapid-key routes, admin send/counts/bind routes, question+review admin-only pings, 404/410 self-hygiene, 9 unit tests
+- [x] Hidden PWA shell (PR #100): `/app` route + admin-login gate + status board, manifest/icons/SW (scope `/app`), middleware exemption (else 307 to `/gb/app`), robots disallow, noindex
+- [x] App UI (PR #101): Moderate tab (answer/close questions, approve/reject reviews), Alerts tab (subscribe, phone/desktop toggle, admin bind), `docs/owner-app.md`
+- [ ] Deploy: set `VAPID_PUBLIC_KEY/PRIVATE_KEY/SUBJECT` on Railway, ensure `ADMIN_CORS` includes storefront origin, redeploy backend + storefront
+- [ ] Distribute per `docs/owner-app.md` (owner devices, install, test send)
+
 ## ⏳ Ops / verification
 - [ ] Redeploy backend, confirm hourly job errors gone (migrations from #51 now merged)
 - [ ] Watch Railway CPU/memory on image-optimization burst (post-#45)
