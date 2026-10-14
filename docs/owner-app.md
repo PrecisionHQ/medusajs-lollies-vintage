@@ -32,6 +32,7 @@ Push needs the `web-push` package (already in `backend/package.json`).
 - **Catalog** (Phase C) — find a variant by name/SKU/barcode (exact filters first, `q` fallback) or camera scan (`BarcodeDetector` where supported, manual entry otherwise); per-currency price edit (full array sent, other currencies preserved); stock adjust ±1/±5/custom against the location level (absolute set of current + delta, floor 0); publish/unpublish toggle. Stock-alert rows on Status carry a **Fix** button that jumps here with the variant preselected.
 - **Clients** (Phase D) — customer search (client-side over newest 100, name/email/phone), detail with mailto/tel links, order history + lifetime value.
 - **Returns** (Phase D) — open requests with items (fail-open filter, show-all toggle); **Receive all** chains initiate + confirm (executes restock per policy); **Cancel**. Partial/per-item receive is a follow-up.
+- **Flows** (Phase E) — automation switches with send counters + opt-out count (same toggle API as the dashboard); campaigns with sent/failed stats, test-send to an entered email, two-tap send-now. A daily job pings admin installs when a flow has been off 30 days (once per disable event, no storage — windowed on `updated_at`).
 - **Moderate** — open questions (answer inline) + pending reviews (approve/reject).
 - **Alerts** — push subscribe, phone/desktop toggle, admin bind.
 
