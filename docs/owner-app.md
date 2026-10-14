@@ -26,7 +26,7 @@ Push needs the `web-push` package (already in `backend/package.json`).
 
 ## Tabs
 
-- **Status** — today/week orders + revenue, needs-you counts, stock alerts (60s poll, offline last-payload).
+- **Status** — today/week orders + revenue, needs-you counts, stock alerts (60s poll, offline last-payload). Board+ (Phase F): 30-day revenue bar chart (dominant currency charted, others named), top-5 products by units, and the >48h unfulfilled list with **Open** jumping to the order.
 - **Orders** (Phase A) — newest 50 with Action/All/Unfulfilled/Unpaid filters (unknown statuses fail open to Action); detail with items, totals, payments and shipments; one-tap **Fulfill** (remaining quantities), **tracking number → Ship**, **Capture** uncaptured payments, **Refund** captured payments (amount + reason + note), **Cancel** unfulfilled orders. Pure PWA UI over Medusa core `/admin/*` — no wrapper routes (see `docs/parity-spike.md`).
 - **Codes** (Phase B) — discount codes: list with value/status, create order-level % or fixed codes (optional usage cap, activated on create), pause/activate, delete. Per-code redemption counts are a follow-up (core tracks budget usage on campaigns, not per-code counters).
 - **Catalog** (Phase C) — find a variant by name/SKU/barcode (exact filters first, `q` fallback) or camera scan (`BarcodeDetector` where supported, manual entry otherwise); per-currency price edit (full array sent, other currencies preserved); stock adjust ±1/±5/custom against the location level (absolute set of current + delta, floor 0); publish/unpublish toggle. Stock-alert rows on Status carry a **Fix** button that jumps here with the variant preselected.

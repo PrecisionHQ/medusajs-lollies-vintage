@@ -11,10 +11,30 @@ type Summary = {
   reviews_pending: number
   flows: { key: string; enabled: boolean }[]
   low_stock: { variant_id: string; title: string; available: number }[]
+  revenue_30d?: { day: string; currency: string; minor: number }[]
+  top_products?: { title: string; qty: number; currency: string; minor: number }[]
+  sla?: { order_id: string; display_id: number | null; email: string | null; age_hours: number }[]
+}
+
+const last30Days = (): string[] => {
+  const days: string[] = []
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(Date.now() - i * 24 * 3600 * 1000)
+    days.push(d.toISOString().slice(0, 10))
+  }
+  return days
 }
 
 /** Status board — mirrors the dashboard /phone page, one fetch, 60s poll. */
-export default function Board({ onAuthLost, onAdjust }: { onAuthLost: () => void; onAdjust: (variantId: string) => void }) {
+export default function Board({
+  onAuthLost,
+  onAdjust,
+  onOpenOrder,
+}: {
+  onAuthLost: () => void
+  onAdjust: (variantId: string) => void
+  onOpenOrder: (orderId: string) => void
+}) {
   const [data, setData] = useState<Summary | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -107,8 +127,90 @@ export default function Board({ onAuthLost, onAdjust }: { onAuthLost: () => void
               <p className="la-muted">Nothing under 5 units.</p>
             )}
           </div>
+          <TrendCard series={data.revenue_30d ?? []} />
+          <TopProductsCard rows={data.top_products ?? []} />
+          <SlaCard rows={data.sla ?? []} onOpen={onOpenOrder} />
         </>
       ) : null}
+    </div>
+  )
+}
+
+/** 30d revenue bars, pure CSS. Dominant currency wins the chart; others are named below. */
+function TrendCard({ series }: { series: NonNullable<Summary["revenue_30d"]> }) {
+  if (!series.length) return null
+  const totals = new Map<string, number>()
+  for (const r of series) totals.set(r.currency, (totals.get(r.currency) ?? 0) + r.minor)
+  const top = [...totals.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "eur"
+  const byDay = new Map(series.filter((r) => r.currency === top).map((r) => [r.day, r.minor]))
+  const days = last30Days()
+  const max = Math.max(1, ...days.map((d) => byDay.get(d) ?? 0))
+  const others = [...totals.entries()].filter(([c]) => c !== top)
+  return (
+    <div className="la-card">
+      <h2 className="la-h2">30 days · {top.toUpperCase()}</h2>
+      <div style={{ display: "flex", alignItems: "flex-end", gap: 2, height: 72 }} aria-hidden="true">
+        {days.map((d) => {
+          const v = byDay.get(d) ?? 0
+          return (
+            <div
+              key={d}
+              title={`${d}: ${(v / 100).toFixed(2)}`}
+              style={{
+                flex: 1,
+                height: `${Math.max(3, Math.round((v / max) * 100))}%`,
+                background: v ? "#c8a24a" : "#3a3226",
+                borderRadius: 2,
+              }}
+            />
+          )
+        })}
+      </div>
+      <p className="la-muted">
+        {(totals.get(top) ?? 0) / 100} {top.toUpperCase()} total
+        {others.map(([c, m]) => ` · ${(m / 100).toFixed(2)} ${c.toUpperCase()}`).join("")}
+      </p>
+    </div>
+  )
+}
+
+function TopProductsCard({ rows }: { rows: NonNullable<Summary["top_products"]> }) {
+  if (!rows.length) return null
+  return (
+    <div className="la-card">
+      <h2 className="la-h2">Top products · 30d</h2>
+      {rows.map((p, i) => (
+        <p key={`${p.title}-${i}`}>
+          {i + 1}. {p.title} — <strong>{p.qty} sold</strong>{" "}
+          <span className="la-muted">· {money(p.minor, p.currency)}</span>
+        </p>
+      ))}
+    </div>
+  )
+}
+
+function SlaCard({
+  rows,
+  onOpen,
+}: {
+  rows: NonNullable<Summary["sla"]>
+  onOpen: (orderId: string) => void
+}) {
+  if (!rows.length) return null
+  return (
+    <div className="la-card">
+      <h2 className="la-h2">Waiting &gt;48h ({rows.length})</h2>
+      {rows.map((s) => (
+        <div key={s.order_id} className="la-row" style={{ padding: "6px 0" }}>
+          <span>
+            #{s.display_id ?? s.order_id.slice(-6)}{s.email ? ` · ${s.email}` : ""} —{" "}
+            <strong>{s.age_hours}h</strong>
+          </span>
+          <button className="la-btn-ghost" onClick={() => onOpen(s.order_id)}>
+            Open
+          </button>
+        </div>
+      ))}
     </div>
   )
 }

@@ -58,7 +58,15 @@ type Filter = "attention" | "all" | "unfulfilled" | "unpaid"
  * wrapper routes. Every mutating call reloads the detail; backend workflow
  * errors (e.g. cancel-after-fulfill) surface as plain messages.
  */
-export default function Orders({ onAuthLost }: { onAuthLost: () => void }) {
+export default function Orders({
+  onAuthLost,
+  target,
+  onTargetDone,
+}: {
+  onAuthLost: () => void
+  target?: string | null
+  onTargetDone?: () => void
+}) {
   const [rows, setRows] = useState<OrderRow[]>([])
   const [filter, setFilter] = useState<Filter>("attention")
   const [selected, setSelected] = useState<OrderDetail | null>(null)
@@ -126,6 +134,13 @@ export default function Orders({ onAuthLost }: { onAuthLost: () => void }) {
   useEffect(() => {
     loadList()
   }, [loadList])
+
+  // Jump target from the Status board's SLA card.
+  useEffect(() => {
+    if (!target) return
+    loadDetail(target).finally(() => onTargetDone?.())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target])
 
   const mutate = async (key: string, fn: () => Promise<unknown>) => {
     setBusy(key)

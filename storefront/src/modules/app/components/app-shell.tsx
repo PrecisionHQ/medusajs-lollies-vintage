@@ -40,6 +40,8 @@ export default function AppShell() {
   const [tab, setTab] = useState<Tab>("status")
   // Stock-alert "Fix" jumps here with the variant preselected.
   const [catalogTarget, setCatalogTarget] = useState<string | null>(null)
+  // SLA "Open" jumps here with the order preselected.
+  const [ordersTarget, setOrdersTarget] = useState<string | null>(null)
 
   useEffect(() => {
     setAuthed(!!getToken())
@@ -93,9 +95,19 @@ export default function AppShell() {
               setCatalogTarget(variantId)
               setTab("catalog")
             }}
+            onOpenOrder={(orderId) => {
+              setOrdersTarget(orderId)
+              setTab("orders")
+            }}
           />
         ) : null}
-        {tab === "orders" ? <Orders onAuthLost={onAuthLost} /> : null}
+        {tab === "orders" ? (
+          <Orders
+            onAuthLost={onAuthLost}
+            target={ordersTarget}
+            onTargetDone={() => setOrdersTarget(null)}
+          />
+        ) : null}
         {tab === "discounts" ? <Discounts onAuthLost={onAuthLost} /> : null}
         {tab === "catalog" ? (
           <Catalog

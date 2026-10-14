@@ -61,7 +61,7 @@ mobile admin (orders → money → catalog → customers). Each phase = backend 
 - [x] **C — Catalog quick edits:** Catalog tab (name/SKU/barcode search with exact-then-`q` fallback, camera scan w/ manual fallback); per-currency price edit; stock adjust +/−/custom per location (absolute set, floor 0); publish toggle; Status stock alerts jump here via Fix button.
 - [x] **D — Customers + returns:** Clients tab (search newest 100 client-side, mailto/tel links, order history + lifetime value); Returns tab (open requests fail-open, Receive-all chains initiate+confirm, Cancel). Exchanges/claims stay dashboard-side until returns prove the pattern; partial receive is a follow-up.
 - [x] **E — Marketing automation (flows exist, phone UI doesn't):** Flows tab (on/off switches + sent counters + opt-outs, dashboard toggle API); campaigns (sent/failed stats, test-send, two-tap send-now); paused-30-days push nudge via daily job (PR #107 + UI PR).
-- [ ] **F — Board+ (only after A–E earn it):** week/month revenue chart, top products, fulfillment-SLA row (unfulfilled >48h).
+- [x] **F — Board+ (only after A–E earn it):** 30d revenue chart (CSS bars, dominant currency + named others), top-5 products, >48h SLA card with Open-to-order jump (PR #109 + UI PR). Flow switches already shipped in Phase E.
 - [ ] **OUT (deliberate):** POS/hardware, shipping-label purchase (no carrier account), theme/blog editor, home-screen widgets + watch (iOS doesn't grant those to PWAs), Sidekick-style AI.
 
 ## ⏳ Ops / verification
