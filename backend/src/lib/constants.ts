@@ -220,3 +220,13 @@ export const META_CAPI_TOKEN = process.env.META_CAPI_TOKEN;
 export const META_TEST_EVENT_CODE = process.env.META_TEST_EVENT_CODE;
 export const META_CAPI_ENABLED =
   !!META_PIXEL_ID && !!META_CAPI_TOKEN && !META_CAPI_TOKEN.includes('STUB');
+
+/**
+ * (optional) Web Push (PWA phone app). Generate once with
+ * `npx web-push generate-vapid-keys`. Missing keys keep push inert by
+ * design: /store/push/vapid-key 404s and admin sends return sent: 0.
+ */
+export const VAPID_PUBLIC_KEY = process.env.VAPID_PUBLIC_KEY;
+export const VAPID_PRIVATE_KEY = process.env.VAPID_PRIVATE_KEY;
+export const VAPID_SUBJECT =
+  process.env.VAPID_SUBJECT || 'mailto:admin@lollies.example';
