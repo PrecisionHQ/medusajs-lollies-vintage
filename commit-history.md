@@ -38,6 +38,20 @@ production by design, never leads it.
 | #14 | feat(payments): Dodo redirect-checkout provider | CLOSED (unmerged) | Auto-closed when #13's branch merge deleted its base; replaced by #18 |
 | #16 | feat(search): index variant options for color/size search and filtering | MERGED | `variants.options.value` searchable + filterable; live matrix green |
 | #18 | feat(payments): Dodo redirect-checkout provider | MERGED | Rebased onto master after #13; PWYW-amount field pending live-key proof |
+| #99 | feat(push): Web Push subscriptions, send API + moderation pings | MERGED | `push` module + store/admin routes, question/review admin-only pings, 404/410 self-hygiene; 9 tests |
+| #100 | feat(pwa): hidden owner app shell with admin login + status board | MERGED | `/app` route, manifest/icons/SW (scope `/app`), middleware exemption, robots/noindex |
+| #101 | feat(pwa): moderation + alerts tabs, owner-app docs | MERGED | Rebasing onto master (add/add on app-shell, kept full version) |
+| #102 | feat(push): new-order admin ping on order.placed | MERGED (into base) | Stacked on #99; landed onto master via re-land #111 |
+| #103 | feat(pwa): Orders tab — list, fulfill, tracking, capture, cancel | MERGED | Cherry-picked onto master; fail-open filters, js-sdk-typed bodies |
+| #104 | feat(pwa): refunds in order detail + discount Codes tab | MERGED | Draft orders skipped (unused in codebase) |
+| #105 | feat(pwa): Catalog tab — search, price, stock, publish, scan | MERGED | Exact-then-`q` variant search, absolute-set stock adjust |
+| #106 | feat(pwa): Clients + Returns tabs | MERGED | Receive-all chains initiate+confirm; partial receive deferred |
+| #107 | feat(push): daily nudge for flows paused 30+ days | MERGED (into base) | Windowed `updated_at`, no storage; landed onto master via re-land #111 |
+| #108 | feat(pwa): Flows tab — automation switches, campaigns, send-now | MERGED | Two-tap send-now; composing stays dashboard-side |
+| #109 | feat(phone): summary +30d revenue series, top products, SLA list | MERGED | Additive fields; self-contained try/catch; 2 tests |
+| #110 | feat(pwa): Board+ chart, top products, SLA card | MERGED | CSS bars, Open-to-order jump; parity list complete |
+| #111 | feat(push): land order ping + flow nudge (from #102, #107) | MERGED | Re-land vehicle: stacked PRs merge into their base, not master |
+| #112 | feat(pwa): land moderation + alerts tabs (from #101) | MERGED | Same re-land pattern |
 
 ## Not ours (left untouched)
 
