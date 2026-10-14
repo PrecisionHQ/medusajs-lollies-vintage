@@ -7,15 +7,17 @@ import LoginForm from "@modules/app/components/login-form"
 import Board from "@modules/app/components/board"
 import Orders from "@modules/app/components/orders"
 import Discounts from "@modules/app/components/discounts"
+import Catalog from "@modules/app/components/catalog"
 import Moderation from "@modules/app/components/moderation"
 import PushSettings from "@modules/app/components/push-settings"
 
-type Tab = "status" | "orders" | "discounts" | "moderate" | "alerts"
+type Tab = "status" | "orders" | "discounts" | "catalog" | "moderate" | "alerts"
 
 const TAB_LABELS: Record<Tab, string> = {
   status: "Status",
   orders: "Orders",
   discounts: "Codes",
+  catalog: "Catalog",
   moderate: "Moderate",
   alerts: "Alerts",
 }
@@ -30,6 +32,8 @@ const TAB_LABELS: Record<Tab, string> = {
 export default function AppShell() {
   const [authed, setAuthed] = useState<boolean | null>(null)
   const [tab, setTab] = useState<Tab>("status")
+  // Stock-alert "Fix" jumps here with the variant preselected.
+  const [catalogTarget, setCatalogTarget] = useState<string | null>(null)
 
   useEffect(() => {
     setAuthed(!!getToken())
@@ -76,9 +80,24 @@ export default function AppShell() {
             </button>
           ))}
         </nav>
-        {tab === "status" ? <Board onAuthLost={onAuthLost} /> : null}
+        {tab === "status" ? (
+          <Board
+            onAuthLost={onAuthLost}
+            onAdjust={(variantId) => {
+              setCatalogTarget(variantId)
+              setTab("catalog")
+            }}
+          />
+        ) : null}
         {tab === "orders" ? <Orders onAuthLost={onAuthLost} /> : null}
         {tab === "discounts" ? <Discounts onAuthLost={onAuthLost} /> : null}
+        {tab === "catalog" ? (
+          <Catalog
+            onAuthLost={onAuthLost}
+            target={catalogTarget}
+            onTargetDone={() => setCatalogTarget(null)}
+          />
+        ) : null}
         {tab === "moderate" ? <Moderation onAuthLost={onAuthLost} /> : null}
         {tab === "alerts" ? <PushSettings /> : null}
       </div>
