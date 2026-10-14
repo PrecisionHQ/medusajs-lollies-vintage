@@ -45,7 +45,7 @@
 - [x] Backend push infra (PR #99): `push` module (`push_subscription`), store subscribe/unsubscribe/vapid-key routes, admin send/counts/bind routes, question+review admin-only pings, 404/410 self-hygiene, 9 unit tests
 - [x] Hidden PWA shell (PR #100): `/app` route + admin-login gate + status board, manifest/icons/SW (scope `/app`), middleware exemption (else 307 to `/gb/app`), robots disallow, noindex
 - [x] App UI (PR #101): Moderate tab (answer/close questions, approve/reject reviews), Alerts tab (subscribe, phone/desktop toggle, admin bind), `docs/owner-app.md`
-- [ ] Deploy: set `VAPID_PUBLIC_KEY/PRIVATE_KEY/SUBJECT` on Railway, ensure `ADMIN_CORS` includes storefront origin, redeploy backend + storefront
+- [x] Deploy (2026-10-15): `VAPID_*` generated + set on Railway, `ADMIN_CORS` extended with storefront origin (preflight verified), backend redeployed (`Migration20261014000000` ran, vapid-key serves live key, regions intact), storefront redeployed (`/app`+manifest+SW+icons 200, noindex, robots disallow, sitemap clean)
 - [ ] Distribute per `docs/owner-app.md` (owner devices, install, test send)
 
 ## 📱 Shopify-mobile parity — back office in `/app` (2026-10-14)
