@@ -315,7 +315,13 @@ export const config = {
   // exempted here so it could render with no backend running. It has been
   // deleted now that Elegant Abode IS the homepage ([countryCode]/page.tsx,
   // region-routed like everything else), so no exemption remains.
+  //
+  // /app (private owner PWA) is exempted the same way sitemap.xml is: it is
+  // top-level, not region-prefixed, and country-routing it to /gb/app would
+  // break the install (manifest scope + SW scope are both /app/). Static
+  // assets under it (*.png icons) are already covered by the extension
+  // rules; the .webmanifest entry covers the manifest itself.
   matcher: [
-    "/((?!api|_next/static|_next/image|feeds|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg|.*\\.mp4|.*\\.webm).*)",
+    "/((?!api|app|_next/static|_next/image|feeds|favicon.ico|sitemap.xml|robots.txt|opengraph-image|.*\\.png|.*\\.jpg|.*\\.gif|.*\\.svg|.*\\.mp4|.*\\.webm|.*\\.webmanifest).*)",
   ],
 }

@@ -14,7 +14,9 @@ import { getBaseURL } from "@lib/util/env"
  * query is a distinct URL, and cart and checkout pages are unique per visitor
  * and worthless in an index. The patterns carry a leading `/*` because every
  * route in this storefront is region-prefixed, so the paths are `/gb/cart`,
- * `/de/cart` and so on.
+ * `/de/cart` and so on. `/app/` is the exception: the private owner PWA is
+ * top-level (outside any region) and stays out of every index — belt and
+ * braces with the route's own noindex metadata.
  */
 export default function robots(): MetadataRoute.Robots {
   const base = getBaseURL().replace(/\/+$/, "")
@@ -26,6 +28,7 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: [
           "/api/",
+          "/app/",
           "/*/account",
           "/*/cart",
           "/*/checkout",
