@@ -69,7 +69,9 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
   }
 
   const customerId = (req as any).auth_context?.actor_id as string | undefined;
-  const [created] = await questions.createQuestions({
+  // create* returns a single object for single input (an array only for
+  // array input) — destructuring the object throws "not iterable".
+  const createdRaw = await questions.createQuestions({
     product_id: productId,
     customer_id: customerId ?? null,
     name: cleanName,
@@ -78,6 +80,7 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     status: "open",
     locale: typeof locale === "string" ? locale.slice(0, 12) : null,
   });
+  const created = Array.isArray(createdRaw) ? createdRaw[0] : createdRaw;
 
   res.status(201).json({ question: { id: created.id, status: created.status } });
 };

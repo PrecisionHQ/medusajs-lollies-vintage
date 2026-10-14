@@ -1,5 +1,5 @@
 import { test, expect, type Page } from "@playwright/test"
-import { dismissPopups, url } from "./helpers"
+import { dismissPopups, suppressPopups, url } from "./helpers"
 
 /**
  * Buy paths (#2, #10). Add-to-cart opens the live cart drawer (the same
@@ -9,6 +9,7 @@ import { dismissPopups, url } from "./helpers"
  */
 
 const openFirstProduct = async (page: Page) => {
+  await suppressPopups(page)
   await page.goto(url("store"))
   await dismissPopups(page)
   const link = page.locator('a[href*="/products/"]').first()

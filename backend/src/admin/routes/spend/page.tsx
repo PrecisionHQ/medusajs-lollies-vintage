@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
+import { SpendIcon } from "../../components/module-icons";
 import {
   Button,
   Container,
@@ -180,6 +181,7 @@ const AdsPage = () => {
 };
 
 export const config = defineRouteConfig({
+  icon: SpendIcon,
   label: "Ad Spend",
 });
 

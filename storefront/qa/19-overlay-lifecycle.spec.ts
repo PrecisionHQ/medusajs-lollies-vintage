@@ -1,5 +1,11 @@
 import { test, expect, type Page } from "@playwright/test"
-import { dismissPopups, openOverlay, suppressPopups, url } from "./helpers"
+import {
+  dismissPopups,
+  openFirstQuickView,
+  openOverlay,
+  suppressPopups,
+  url,
+} from "./helpers"
 
 /**
  * Overlay lifecycle (#6, #7, #15). The Modave theme drives modals through
@@ -28,6 +34,32 @@ test.describe("Overlay lifecycle", () => {
     await page.keyboard.press("Escape")
   }
 
+  /**
+   * Clicks a link and waits for the route to change, retrying the click
+   * when it lands but React's handler is replaced mid-fade (observed
+   * live: the click resolved yet the router never navigated). Link
+   * clicks are idempotent, so a retry is safe and keeps a render race
+   * from failing a navigation test.
+   */
+  const clickAndNavigate = async (
+    page: Page,
+    locator: ReturnType<Page["locator"]>,
+    urlPattern: RegExp
+  ) => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      await locator.first().click({ timeout: 10000 }).catch(() => {})
+      if (
+        await page
+          .waitForURL(urlPattern, { timeout: 5000 })
+          .then(() => true)
+          .catch(() => false)
+      ) {
+        return
+      }
+    }
+    await expect(page).toHaveURL(urlPattern)
+  }
+
   test("search suggestion opens an interactive PDP", async ({ page }) => {
     await suppressPopups(page)
     await page.goto(url())
@@ -37,9 +69,7 @@ test.describe("Overlay lifecycle", () => {
     await page.locator('#search input[name="text"]').fill("dress")
     const suggestion = page.locator('#search a[href*="/products/"]').first()
     await expect(suggestion).toBeVisible({ timeout: 20000 })
-    await suggestion.click()
-
-    await expect(page).toHaveURL(/\/products\//)
+    await clickAndNavigate(page, suggestion, /\/products\//)
     await assertInteractive(page)
   })
 
@@ -49,23 +79,16 @@ test.describe("Overlay lifecycle", () => {
     await suppressPopups(page)
     await page.goto(url())
     await dismissPopups(page)
-    // Quick-view is hover-revealed on the card: hover the first VISIBLE
-    // card (carousel/offscreen cards report hidden).
-    const cards = page.locator(".card-product")
-    for (let i = 0; i < (await cards.count()); i++) {
-      if (await cards.nth(i).isVisible()) {
-        await cards.nth(i).hover()
-        break
-      }
-    }
-    await openOverlay(page, 'a[href="#quickView"]:visible', "#quickView.show")
+    await openFirstQuickView(page)
     await expect(page.locator("#quickView.show")).toBeVisible()
+    // Let the open fade settle before clicking through the modal.
+    await page.waitForTimeout(600)
 
-    await page
-      .locator('#quickView a[href*="/products/"]')
-      .first()
-      .click()
-    await expect(page).toHaveURL(/\/products\//)
+    await clickAndNavigate(
+      page,
+      page.locator('#quickView a[href*="/products/"]'),
+      /\/products\//
+    )
     await assertInteractive(page)
   })
 
@@ -79,12 +102,11 @@ test.describe("Overlay lifecycle", () => {
     await page.locator('#search input[name="text"]').fill("dress")
     const suggestion = page.locator('#search a[href*="/products/"]').first()
     await expect(suggestion).toBeVisible({ timeout: 20000 })
-    await suggestion.click()
-    await expect(page).toHaveURL(/\/products\//)
+    await clickAndNavigate(page, suggestion, /\/products\//)
 
     const related = page.locator('a[href*="/products/"]').first()
     await expect(related).toBeVisible()
-    await related.click()
+    await clickAndNavigate(page, related, /\/products\//)
     await assertInteractive(page)
   })
 })

@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
+import { SeoIcon } from "../../components/module-icons";
 import { Button, Container, Heading, Text } from "@medusajs/ui";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -138,6 +139,7 @@ const SeoPage = () => {
 };
 
 export const config = defineRouteConfig({
+  icon: SeoIcon,
   label: "SEO",
 });
 

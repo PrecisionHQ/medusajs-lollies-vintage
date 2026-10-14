@@ -27,9 +27,16 @@ export function loadBootstrap(): Promise<any> {
  * .show from every open modal/offcanvas as well — the next data-bs-toggle
  * open re-shows cleanly through Bootstrap's own show() path.
  *
- * Strategy is belt-and-braces: force-hide in the DOM synchronously (the
- * guarantee), then ask the Bootstrap instances to hide too (keeps their
- * internal state consistent for the next open).
+ * Strategy: force-hide in the DOM synchronously (the guarantee — the page
+ * is free the moment navigation lands), then dispose the Bootstrap
+ * instances so the next data-bs-toggle open gets a fresh instance with
+ * clean transition state.
+ *
+ * Deliberately NOT calling instance.hide(): with the element already
+ * display:none, Bootstrap's deferred hide continuation throws
+ * asynchronously ("Cannot read properties of null") outside our
+ * try/catch — pageerror noise on every overlay nav. Dispose alone is
+ * both quiet and leaves correct state behind.
  */
 export function dismissBootstrapOverlays(): void {
   if (typeof document === "undefined") {
@@ -56,11 +63,10 @@ export function dismissBootstrapOverlays(): void {
             const inst =
               bs?.Modal?.getInstance?.(el) ??
               bs?.Offcanvas?.getInstance?.(el)
-            inst?.hide?.()
             inst?.dispose?.()
           }
         } catch {
-          // DOM sweep above is the guarantee; instance hide is best-effort.
+          // DOM sweep above is the guarantee; dispose is best-effort.
         }
       })
       .catch(() => {

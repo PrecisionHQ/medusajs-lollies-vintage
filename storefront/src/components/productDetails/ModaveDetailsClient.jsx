@@ -10,6 +10,7 @@ import { useContextElement } from "@/context/Context";
 import SizeGuide from "@/components/modals/SizeGuide";
 import AskQuestionModal from "@/components/modals/AskQuestionModal";
 import ShippingReturnsModal from "@/components/modals/ShippingReturnsModal";
+import ShareModal from "@/components/modals/ShareModal";
 import { addToCart } from "@lib/data/cart";
 import { notifyCartUpdated } from "@lib/util/cart-events";
 import { openCartModal } from "@/components/common/cart-modal";
@@ -544,6 +545,7 @@ export default function ModaveDetailsClient({
                             href="#share_social"
                             data-bs-toggle="modal"
                             className="tf-product-extra-icon"
+                            data-testid="share-link"
                           >
                             <div className="icon">
                               <i className="icon-share" />
@@ -632,6 +634,7 @@ export default function ModaveDetailsClient({
       <SizeGuide />
       <AskQuestionModal productId={product.id} />
       <ShippingReturnsModal />
+      <ShareModal productId={product.id} productTitle={product.title} />
     </section>
   );
 }

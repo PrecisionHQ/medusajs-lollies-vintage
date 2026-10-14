@@ -1,4 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk";
+import { CampaignsIcon } from "../../components/module-icons";
 import {
   Button,
   Container,
@@ -370,6 +371,7 @@ const CampaignsPage = () => {
 };
 
 export const config = defineRouteConfig({
+  icon: CampaignsIcon,
   label: "Email campaigns",
 });
 

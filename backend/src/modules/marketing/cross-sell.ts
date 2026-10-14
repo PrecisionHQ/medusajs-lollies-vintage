@@ -5,6 +5,7 @@ import { buildUnsubscribeLink } from "./utils";
 import {
   alreadySent,
   claimSend,
+  isFlowEnabled,
   isOptedOut,
   recentlyEmailed,
 } from "./flow-guards";
@@ -22,6 +23,9 @@ export async function runCrossSell(
   container: any
 ): Promise<{ sent: number; skipped: number }> {
   const marketing = container.resolve("marketing") as any;
+  if (!(await isFlowEnabled(marketing, "cross_sell"))) {
+    return { sent: 0, skipped: 0 };
+  }
   const notifications = container.resolve(Modules.NOTIFICATION);
   const orderModule = container.resolve(Modules.ORDER);
   const productModule = container.resolve(Modules.PRODUCT);

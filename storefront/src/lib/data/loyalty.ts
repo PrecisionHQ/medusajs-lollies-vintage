@@ -42,3 +42,29 @@ export async function redeemLoyalty(): Promise<{ ok: boolean; code?: string; err
     return { ok: false, error: "failed" }
   }
 }
+
+/** Share-to-earn (#13): guests get signin, authed earn (or duplicate/cap). */
+export async function earnShare(
+  productId: string
+): Promise<{ ok: boolean; points?: number; duplicate?: boolean; error?: string }> {
+  try {
+    const res = await sdk.client.fetch<{ points: number; duplicate?: boolean }>(
+      `/store/loyalty/share-earn`,
+      {
+        method: "POST",
+        headers: { ...(await getAuthHeaders()) },
+        body: { product_id: productId },
+      }
+    )
+    return { ok: true, points: res.points, duplicate: res.duplicate }
+  } catch (e: any) {
+    const status = e?.status ?? e?.response?.status
+    if (status === 401) {
+      return { ok: false, error: "signin" }
+    }
+    if (status === 429) {
+      return { ok: false, error: "capped" }
+    }
+    return { ok: false, error: "failed" }
+  }
+}
