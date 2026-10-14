@@ -24,7 +24,14 @@ touching the region-prefixed store.
 
 Push needs the `web-push` package (already in `backend/package.json`).
 
-## API surface
+## Tabs
+
+- **Status** — today/week orders + revenue, needs-you counts, stock alerts (60s poll, offline last-payload).
+- **Orders** (Phase A) — newest 50 with Action/All/Unfulfilled/Unpaid filters (unknown statuses fail open to Action); detail with items, totals, payments and shipments; one-tap **Fulfill** (remaining quantities), **tracking number → Ship**, **Capture** uncaptured payments, **Cancel** unfulfilled orders. Pure PWA UI over Medusa core `/admin/*` — no wrapper routes (see `docs/parity-spike.md`).
+- **Moderate** — open questions (answer inline) + pending reviews (approve/reject).
+- **Alerts** — push subscribe, phone/desktop toggle, admin bind.
+
+## API surface (push)
 
 - `GET /store/push/vapid-key` → `{ publicKey }` (404 when unconfigured)
 - `POST /store/push/subscriptions` → upsert by endpoint (accepts Web Push JS shape `{ endpoint, keys: { p256dh, auth }, device }`)
@@ -33,9 +40,9 @@ Push needs the `web-push` package (already in `backend/package.json`).
 - `GET /admin/push/subscriptions` → `{ count, by_device }` (no endpoints/keys)
 - `POST /admin/push/send` → `{ title, body, url?, device? }` broadcast/test
 
-Auto-pings: new question / new review notify **bound (admin) installs only**
-(`adminOnly`), so customer installs never see back-office activity. Manual
-sends reach every install unless `device` filters. Stale endpoints (push
+Auto-pings: new question / new review / **new order** notify **bound (admin)
+installs only** (`adminOnly`), so customer installs never see back-office
+activity. Manual sends reach every install unless `device` filters. Stale endpoints (push
 service 404/410) are deleted on send — no janitor.
 
 ## Distribute (owner devices only)
