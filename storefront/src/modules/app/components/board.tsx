@@ -14,7 +14,7 @@ type Summary = {
 }
 
 /** Status board — mirrors the dashboard /phone page, one fetch, 60s poll. */
-export default function Board({ onAuthLost }: { onAuthLost: () => void }) {
+export default function Board({ onAuthLost, onAdjust }: { onAuthLost: () => void; onAdjust: (variantId: string) => void }) {
   const [data, setData] = useState<Summary | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -96,7 +96,12 @@ export default function Board({ onAuthLost }: { onAuthLost: () => void }) {
             <h2 className="la-h2">Stock alerts ({data.low_stock.length})</h2>
             {data.low_stock.length ? (
               data.low_stock.map((s) => (
-                <p key={s.variant_id}>{s.title} — <strong>{s.available} left</strong></p>
+                <div key={s.variant_id} className="la-row" style={{ padding: "6px 0" }}>
+                  <span>{s.title} — <strong>{s.available} left</strong></span>
+                  <button className="la-btn-ghost" onClick={() => onAdjust(s.variant_id)}>
+                    Fix
+                  </button>
+                </div>
               ))
             ) : (
               <p className="la-muted">Nothing under 5 units.</p>
