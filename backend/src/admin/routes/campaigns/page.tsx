@@ -370,7 +370,7 @@ const CampaignsPage = () => {
 };
 
 export const config = defineRouteConfig({
-  label: "Campaigns",
+  label: "Email campaigns",
 });
 
 export default CampaignsPage;
