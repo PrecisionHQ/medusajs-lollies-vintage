@@ -8,16 +8,20 @@ import Board from "@modules/app/components/board"
 import Orders from "@modules/app/components/orders"
 import Discounts from "@modules/app/components/discounts"
 import Catalog from "@modules/app/components/catalog"
+import Customers from "@modules/app/components/customers"
+import Returns from "@modules/app/components/returns"
 import Moderation from "@modules/app/components/moderation"
 import PushSettings from "@modules/app/components/push-settings"
 
-type Tab = "status" | "orders" | "discounts" | "catalog" | "moderate" | "alerts"
+type Tab = "status" | "orders" | "discounts" | "catalog" | "customers" | "returns" | "moderate" | "alerts"
 
 const TAB_LABELS: Record<Tab, string> = {
   status: "Status",
   orders: "Orders",
   discounts: "Codes",
   catalog: "Catalog",
+  customers: "Clients",
+  returns: "Returns",
   moderate: "Moderate",
   alerts: "Alerts",
 }
@@ -98,6 +102,8 @@ export default function AppShell() {
             onTargetDone={() => setCatalogTarget(null)}
           />
         ) : null}
+        {tab === "customers" ? <Customers onAuthLost={onAuthLost} /> : null}
+        {tab === "returns" ? <Returns onAuthLost={onAuthLost} /> : null}
         {tab === "moderate" ? <Moderation onAuthLost={onAuthLost} /> : null}
         {tab === "alerts" ? <PushSettings /> : null}
       </div>
