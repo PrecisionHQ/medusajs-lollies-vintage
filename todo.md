@@ -1,6 +1,9 @@
 # Master todo — Lollies Vintage platform (updated 2026-10-12)
 
 ## ✅ Done (merged + live)
+- PR #97 merged: admin Campaigns→Email campaigns label
+- Backend redeployed 2026-10-14 from master tip (#78/#79/#97 now live; phone board API verified 401-live; regions 249/249 intact)
+- Branch hygiene 2026-10-14: pruned 40+ squash-merged local branches + 4 stale remote branches + duplicate docs stash; open PRs: #49 (docs) only
 - PRs #35–#45: Modave storefront, video lookbook/hero, purchasability, Shop All + logo, loyalty completion, backend build rescue, caching (scopes, revalidation, images)
 - PR #40: Lollies footer (branding, socials, 13-method payment band, real contact)
 - PR #41–#42: loyalty workstream completion + container-key deconflict
