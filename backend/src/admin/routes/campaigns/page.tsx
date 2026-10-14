@@ -372,7 +372,7 @@ const CampaignsPage = () => {
 
 export const config = defineRouteConfig({
   icon: CampaignsIcon,
-  label: "Campaigns",
+  label: "Email campaigns",
 });
 
 export default CampaignsPage;
