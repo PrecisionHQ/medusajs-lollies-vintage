@@ -32,8 +32,8 @@ export function ShellStyles() {
       .la-btn-ghost { background: transparent; color: ${theme.ink}; border: 1px solid ${theme.line}; border-radius: 12px; padding: 10px 14px; font-size: 15px; min-height: 44px; cursor: pointer; }
       .la-input, .la-textarea { width: 100%; background: #100d09; color: ${theme.ink}; border: 1px solid ${theme.line}; border-radius: 10px; padding: 12px; font-size: 16px; }
       .la-textarea { min-height: 88px; resize: vertical; }
-      .la-tabs { display: flex; gap: 8px; position: sticky; top: 0; background: ${theme.bg}; padding: 8px 0; z-index: 2; }
-      .la-tab { flex: 1; border-radius: 12px; border: 1px solid ${theme.line}; background: transparent; color: ${theme.muted}; padding: 12px 4px; font-size: 15px; font-weight: 600; min-height: 48px; cursor: pointer; }
+      .la-tabs { display: flex; gap: 8px; position: sticky; top: 0; background: ${theme.bg}; padding: 8px 0; z-index: 2; overflow-x: auto; }
+      .la-tab { flex: 1 0 auto; border-radius: 12px; border: 1px solid ${theme.line}; background: transparent; color: ${theme.muted}; padding: 12px 10px; font-size: 15px; font-weight: 600; min-height: 48px; cursor: pointer; white-space: nowrap; }
       .la-tab[aria-selected="true"] { background: ${theme.card}; color: ${theme.ink}; border-color: ${theme.accent}; }
       .la-err { color: ${theme.danger}; font-size: 14px; }
       .la-item { border-top: 1px solid ${theme.line}; padding: 12px 0; }
