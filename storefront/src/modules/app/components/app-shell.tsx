@@ -53,11 +53,12 @@ export default function AppShell() {
           <h1 className="la-h1">Lollies Shop</h1>
           <button className="la-btn-ghost" onClick={logout}>Sign out</button>
         </div>
-        <nav className="la-tabs" aria-label="Owner app">
+        <nav className="la-tabs" aria-label="Owner app" role="tablist">
           {(["status", "moderate", "alerts"] as Tab[]).map((t) => (
             <button
               key={t}
               className="la-tab"
+              role="tab"
               aria-selected={tab === t}
               onClick={() => setTab(t)}
             >

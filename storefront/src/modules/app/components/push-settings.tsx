@@ -60,7 +60,7 @@ export default function PushSettings() {
           `${backendUrl()}/store/push/vapid-key`,
           { headers: { "x-publishable-api-key": process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ?? "" } }
         ).then((r) => {
-          if (!r.ok) throw new Error("Push isn't configured on the backend yet (VAPID keys missing).")
+          if (!r.ok) throw new Error("Push is not configured on the backend yet (VAPID keys missing).")
           return r.json()
         })
         sub = await reg.pushManager.subscribe({
@@ -134,7 +134,7 @@ export default function PushSettings() {
     return (
       <div className="la-card">
         <h2 className="la-h2">Alerts</h2>
-        <p className="la-muted">This browser can't do push notifications — install the app in Chrome/Safari to get alerts.</p>
+        <p className="la-muted">This browser cannot do push notifications — install the app in Chrome/Safari to get alerts.</p>
       </div>
     )
   }

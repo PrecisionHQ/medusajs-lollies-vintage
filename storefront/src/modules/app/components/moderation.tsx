@@ -36,13 +36,16 @@ export default function Moderation({ onAuthLost }: { onAuthLost: () => void }) {
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState<string | null>(null)
 
-  const fail = (e: unknown) => {
-    if (e instanceof AppAuthError) {
-      onAuthLost()
-      return
-    }
-    setError(e instanceof Error ? e.message : "Could not load.")
-  }
+  const fail = useCallback(
+    (e: unknown) => {
+      if (e instanceof AppAuthError) {
+        onAuthLost()
+        return
+      }
+      setError(e instanceof Error ? e.message : "Could not load.")
+    },
+    [onAuthLost]
+  )
 
   const load = useCallback(async () => {
     try {
@@ -58,12 +61,11 @@ export default function Moderation({ onAuthLost }: { onAuthLost: () => void }) {
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [fail])
 
   useEffect(() => {
     load()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [load])
 
   const act = async (id: string, fn: () => Promise<unknown>) => {
     setBusy(id)
