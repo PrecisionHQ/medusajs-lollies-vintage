@@ -1,6 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http";
 import { Modules } from "@medusajs/framework/utils";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
+import { notifyPushSubscribers } from "../../../../../modules/push/push-sender";
 
 /**
  * PR-04 — Store reviews for one product.
@@ -112,6 +113,13 @@ export const POST = async (req: MedusaRequest, res: MedusaResponse) => {
     verified,
   });
   const created = Array.isArray(createdRaw) ? createdRaw[0] : createdRaw;
+
+  // Admin ping (best-effort, never fails the review): bound installs only.
+  notifyPushSubscribers(
+    req.scope,
+    { title: "New review", body: "A review is waiting for moderation." },
+    { adminOnly: true }
+  ).catch(() => {});
 
   res.status(201).json({
     review: { id: created.id, status: created.status, verified },

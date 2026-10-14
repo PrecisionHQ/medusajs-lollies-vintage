@@ -98,6 +98,10 @@ const medusaConfig = {
       resolve: './src/modules/loyalty',
     },
     {
+      // PWA phone app: Web Push subscriptions (question/review/stock pings).
+      resolve: './src/modules/push',
+    },
+    {
       // PR-15: URL redirects + 404 log. No options.
       resolve: './src/modules/redirects',
     },
