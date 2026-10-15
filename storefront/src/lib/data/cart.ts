@@ -10,6 +10,7 @@ import medusaError from "@lib/util/medusa-error"
 import { HttpTypes } from "@medusajs/types"
 import { omit } from "lodash"
 import { redirect } from "next/navigation"
+import { cookies } from "next/headers"
 import {
   getAuthHeaders,
   getCacheDirectives,
@@ -90,7 +91,55 @@ export async function getOrSetCart(countryCode: string) {
     await revalidateCacheTag("carts", { visitor: true })
   }
 
+  await stampAttribution(cart.id).catch(() => {})
+
   return cart
+}
+
+/**
+ * Phase 3 (C1) — first-touch attribution. The middleware plants
+ * `_lollies_utm` (`utm_source=X|utm_campaign=Y|…`, 30d) on ad landings;
+ * this stamps source/campaign into cart metadata once, so the order
+ * inherits it and ROAS can join spend → revenue. First touch wins (an
+ * existing stamp is never overwritten); failures are silent because
+ * attribution must never break the cart.
+ */
+export async function stampAttribution(cartId: string) {
+  const jar = await cookies()
+  const raw = jar.get("_lollies_utm")?.value
+  if (!raw) return
+  const parts = Object.fromEntries(
+    raw
+      .split("|")
+      .map((p) => p.split("="))
+      .filter((kv) => kv.length === 2)
+      .map(([k, v]) => [k, decodeURIComponent(v)])
+  ) as Record<string, string>
+  if (!parts.utm_source) return
+  const cart = await sdk.client
+    .fetch<{ cart: HttpTypes.StoreCart }>(`/store/carts/${cartId}`, {
+      method: "GET",
+      headers: { ...(await getAuthHeaders()) },
+    })
+    .then(({ cart }) => cart)
+    .catch(() => null)
+  if (!cart || (cart.metadata as any)?.attribution?.utm_source) return
+  await sdk.store.cart.update(
+    cartId,
+    {
+      metadata: {
+        ...(cart.metadata ?? {}),
+        attribution: {
+          utm_source: parts.utm_source,
+          ...(parts.utm_campaign ? { utm_campaign: parts.utm_campaign } : {}),
+          stamped_at: new Date().toISOString(),
+        },
+      },
+    },
+    {},
+    await getAuthHeaders()
+  )
+  await revalidateCacheTag("carts", { visitor: true })
 }
 
 export async function updateCart(data: HttpTypes.StoreUpdateCart) {
