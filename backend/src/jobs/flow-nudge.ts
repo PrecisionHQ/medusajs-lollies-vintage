@@ -1,6 +1,7 @@
 import { MedusaContainer } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { notifyPushSubscribers } from "../modules/push/push-sender";
+import { heartbeat } from "../modules/ops/heartbeat";
 
 /**
  * Owner PWA — paused-flow nudge, daily.
@@ -38,8 +39,10 @@ export default async function flowNudgeJob(container: MedusaContainer) {
       ).catch(() => {});
       logger.info(`flow-nudge: pinged for paused flow ${c.key}`);
     }
+    await heartbeat(container, "flow-nudge-daily", true);
   } catch (error) {
     logger.error(`flow-nudge job failed: ${(error as Error).message}`);
+    await heartbeat(container, "flow-nudge-daily", false, error);
   }
 }
 
