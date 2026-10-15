@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { appFetch, AppAuthError } from "@modules/app/backend"
 import { backendUrl } from "@modules/app/backend"
+import { money } from "@modules/app/components/ui"
 
 type Creator = {
   id: string
@@ -12,6 +13,16 @@ type Creator = {
   commission_pct?: number | null
   code?: string | null
   status?: string | null
+}
+
+type Stat = {
+  creator_id: string
+  handle: string
+  visits: number
+  redemptions: number
+  currency: string
+  revenue_minor: number
+  owed_minor: number
 }
 
 const linkFor = (handle: string) =>
@@ -24,6 +35,7 @@ const linkFor = (handle: string) =>
  */
 export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
   const [rows, setRows] = useState<Creator[]>([])
+  const [stats, setStats] = useState<Stat[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
@@ -43,8 +55,14 @@ export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
 
   const load = useCallback(async () => {
     try {
-      const res = await appFetch<{ creators: Creator[] }>("/admin/affiliates")
-      setRows(res.creators ?? [])
+      const [list, board] = await Promise.all([
+        appFetch<{ creators: Creator[] }>("/admin/affiliates"),
+        appFetch<{ rows: Stat[] }>("/admin/affiliates/stats?days=30").catch(() => ({
+          rows: [],
+        })),
+      ])
+      setRows(list.creators ?? [])
+      setStats(board.rows ?? [])
       setError(null)
     } catch (e) {
       fail(e)
@@ -168,6 +186,18 @@ export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
         </div>
         {loading ? <p className="la-muted">Loading…</p> : null}
         {!loading && !rows.length ? <p className="la-muted">Nobody yet — add your first creator above.</p> : null}
+        {stats.length ? (
+          <div className="la-item">
+            <p className="la-muted">30d board</p>
+            {stats.slice(0, 10).map((s) => (
+              <p key={`${s.creator_id}-${s.currency}`} style={{ fontSize: 14 }}>
+                <strong>@{s.handle}</strong> — {s.redemptions} × {money(s.revenue_minor, s.currency)} ·{" "}
+                {money(s.owed_minor, s.currency)} owed
+                <span className="la-muted"> · {s.visits} visits</span>
+              </p>
+            ))}
+          </div>
+        ) : null}
         {rows.map((c) => (
           <div key={c.id} className="la-item">
             <p>

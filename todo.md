@@ -111,7 +111,7 @@ Shopify Collabs model: open-access (any creator, auto-links) vs invite-only
 (+2.9%). No app store here — build on promo codes + UTM + orders.
 
 - [x] **F1 — Creators + codes:** `affiliate` module (`affiliate_creator`: handle unique, rate, code, status) + admin CRUD (409 on taken handle) + dashboard page (add, one-tap personal-code mint via promo API, pause/activate, delete) + PWA Affiliates Labs tab (add, mint, copy referral link); validation tests
-- [ ] **F2 — Attribution board:** visits (link hits), redemptions (code orders), revenue, commission owed; admin page + PWA leaderboard card
+- [x] **F2 — Attribution board:** `affiliate_hit` log (no PII, advisory) + `POST /store/affiliates/hit` beacon (always-ok, unknown handles ignored) + middleware fire on first-touch affiliate landings (fire-and-forget) + `GET /admin/affiliates/stats` (code-redemption join via line-item adjustments, owed math, per creator+currency, 2 tests) + dashboard leaderboard + PWA board
 - [ ] **F3 — Payouts:** manual ledger first (mark paid + note); auto later; self-signup page only after closed program proves out
 
 ## 🧑‍💼 Staff RBAC (Phase 5, 2026-10-15)

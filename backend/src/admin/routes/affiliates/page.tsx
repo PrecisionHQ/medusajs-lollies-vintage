@@ -14,6 +14,19 @@ type Creator = {
   status?: string | null;
 };
 
+type Stat = {
+  creator_id: string;
+  handle: string;
+  visits: number;
+  redemptions: number;
+  currency: string;
+  revenue_minor: number;
+  owed_minor: number;
+};
+
+const money = (minor: number, currency: string) =>
+  `${(Number(minor ?? 0) / 100).toFixed(2)} ${String(currency ?? "eur").toUpperCase()}`;
+
 const PLATFORMS = ["instagram", "tiktok", "youtube", "blog", "other"];
 
 /**
@@ -38,6 +51,12 @@ const AffiliatesPage = () => {
   }>({
     queryKey: ["affiliates"],
     queryFn: () => sdk.client.fetch("/admin/affiliates"),
+    refetchInterval: 300_000,
+  });
+
+  const { data: stats } = useQuery<{ rows: Stat[] }>({
+    queryKey: ["affiliates-stats"],
+    queryFn: () => sdk.client.fetch("/admin/affiliates/stats?days=30"),
     refetchInterval: 300_000,
   });
 
@@ -138,6 +157,19 @@ const AffiliatesPage = () => {
 
   return (
     <div className="flex flex-col gap-3 max-w-2xl">
+      {(stats?.rows ?? []).length ? (
+        <Container className="px-5 py-4">
+          <Heading level="h3">Leaderboard · 30d</Heading>
+          {(stats?.rows ?? []).slice(0, 10).map((s) => (
+            <Text key={`${s.creator_id}-${s.currency}`}>
+              <span className="font-medium">@{s.handle}</span> — {s.redemptions}{" "}
+              redemptions · {money(s.revenue_minor, s.currency)} ·{" "}
+              {money(s.owed_minor, s.currency)} owed
+              <span className="text-ui-fg-subtle"> · {s.visits} visits</span>
+            </Text>
+          ))}
+        </Container>
+      ) : null}
       <Container className="px-5 py-4">
         <Heading level="h2">Affiliates</Heading>
         <Text className="text-ui-fg-subtle">
