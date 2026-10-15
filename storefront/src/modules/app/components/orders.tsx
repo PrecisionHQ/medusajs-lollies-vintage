@@ -35,7 +35,7 @@ type OrderDetail = OrderRow & {
     shipped_at?: string | null
     items?: { id: string; quantity?: number }[]
   }[]
-  payment_collections?: { payments?: { id: string; amount?: number; captured_at?: string | null }[] }[]
+  payment_collections?: { payments?: { id: string; amount?: number; captured_at?: string | null; provider_id?: string | null }[] }[]
 }
 
 const DONE_FULFILL = ["fulfilled", "shipped", "delivered"]
@@ -109,7 +109,7 @@ export default function Orders({
       setBusy(id)
       try {
         const res = await appFetch<{ order: OrderDetail }>(
-          `/admin/orders/${id}?fields=id,display_id,email,total,subtotal,tax_total,shipping_total,discount_total,currency_code,status,payment_status,fulfillment_status,created_at,*items,*fulfillments,*payment_collections`
+          `/admin/orders/${id}?fields=id,display_id,email,total,subtotal,tax_total,shipping_total,discount_total,currency_code,status,payment_status,fulfillment_status,created_at,*items,*fulfillments,*payment_collections,*payment_collections.payments`
         )
         setSelected(res.order)
         setError(null)
@@ -274,6 +274,7 @@ export default function Orders({
                 }
               >
                 Capture {money(Number(uncaptured[0].amount ?? 0), selected.currency_code ?? "eur")}
+                {uncaptured[0].provider_id ? ` via ${uncaptured[0].provider_id}` : ""}
               </button>
             ) : null}
             {!DONE_STATUS.includes(selected.status ?? "") ? (
@@ -297,7 +298,8 @@ export default function Orders({
           {captured.map((p) => (
             <div key={p.id} className="la-item">
               <p className="la-muted">
-                Paid {money(Number(p.amount ?? 0), selected.currency_code ?? "eur")} · refund:
+                Paid {money(Number(p.amount ?? 0), selected.currency_code ?? "eur")}
+                {p.provider_id ? ` via ${p.provider_id}` : ""} · refund:
               </p>
               <div style={{ display: "flex", gap: 8 }}>
                 <input

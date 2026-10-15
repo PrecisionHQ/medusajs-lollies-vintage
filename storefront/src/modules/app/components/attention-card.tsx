@@ -12,7 +12,7 @@ type Section = {
   degraded?: boolean
 }
 
-type Tab = "status" | "orders" | "discounts" | "catalog" | "customers" | "returns" | "flows" | "moderate" | "alerts"
+type Tab = "status" | "orders" | "money" | "discounts" | "catalog" | "customers" | "returns" | "flows" | "moderate" | "alerts"
 
 const line = (key: string, item: Record<string, unknown>): string => {
   const s = (v: unknown) => String(v ?? "?")
