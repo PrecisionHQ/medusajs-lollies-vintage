@@ -72,6 +72,6 @@ mobile admin (orders → money → catalog → customers). Each phase = backend 
 - [x] PR-A3 PWA + digest: Status-tab attention card (tab/order/variant jumps) + 08:00 digest ping (silent on clear days); `owner-app.md` updated
 
 ## ⏳ Ops / verification
-- [ ] Redeploy backend, confirm hourly job errors gone (migrations from #51 now merged)
+- [x] Redeploy backend, confirm hourly job errors gone → review-request root-caused (bad `fulfillment_status` filter, PR #115) and redeployed 2026-10-15; hub (PRs #116–#118) now watches all jobs via heartbeats
 - [ ] Watch Railway CPU/memory on image-optimization burst (post-#45)
 - [ ] Drop orphan `newsletter_subscriber` table when convenient (superseded, harmless)
