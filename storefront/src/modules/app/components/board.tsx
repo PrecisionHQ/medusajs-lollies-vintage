@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { appFetch, AppAuthError } from "@modules/app/backend"
 import { money } from "@modules/app/components/ui"
+import AttentionCard from "@modules/app/components/attention-card"
 
 type Summary = {
   today: { orders: number; revenue: { currency: string; minor: number }[] }
@@ -30,10 +31,12 @@ export default function Board({
   onAuthLost,
   onAdjust,
   onOpenOrder,
+  onGotoTab,
 }: {
   onAuthLost: () => void
   onAdjust: (variantId: string) => void
   onOpenOrder: (orderId: string) => void
+  onGotoTab: (tab: "status" | "orders" | "discounts" | "catalog" | "customers" | "returns" | "flows" | "moderate" | "alerts") => void
 }) {
   const [data, setData] = useState<Summary | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -77,6 +80,12 @@ export default function Board({
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <AttentionCard
+        onAuthLost={onAuthLost}
+        onGotoTab={onGotoTab}
+        onOpenOrder={onOpenOrder}
+        onAdjust={onAdjust}
+      />
       {offline ? (
         <div className="la-card">
           <p className="la-muted">Offline — showing the last loaded status.</p>

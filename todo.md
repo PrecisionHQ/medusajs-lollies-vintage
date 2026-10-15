@@ -64,6 +64,13 @@ mobile admin (orders → money → catalog → customers). Each phase = backend 
 - [x] **F — Board+ (only after A–E earn it):** 30d revenue chart (CSS bars, dominant currency + named others), top-5 products, >48h SLA card with Open-to-order jump (PR #109 + UI PR). Flow switches already shipped in Phase E.
 - [ ] **OUT (deliberate):** POS/hardware, shipping-label purchase (no carrier account), theme/blog editor, home-screen widgets + watch (iOS doesn't grant those to PWAs), Sidekick-style AI.
 
+## 📣 Attention hub (2026-10-15)
+
+- [x] PR-A0 hotfix: review-request delivered query via fulfillments (hourly prod failure)
+- [x] PR-A1 backend: `ops` heartbeat module (7 jobs wired) + `GET /admin/ops/attention` (8 sections, fail-open, bounded, no FX)
+- [x] PR-A2 dashboard: Attention sidebar page (severity cards, fix links, all-clear state)
+- [x] PR-A3 PWA + digest: Status-tab attention card (tab/order/variant jumps) + 08:00 digest ping (silent on clear days); `owner-app.md` updated
+
 ## ⏳ Ops / verification
 - [ ] Redeploy backend, confirm hourly job errors gone (migrations from #51 now merged)
 - [ ] Watch Railway CPU/memory on image-optimization burst (post-#45)
