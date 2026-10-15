@@ -56,8 +56,47 @@ function readUtmParams(searchParams: URLSearchParams): string | null {
   return parts.length ? parts.join("|") : null;
 }
 
-function maybeSetUtmCookie(
-  response: NextResponse,
+/**
+ * Phase 4 (F2) — referral hit beacon. Fires only on first-touch affiliate
+ * landings (URL carries utm params, no cookie yet — the same condition
+ * that plants the cookie). Fire-and-forget on purpose: awaiting it would
+ * tax every ad landing, and visits are advisory (payouts key on
+ * redemptions). The endpoint always answers ok:true, so nothing here can
+ * fail the shopper's navigation either way.
+ */
+function fireAffiliateHit(
+  searchParams: URLSearchParams,
+  utmValue: string | null,
+  hasUtmCookie: boolean
+) {
+  try {
+    if (!utmValue || hasUtmCookie || !BACKEND_URL || !PUBLISHABLE_API_KEY) {
+      return
+    }
+    const parts = Object.fromEntries(
+      utmValue
+        .split("|")
+        .map((p) => p.split("="))
+        .filter((kv) => kv.length === 2)
+        .map(([k, v]) => [k, decodeURIComponent(v)])
+    ) as Record<string, string>
+    if (parts.utm_source !== "affiliate" || !parts.utm_campaign) {
+      return
+    }
+    void fetch(`${BACKEND_URL}/store/affiliates/hit`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-publishable-api-key": PUBLISHABLE_API_KEY,
+      },
+      body: JSON.stringify({ handle: parts.utm_campaign }),
+    }).catch(() => {})
+  } catch {
+    // Beacon. Never fail the request.
+  }
+}
+
+function maybeSetUtmCookie(  response: NextResponse,
   utmValue: string | null,
   hasUtmCookie: boolean
 ) {
@@ -245,6 +284,7 @@ export async function middleware(request: NextRequest) {
   // below via maybeSetUtmCookie (both exits replace `response` wholesale).
   const utmValue = readUtmParams(searchParams)
   const hasUtmCookie = Boolean(request.cookies.get("_lollies_utm")?.value)
+  fireAffiliateHit(searchParams, utmValue, hasUtmCookie)
 
   // check if one of the country codes is in the url
   if (urlHasCountryCode && (!cartId || cartIdCookie)) {
