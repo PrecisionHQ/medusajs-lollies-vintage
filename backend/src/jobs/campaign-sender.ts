@@ -1,6 +1,7 @@
 import { MedusaContainer } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { runCampaignSend } from "../modules/marketing/campaign-sender";
+import { heartbeat } from "../modules/ops/heartbeat";
 
 /**
  * P3 — Campaign sender pass, every 15 minutes. Picks up campaigns that are
@@ -47,8 +48,10 @@ export default async function campaignSenderJob(container: MedusaContainer) {
       // other jobs' every-run logging).
       logger.info(`campaign-sender: nothing due`);
     }
+    await heartbeat(container, "campaign-sender-quarter-hourly", true);
   } catch (error) {
     logger.error(`campaign-sender job failed: ${(error as Error).message}`);
+    await heartbeat(container, "campaign-sender-quarter-hourly", false, error);
   }
 }
 

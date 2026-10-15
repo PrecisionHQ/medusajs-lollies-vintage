@@ -1,6 +1,7 @@
 import { MedusaContainer } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { abandonedCartWorkflow } from "../workflows/abandoned-cart";
+import { heartbeat } from "../modules/ops/heartbeat";
 
 /**
  * PR-02 — Hourly abandoned-cart pass. The workflow is idempotent (FlowLog keys)
@@ -14,11 +15,13 @@ export default async function abandonedCartJob(container: MedusaContainer) {
     logger.info(
       `abandoned-cart: sent first=${result.sentFirst} second=${result.sentSecond} skipped=${result.skipped}`
     );
+    await heartbeat(container, "abandoned-cart-hourly", true);
   } catch (error) {
     // Never throw: a failed run must not wedge the scheduler; next hour retries.
     logger.error(
       `abandoned-cart job failed: ${(error as Error).message}`
     );
+    await heartbeat(container, "abandoned-cart-hourly", false, error);
   }
 }
 

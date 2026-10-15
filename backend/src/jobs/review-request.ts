@@ -1,6 +1,7 @@
 import { MedusaContainer } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { reviewRequestWorkflow } from "../workflows/review-request";
+import { heartbeat } from "../modules/ops/heartbeat";
 
 /**
  * PR-03 — Hourly review-request pass. Idempotent via FlowLog keys;
@@ -13,8 +14,10 @@ export default async function reviewRequestJob(container: MedusaContainer) {
     logger.info(
       `review-request: sent=${result.sent} skipped=${result.skipped}`
     );
+    await heartbeat(container, "review-request-hourly", true);
   } catch (error) {
     logger.error(`review-request job failed: ${(error as Error).message}`);
+    await heartbeat(container, "review-request-hourly", false, error);
   }
 }
 

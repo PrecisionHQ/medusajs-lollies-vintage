@@ -1,6 +1,7 @@
 import { MedusaContainer } from "@medusajs/framework/types";
 import { ContainerRegistrationKeys } from "@medusajs/framework/utils";
 import { runCrossSell } from "../modules/marketing/cross-sell";
+import { heartbeat } from "../modules/ops/heartbeat";
 
 /**
  * P9 — Daily cross-sell pass (09:00). Never throws: a failed run must
@@ -11,8 +12,10 @@ export default async function crossSellJob(container: MedusaContainer) {
   try {
     const r = await runCrossSell(container);
     logger.info(`cross-sell: sent=${r.sent} skipped=${r.skipped}`);
+    await heartbeat(container, "cross-sell-daily", true);
   } catch (error) {
     logger.error(`cross-sell job failed: ${(error as Error).message}`);
+    await heartbeat(container, "cross-sell-daily", false, error);
   }
 }
 

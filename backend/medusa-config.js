@@ -102,6 +102,10 @@ const medusaConfig = {
       resolve: './src/modules/push',
     },
     {
+      // Attention hub: job heartbeat log for the ops aggregator.
+      resolve: './src/modules/ops',
+    },
+    {
       // PR-15: URL redirects + 404 log. No options.
       resolve: './src/modules/redirects',
     },
