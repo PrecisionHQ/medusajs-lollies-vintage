@@ -7,10 +7,12 @@ import { attributeStats } from "../../../../modules/affiliates/attribution";
 const DAY = 24 * 3600 * 1000;
 
 /**
- * Phase 4 (F2) — attribution board data. Per creator+currency: visits
+ * Phase 4 (F2+F3) — attribution board data. Per creator+currency: visits
  * (hit log, advisory), redemptions (orders carrying the creator's code in
- * line-item adjustments, authoritative), revenue, commission owed. Bounded
- * reads (200 creators, 2000 hits, 1000 orders); fail-open degraded
+ * line-item adjustments, authoritative), revenue, commission owed, plus
+ * all-time paid from the payout ledger. Owed is windowed, paid is
+ * lifetime — no computed balance (it would lie); the pay form prefills
+ * windowed owed as a convenience. Bounded reads; fail-open degraded
  * contract like every other aggregator.
  */
 export const GET = async (
@@ -24,7 +26,7 @@ export const GET = async (
     const affiliates = scope.resolve("affiliate") as any;
     const orderModule = scope.resolve("order") as any;
 
-    const [creators, hits, orders] = await Promise.all([
+    const [creators, hits, orders, payouts] = await Promise.all([
       affiliates
         .listAffiliateCreators({}, { take: 200, order: { created_at: "DESC" } })
         .catch(() => []),
@@ -37,12 +39,26 @@ export const GET = async (
           { relations: ["items.adjustments"], take: 1000 }
         )
         .catch(() => []),
+      affiliates.listAffiliatePayouts({}, { take: 2000 }).catch(() => []),
     ]);
+
+    const paid = new Map<string, number>();
+    for (const p of payouts ?? []) {
+      const key = `${p.creator_id}|${String(p.currency ?? "eur").toLowerCase()}`;
+      paid.set(key, (paid.get(key) ?? 0) + Number(p.amount_minor ?? 0));
+    }
+
+    const rows = attributeStats(creators ?? [], hits ?? [], orders ?? [], since.toISOString()).map(
+      (r) => ({
+        ...r,
+        paid_minor: paid.get(`${r.creator_id}|${r.currency}`) ?? 0,
+      })
+    );
 
     res.json({
       generated_at: new Date().toISOString(),
       days,
-      rows: attributeStats(creators ?? [], hits ?? [], orders ?? [], since.toISOString()),
+      rows,
     });
   } catch {
     res.json({ generated_at: new Date().toISOString(), days: 0, rows: [], degraded: true });

@@ -22,6 +22,17 @@ type Stat = {
   currency: string;
   revenue_minor: number;
   owed_minor: number;
+  paid_minor: number;
+};
+
+type Payout = {
+  id: string;
+  creator_id: string;
+  handle: string | null;
+  amount_minor: number;
+  currency: string;
+  note: string | null;
+  created_at: string | null;
 };
 
 const money = (minor: number, currency: string) =>
@@ -59,6 +70,46 @@ const AffiliatesPage = () => {
     queryFn: () => sdk.client.fetch("/admin/affiliates/stats?days=30"),
     refetchInterval: 300_000,
   });
+
+  const { data: payoutsData, refetch: refetchPayouts } = useQuery<{
+    payouts: Payout[];
+  }>({
+    queryKey: ["affiliates-payouts"],
+    queryFn: () => sdk.client.fetch("/admin/affiliates/payouts"),
+    refetchInterval: 300_000,
+  });
+
+  const [payAmount, setPayAmount] = useState<Record<string, string>>({});
+  const [payNote, setPayNote] = useState<Record<string, string>>({});
+
+  const pay = async (c: Creator, currency: string, prefill: number) => {
+    const raw = (payAmount[c.id] ?? "").trim();
+    const major = raw ? Number(raw.replace(",", ".")) : prefill / 100;
+    if (!Number.isFinite(major) || major <= 0) {
+      setError("Enter a valid amount (prefilled with windowed owed).");
+      return;
+    }
+    setBusy(`pay-${c.id}`);
+    setError(null);
+    try {
+      await sdk.client.fetch("/admin/affiliates/payouts", {
+        method: "POST",
+        body: {
+          creator_id: c.id,
+          amount_minor: Math.round(major * 100),
+          currency,
+          note: payNote[c.id]?.trim() || null,
+        },
+      });
+      setPayAmount((m) => ({ ...m, [c.id]: "" }));
+      setPayNote((m) => ({ ...m, [c.id]: "" }));
+      await Promise.all([refetch(), refetchPayouts()]);
+    } catch (e) {
+      fail(e);
+    } finally {
+      setBusy(null);
+    }
+  };
 
   const creators = data?.creators ?? [];
 
@@ -164,7 +215,7 @@ const AffiliatesPage = () => {
             <Text key={`${s.creator_id}-${s.currency}`}>
               <span className="font-medium">@{s.handle}</span> — {s.redemptions}{" "}
               redemptions · {money(s.revenue_minor, s.currency)} ·{" "}
-              {money(s.owed_minor, s.currency)} owed
+              {money(s.owed_minor, s.currency)} owed · {money(s.paid_minor, s.currency)} paid
               <span className="text-ui-fg-subtle"> · {s.visits} visits</span>
             </Text>
           ))}
@@ -263,7 +314,84 @@ const AffiliatesPage = () => {
               Delete
             </Button>
           </div>
+          <PayoutBlock
+            creator={c}
+            stats={(stats?.rows ?? []).filter((s) => s.creator_id === c.id)}
+            payouts={(payoutsData?.payouts ?? []).filter((p) => p.creator_id === c.id)}
+            amount={payAmount[c.id] ?? ""}
+            setAmount={(v) => setPayAmount((m) => ({ ...m, [c.id]: v }))}
+            note={payNote[c.id] ?? ""}
+            setNote={(v) => setPayNote((m) => ({ ...m, [c.id]: v }))}
+            busy={busy === `pay-${c.id}`}
+            onPay={(currency, prefill) => pay(c, currency, prefill)}
+          />
         </Container>
+      ))}
+    </div>
+  );
+};
+
+/**
+ * Per-creator ledger: windowed owed + lifetime paid per currency (no
+ * computed balance — different windows would make it lie), pay form
+ * prefilled with windowed owed, append-only history below.
+ */
+const PayoutBlock = ({
+  creator,
+  stats,
+  payouts,
+  amount,
+  setAmount,
+  note,
+  setNote,
+  busy,
+  onPay,
+}: {
+  creator: Creator;
+  stats: Stat[];
+  payouts: Payout[];
+  amount: string;
+  setAmount: (v: string) => void;
+  note: string;
+  setNote: (v: string) => void;
+  busy: boolean;
+  onPay: (currency: string, prefillMinor: number) => void;
+}) => {
+  const currencies = [...new Set([...stats.map((s) => s.currency), ...payouts.map((p) => p.currency)])];
+  if (!stats.length && !payouts.length) return null;
+  return (
+    <div className="mt-2 border-t border-ui-border-base pt-2">
+      {currencies.map((cur) => {
+        const owed = stats.filter((s) => s.currency === cur).reduce((n, s) => n + s.owed_minor, 0);
+        const paid = payouts.filter((p) => p.currency === cur).reduce((n, p) => n + p.amount_minor, 0);
+        return (
+          <div key={cur} className="flex items-center gap-2 py-1 flex-wrap">
+            <Text>
+              {cur.toUpperCase()}: {money(owed, cur)} owed · {money(paid, cur)} paid
+            </Text>
+            <Input
+              placeholder={(owed / 100).toFixed(2)}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="max-w-28"
+            />
+            <Input
+              placeholder="Note (PayPal id…)"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              className="max-w-48"
+            />
+            <Button variant="secondary" disabled={busy} onClick={() => onPay(cur, owed)}>
+              {busy ? "…" : "Record payout"}
+            </Button>
+          </div>
+        );
+      })}
+      {payouts.slice(0, 5).map((p) => (
+        <Text key={p.id} className="text-ui-fg-subtle">
+          {money(p.amount_minor, p.currency)}
+          {p.note ? ` — ${p.note}` : ""}
+        </Text>
       ))}
     </div>
   );
