@@ -123,4 +123,4 @@ NO custom roles module needed.
 
 - [x] **R1 — Policies + enforcement map:** `src/policies/shop.ts` (12 custom resources × CRUD) + `src/api/middlewares.ts` (every custom admin route mapped; coverage test fails future unguarded routes)
 - [x] **R2 — Staff UI + PWA gating:** dashboard Staff page (roles, policy attach, users, invites with roles; flag-off state) + PWA tab gating via `rbac/me/permissions` (fail-open) + `docs/staff-roles.md` runbook
-- [ ] **R3 — Rollout (gated, owner-coordinated):** verify super_admin → create fulfillment/support/marketing roles in UI → test scoped login incognito → set `MEDUSA_FF_RBAC=true` → verify owner + scoped; break-glass = unset flag
+- [x] **R3 — Rollout, flag ON (2026-10-15):** `MEDUSA_FF_RBAC=true` set on Railway backend (redeployed SUCCESS, health 200). Owner verification pending: re-login dashboard (fresh JWT picks up `role_super_admin`), confirm Staff page lists roles, create fulfillment/support/marketing roles, incognito scoped-login test. Break-glass armed: unset flag → redeploy = open again.
