@@ -116,10 +116,11 @@ Shopify Collabs model: open-access (any creator, auto-links) vs invite-only
 
 ## 🧑‍💼 Staff RBAC (Phase 5, 2026-10-15)
 
-Medusa 2.19: invites/users only, NO roles/permissions routes (verified in
-dist). Full-admin-or-nothing today, including the PWA JWT. Biggest build —
-last by design. Interim: owner-only posture, no shared logins.
+Medusa 2.19 HAS native RBAC (`/admin/rbac/*`, policies, `rbac/me/permissions`,
+route-declared enforcement, `role_super_admin` wildcard already assigned by a
+boot migration). Flag `MEDUSA_FF_RBAC` defaults OFF — everything open today.
+NO custom roles module needed.
 
-- [ ] **R1 — Roles module:** `staff_role` (resource→actions matrix) + assignment on invite/accept
-- [ ] **R2 — Enforcement:** middleware scoping `/admin/*` (UI hiding is not security) + dashboard menu gating + role-aware PWA tabs
-- [ ] Roles draft: owner (all), fulfillment (orders/returns/catalog-read), support (customers/moderation/refund-cap?), marketing (flows/campaigns/codes) — amounts capped per action where it matters
+- [x] **R1 — Policies + enforcement map:** `src/policies/shop.ts` (12 custom resources × CRUD) + `src/api/middlewares.ts` (every custom admin route mapped; coverage test fails future unguarded routes)
+- [x] **R2 — Staff UI + PWA gating:** dashboard Staff page (roles, policy attach, users, invites with roles; flag-off state) + PWA tab gating via `rbac/me/permissions` (fail-open) + `docs/staff-roles.md` runbook
+- [ ] **R3 — Rollout (gated, owner-coordinated):** verify super_admin → create fulfillment/support/marketing roles in UI → test scoped login incognito → set `MEDUSA_FF_RBAC=true` → verify owner + scoped; break-glass = unset flag

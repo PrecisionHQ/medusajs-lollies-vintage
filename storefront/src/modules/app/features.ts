@@ -87,6 +87,47 @@ const LABS: TabId[] = [
 export const LAB_IDS = LABS
 export const LOCKED: TabId[] = ["status"]
 
+/**
+ * Phase 5 (R2) — tab gating over native RBAC. Each tab names the
+ * `resource:read` permission(s) it needs; null = always visible (local
+ * screens with no backend read). Checked against
+ * GET /admin/rbac/me/permissions (flat `resource:operation` strings,
+ * wildcards expanded server-side). Fail-open: when the endpoint 404s
+ * (flag off) or errors, everything shows — today's behavior preserved.
+ */
+export const TAB_PERMISSIONS: Record<TabId, string[] | null> = {
+  status: null,
+  orders: ["order:read"],
+  money: ["payment:read"],
+  discounts: ["promotion:read"],
+  catalog: ["product:read"],
+  customers: ["customer:read"],
+  returns: ["return:read"],
+  flows: ["marketing:read"],
+  moderate: ["question:read", "review:read"],
+  alerts: null,
+  preorders: ["product:read"],
+  analytics: ["order:read"],
+  spend: ["marketing:read"],
+  pricing: ["product:read"],
+  loyalty: ["loyalty:read"],
+  bundles: ["bundle:read"],
+  redirects: ["redirect:read"],
+  seo: ["product:read"],
+  shipping: ["shipping:read"],
+  channels: ["sales_channel:read"],
+  affiliates: ["affiliate:read"],
+}
+
+export function visibleWithPermissions(tabs: TabId[], granted: Set<string> | null): TabId[] {
+  if (!granted) return tabs
+  return tabs.filter((t) => {
+    const need = TAB_PERMISSIONS[t]
+    if (!need) return true
+    return need.some((p) => granted.has(p))
+  })
+}
+
 const KEY = "lollies-app-features"
 
 export function defaultEnabled(): TabId[] {
