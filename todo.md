@@ -74,7 +74,8 @@ mobile admin (orders → money → catalog → customers). Each phase = backend 
 ## 💰 Payments page (Phase 2, 2026-10-15)
 
 - [x] Backend `GET /admin/payments/overview` (provider health via key presence, 30d aggregates, newest 50, stuck queue; fail-open contract, 2 tests)
-- [x] PWA Money tab (provider cards, latest, stuck → order jump) + provider labels on order payments
+- [x] PWA Money tab + provider labels on order payments
+- [x] Deploy (2026-10-15): backend (`/admin/payments/overview` 401-live) + storefront (Money + Labs live, `/app` 200) redeployed; first storefront upload timed out transiently, retry succeeded, previous build served throughout (no outage)
 - [ ] Dashboard Payments page (transactions table, filters, capture/refund actions) — still open
 - [ ] Live proof: provider 30d totals vs provider dashboards; test-mode capture+refund round-trip (needs Stripe test keys — same errand as the auto-capture STUB-RISK)
 
