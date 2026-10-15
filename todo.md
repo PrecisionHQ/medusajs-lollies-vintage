@@ -99,8 +99,8 @@ overrides) + orders flowing back. Missing here: registry, TikTok feed,
 availability toggles, and revenue attribution (UTM stops at the cookie —
 nothing reaches carts/orders today).
 
-- [ ] **C1 — Attribution plumbing:** stamp `_lollies_utm` (source/campaign) into cart metadata on ensure (first-touch wins); verify cart→order carries metadata
-- [ ] **C2 — Channel registry (backend):** channel metadata on core `sales_channels` (platform, feed URL, utm_source, last sync/errors) + admin CRUD; availability toggle product↔channel; TikTok feed endpoint (Google-format, like Meta)
+- [x] **C1 — Attribution plumbing (merged, awaiting deploy):** stamp `_lollies_utm` (source/campaign) into cart metadata on ensure (first-touch wins); cart→order carry-over proof rides C3's live test
+- [x] **C2 — Channel registry + feeds + availability:** shared catalog-feed builder (`/feeds/google` refactored, `/feeds/tiktok` new, Google-template format); dashboard Channels page (registry CRUD on core `sales_channels` metadata, product search + batch-link availability); PWA Channels Labs tab (status, utm, feed URLs). Zero backend wrappers — core APIs throughout.
 - [ ] **C3 — ROAS per channel:** join spend ledger (source) ↔ order attribution; extend spend page + PWA channel card (status, errors, ROAS)
 - [ ] Live proof: TikTok catalog ingests feed; one attributed test order end-to-end
 
