@@ -110,7 +110,7 @@ Shopify Collabs model: open-access (any creator, auto-links) vs invite-only
 (vetted, custom rates); tracking = links + personal codes; payouts automatic
 (+2.9%). No app store here — build on promo codes + UTM + orders.
 
-- [ ] **F1 — Creators + codes:** creator table (handle/platform/rate) → one-tap personal code (promo API) + referral-link minting (redirects module)
+- [x] **F1 — Creators + codes:** `affiliate` module (`affiliate_creator`: handle unique, rate, code, status) + admin CRUD (409 on taken handle) + dashboard page (add, one-tap personal-code mint via promo API, pause/activate, delete) + PWA Affiliates Labs tab (add, mint, copy referral link); validation tests
 - [ ] **F2 — Attribution board:** visits (link hits), redemptions (code orders), revenue, commission owed; admin page + PWA leaderboard card
 - [ ] **F3 — Payouts:** manual ledger first (mark paid + note); auto later; self-signup page only after closed program proves out
 

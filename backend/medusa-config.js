@@ -106,6 +106,10 @@ const medusaConfig = {
       resolve: './src/modules/ops',
     },
     {
+      // Phase 4 (F1): affiliate creators (codes via promotions API).
+      resolve: './src/modules/affiliates',
+    },
+    {
       // PR-15: URL redirects + 404 log. No options.
       resolve: './src/modules/redirects',
     },

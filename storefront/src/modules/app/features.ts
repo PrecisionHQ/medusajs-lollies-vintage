@@ -31,6 +31,7 @@ export type TabId =
   | "seo"
   | "shipping"
   | "channels"
+  | "affiliates"
 
 export const TAB_LABELS: Record<TabId, string> = {
   status: "Status",
@@ -53,6 +54,7 @@ export const TAB_LABELS: Record<TabId, string> = {
   seo: "SEO",
   shipping: "Shipping",
   channels: "Channels",
+  affiliates: "Affiliates",
 }
 
 const CURATED: TabId[] = [
@@ -79,6 +81,7 @@ const LABS: TabId[] = [
   "seo",
   "shipping",
   "channels",
+  "affiliates",
 ]
 
 export const LAB_IDS = LABS
