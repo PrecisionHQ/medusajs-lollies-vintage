@@ -13,11 +13,22 @@ type Spend = {
   currency?: string
 }
 
+type RoasRow = {
+  source: string
+  currency: string
+  spend_minor: number
+  revenue_minor: number
+  orders: number
+  roas: number | null
+}
+
 const today = () => new Date().toISOString().slice(0, 10)
 
 /** Spend — ad-spend ledger view + add + delete (same API as the dashboard). */
 export default function Spend({ onAuthLost }: { onAuthLost: () => void }) {
   const [rows, setRows] = useState<Spend[]>([])
+  const [roas, setRoas] = useState<RoasRow[]>([])
+  const [unattributed, setUnattributed] = useState<{ currency: string; revenue_minor: number; orders: number }[]>([])
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -37,8 +48,15 @@ export default function Spend({ onAuthLost }: { onAuthLost: () => void }) {
 
   const load = useCallback(async () => {
     try {
-      const res = await appFetch<{ spend: Spend[] }>("/admin/marketing/spend")
-      setRows(res.spend ?? [])
+      const [spendRes, roasRes] = await Promise.all([
+        appFetch<{ spend: Spend[] }>("/admin/marketing/spend"),
+        appFetch<{ rows: RoasRow[]; unattributed: { currency: string; revenue_minor: number; orders: number }[] }>(
+          "/admin/marketing/roas?days=30"
+        ).catch(() => ({ rows: [], unattributed: [] })),
+      ])
+      setRows(spendRes.spend ?? [])
+      setRoas(roasRes.rows ?? [])
+      setUnattributed(roasRes.unattributed ?? [])
       setError(null)
     } catch (e) {
       fail(e)
@@ -103,6 +121,26 @@ export default function Spend({ onAuthLost }: { onAuthLost: () => void }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div className="la-card">
+        <h2 className="la-h2">ROAS · 30d</h2>
+        {!loading && !roas.length ? (
+          <p className="la-muted">No spend or attributed revenue yet.</p>
+        ) : null}
+        {roas.map((r) => (
+          <p key={`${r.source}-${r.currency}`} style={{ fontSize: 14 }}>
+            <strong>{r.source}</strong> — {r.roas === null ? "organic" : `${r.roas.toFixed(2)}×`}
+            <br />
+            <span className="la-muted">
+              {money(r.revenue_minor, r.currency)} / {money(r.spend_minor, r.currency)} · {r.orders} orders
+            </span>
+          </p>
+        ))}
+        {unattributed.map((u) => (
+          <p key={u.currency} className="la-muted" style={{ fontSize: 13 }}>
+            unattributed: {money(u.revenue_minor, u.currency)} · {u.orders} orders
+          </p>
+        ))}
+      </div>
       <div className="la-card">
         <h2 className="la-h2">Log spend</h2>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
