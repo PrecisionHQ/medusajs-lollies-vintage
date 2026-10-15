@@ -23,6 +23,16 @@ type Stat = {
   currency: string
   revenue_minor: number
   owed_minor: number
+  paid_minor: number
+}
+
+type Payout = {
+  id: string
+  creator_id: string
+  amount_minor: number
+  currency: string
+  note: string | null
+  created_at: string | null
 }
 
 const linkFor = (handle: string) =>
@@ -36,6 +46,9 @@ const linkFor = (handle: string) =>
 export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
   const [rows, setRows] = useState<Creator[]>([])
   const [stats, setStats] = useState<Stat[]>([])
+  const [payouts, setPayouts] = useState<Payout[]>([])
+  const [payAmount, setPayAmount] = useState<Record<string, string>>({})
+  const [payNote, setPayNote] = useState<Record<string, string>>({})
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
@@ -55,14 +68,18 @@ export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
 
   const load = useCallback(async () => {
     try {
-      const [list, board] = await Promise.all([
+      const [list, board, ledger] = await Promise.all([
         appFetch<{ creators: Creator[] }>("/admin/affiliates"),
         appFetch<{ rows: Stat[] }>("/admin/affiliates/stats?days=30").catch(() => ({
           rows: [],
         })),
+        appFetch<{ payouts: Payout[] }>("/admin/affiliates/payouts").catch(() => ({
+          payouts: [],
+        })),
       ])
       setRows(list.creators ?? [])
       setStats(board.rows ?? [])
+      setPayouts(ledger.payouts ?? [])
       setError(null)
     } catch (e) {
       fail(e)
@@ -149,6 +166,35 @@ export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
     }
   }
 
+  const pay = async (c: Creator, currency: string, prefillMinor: number) => {
+    const raw = (payAmount[c.id] ?? "").trim()
+    const major = raw ? Number(raw.replace(",", ".")) : prefillMinor / 100
+    if (!Number.isFinite(major) || major <= 0) {
+      setError("Enter a valid amount (prefilled with windowed owed).")
+      return
+    }
+    setBusy(`pay-${c.id}`)
+    setError(null)
+    try {
+      await appFetch("/admin/affiliates/payouts", {
+        method: "POST",
+        body: JSON.stringify({
+          creator_id: c.id,
+          amount_minor: Math.round(major * 100),
+          currency,
+          note: payNote[c.id]?.trim() || null,
+        }),
+      })
+      setPayAmount((m) => ({ ...m, [c.id]: "" }))
+      setPayNote((m) => ({ ...m, [c.id]: "" }))
+      await load()
+    } catch (e) {
+      fail(e)
+    } finally {
+      setBusy(null)
+    }
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
       <div className="la-card">
@@ -192,7 +238,7 @@ export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
             {stats.slice(0, 10).map((s) => (
               <p key={`${s.creator_id}-${s.currency}`} style={{ fontSize: 14 }}>
                 <strong>@{s.handle}</strong> — {s.redemptions} × {money(s.revenue_minor, s.currency)} ·{" "}
-                {money(s.owed_minor, s.currency)} owed
+                {money(s.owed_minor, s.currency)} owed · {money(s.paid_minor, s.currency)} paid
                 <span className="la-muted"> · {s.visits} visits</span>
               </p>
             ))}
@@ -240,9 +286,90 @@ export default function Affiliates({ onAuthLost }: { onAuthLost: () => void }) {
                 {copied === c.id ? "Copied" : "Copy link"}
               </button>
             </div>
+            <PayoutRow
+              creator={c}
+              stats={stats.filter((s) => s.creator_id === c.id)}
+              payouts={payouts.filter((p) => p.creator_id === c.id)}
+              amount={payAmount[c.id] ?? ""}
+              setAmount={(v) => setPayAmount((m) => ({ ...m, [c.id]: v }))}
+              note={payNote[c.id] ?? ""}
+              setNote={(v) => setPayNote((m) => ({ ...m, [c.id]: v }))}
+              busy={busy === `pay-${c.id}`}
+              onPay={(currency, prefill) => pay(c, currency, prefill)}
+            />
           </div>
         ))}
       </div>
+    </div>
+  )
+}
+
+/**
+ * Per-creator ledger: windowed owed + lifetime paid (no computed balance —
+ * different windows would make it lie), pay form prefilled with windowed
+ * owed, recent history below.
+ */
+function PayoutRow({
+  stats,
+  payouts,
+  amount,
+  setAmount,
+  note,
+  setNote,
+  busy,
+  onPay,
+}: {
+  creator: Creator
+  stats: Stat[]
+  payouts: Payout[]
+  amount: string
+  setAmount: (v: string) => void
+  note: string
+  setNote: (v: string) => void
+  busy: boolean
+  onPay: (currency: string, prefillMinor: number) => void
+}) {
+  const currencies = [...new Set([...stats.map((s) => s.currency), ...payouts.map((p) => p.currency)])]
+  if (!stats.length && !payouts.length) return null
+  return (
+    <div style={{ marginTop: 8 }}>
+      {currencies.map((cur) => {
+        const owed = stats.filter((s) => s.currency === cur).reduce((n, s) => n + s.owed_minor, 0)
+        const paid = payouts.filter((p) => p.currency === cur).reduce((n, p) => n + p.amount_minor, 0)
+        return (
+          <div key={cur} style={{ marginBottom: 8 }}>
+            <p className="la-muted" style={{ fontSize: 13, margin: "0 0 4px" }}>
+              {cur.toUpperCase()}: {money(owed, cur)} owed · {money(paid, cur)} paid
+            </p>
+            <div style={{ display: "flex", gap: 8 }}>
+              <input
+                className="la-input"
+                inputMode="decimal"
+                placeholder={(owed / 100).toFixed(2)}
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                aria-label="Payout amount"
+              />
+              <input
+                className="la-input"
+                placeholder="Note"
+                value={note}
+                onChange={(e) => setNote(e.target.value)}
+                aria-label="Payout note"
+              />
+              <button className="la-btn-ghost" disabled={busy} onClick={() => onPay(cur, owed)}>
+                {busy ? "…" : "Pay"}
+              </button>
+            </div>
+          </div>
+        )
+      })}
+      {payouts.slice(0, 3).map((p) => (
+        <p key={p.id} className="la-muted" style={{ fontSize: 12 }}>
+          {money(p.amount_minor, p.currency)}
+          {p.note ? ` — ${p.note}` : ""}
+        </p>
+      ))}
     </div>
   )
 }
