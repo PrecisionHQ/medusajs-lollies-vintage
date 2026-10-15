@@ -93,13 +93,15 @@ const AdsPage = () => {
         <Heading level="h2">Ad spend</Heading>
         <Text className="text-ui-fg-subtle">
           Cost side of ROAS, entered by hand per source/campaign. Revenue
-          comes from PostHog: Insight on order_placed grouped by utm_source,
-          divided by the totals below.
+          now joins from order attribution below (C3) — PostHog remains the
+          cross-check, not the source of truth.
         </Text>
         {notice ? (
           <Text className="mt-2 text-ui-fg-subtle">{notice}</Text>
         ) : null}
       </Container>
+
+      <RoasCard />
 
       <Container className="px-6 py-4">
         <Heading level="h3" className="mb-3">
@@ -177,6 +179,61 @@ const AdsPage = () => {
         )}
       </Container>
     </div>
+  );
+};
+
+/**
+ * Phase 3 (C3) — ROAS per channel, joining the ledger above to attributed
+ * order revenue (cart stamp, C1). Organic sources show roas:null, never 0.
+ */
+const RoasCard = () => {
+  const { data, isLoading, error } = useQuery<{
+    days: number;
+    rows: {
+      source: string;
+      currency: string;
+      spend_minor: number;
+      revenue_minor: number;
+      orders: number;
+      roas: number | null;
+    }[];
+    unattributed: { currency: string; revenue_minor: number; orders: number }[];
+  }>({
+    queryKey: ["marketing-roas"],
+    queryFn: () => sdk.client.fetch("/admin/marketing/roas?days=30"),
+  });
+
+  return (
+    <Container className="px-6 py-4">
+      <Heading level="h3" className="mb-3">
+        ROAS · 30 days
+      </Heading>
+      {isLoading ? <Text>Loading ROAS…</Text> : null}
+      {error ? <Text>Could not load ROAS.</Text> : null}
+      {data
+        ? data.rows.map((r) => (
+            <Text key={`${r.source}-${r.currency}`}>
+              <span className="font-semibold">{r.source}</span>:{" "}
+              {r.roas === null ? "organic" : `${r.roas.toFixed(2)}×`} ·{" "}
+              {fmt(r.revenue_minor, r.currency)} / {fmt(r.spend_minor, r.currency)} ·{" "}
+              {r.orders} orders
+            </Text>
+          ))
+        : null}
+      {data && !data.rows.length ? (
+        <Text className="text-ui-fg-subtle">
+          No spend or attributed revenue in range — log spend above, and check
+          that orders carry attribution (C1 proof).
+        </Text>
+      ) : null}
+      {data
+        ? data.unattributed.map((u) => (
+            <Text key={u.currency} className="text-ui-fg-subtle">
+              unattributed: {fmt(u.revenue_minor, u.currency)} · {u.orders} orders
+            </Text>
+          ))
+        : null}
+    </Container>
   );
 };
 

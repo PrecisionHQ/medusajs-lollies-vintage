@@ -40,7 +40,8 @@ Default (triage): Status, Orders, Money, Codes, Catalog, Clients, Returns, Flows
 
 The ⚙ button opens the registry: every capability toggleable per device
 (localStorage; Status locked as home). Labs tabs — Preorders (flag list +
-clear), Stats (KPIs 7/30/90d), Spend (ledger + log + delete), Pricing
+clear), Stats (KPIs 7/30/90d), Spend (ROAS per channel + ledger + log +
+delete), Pricing
 (missing-price audit → Catalog Fix), Loyalty (settings + outstanding),
 Bundles (list + delete), Redirects (add 301 + delete), SEO (client-computed
 health), Shipping (zones reference), Channels (registry status, feed URLs) — default OFF. Attention-first rule: a

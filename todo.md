@@ -101,7 +101,7 @@ nothing reaches carts/orders today).
 
 - [x] **C1 — Attribution plumbing (merged, awaiting deploy):** stamp `_lollies_utm` (source/campaign) into cart metadata on ensure (first-touch wins); cart→order carry-over proof rides C3's live test
 - [x] **C2 — Channel registry + feeds + availability:** shared catalog-feed builder (`/feeds/google` refactored, `/feeds/tiktok` new, Google-template format); dashboard Channels page (registry CRUD on core `sales_channels` metadata, product search + batch-link availability); PWA Channels Labs tab (status, utm, feed URLs). Zero backend wrappers — core APIs throughout.
-- [ ] **C3 — ROAS per channel:** join spend ledger (source) ↔ order attribution; extend spend page + PWA channel card (status, errors, ROAS)
+- [x] **C3 — ROAS per channel:** `GET /admin/marketing/roas` joins spend ledger → attributed order revenue (lowercased source key, unattributed bucket, null-ROAS organic, 2 tests); spend dashboard page + PWA Spend tab show per-source ROAS; live proof = attributed test order + TikTok feed ingestion
 - [ ] Live proof: TikTok catalog ingests feed; one attributed test order end-to-end
 
 ## 🤝 Affiliates (Phase 4, 2026-10-15)
