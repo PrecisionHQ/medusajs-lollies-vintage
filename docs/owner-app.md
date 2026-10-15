@@ -43,7 +43,7 @@ The ⚙ button opens the registry: every capability toggleable per device
 clear), Stats (KPIs 7/30/90d), Spend (ledger + log + delete), Pricing
 (missing-price audit → Catalog Fix), Loyalty (settings + outstanding),
 Bundles (list + delete), Redirects (add 301 + delete), SEO (client-computed
-health), Shipping (zones reference) — default OFF. Attention-first rule: a
+health), Shipping (zones reference), Channels (registry status, feed URLs) — default OFF. Attention-first rule: a
 jump targeting a disabled tab auto-enables it (on-demand reveal), so
 hidden features surface exactly when they need a human and never before.
 - **Moderate** — open questions (answer inline) + pending reviews (approve/reject).
