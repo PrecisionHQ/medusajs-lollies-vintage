@@ -71,7 +71,15 @@ mobile admin (orders → money → catalog → customers). Each phase = backend 
 - [x] PR-A2 dashboard: Attention sidebar page (severity cards, fix links, all-clear state)
 - [x] PR-A3 PWA + digest: Status-tab attention card (tab/order/variant jumps) + 08:00 digest ping (silent on clear days); `owner-app.md` updated
 
-## ⏳ Ops / verification
+## 💰 Payments page (Phase 2, 2026-10-15)
+
+- [x] Backend `GET /admin/payments/overview` (provider health via key presence, 30d aggregates, newest 50, stuck queue; fail-open contract, 2 tests)
+- [x] PWA Money tab (provider cards, latest, stuck → order jump) + provider labels on order payments
+- [ ] Dashboard Payments page (transactions table, filters, capture/refund actions) — still open
+- [ ] Live proof: provider 30d totals vs provider dashboards; test-mode capture+refund round-trip (needs Stripe test keys — same errand as the auto-capture STUB-RISK)
+
+## Ops / verification
+
 - [x] Redeploy backend, confirm hourly job errors gone → review-request root-caused (bad `fulfillment_status` filter, PR #115) and redeployed 2026-10-15; hub (PRs #116–#118) now watches all jobs via heartbeats
 - [ ] Watch Railway CPU/memory on image-optimization burst (post-#45)
 - [ ] Drop orphan `newsletter_subscriber` table when convenient (superseded, harmless)

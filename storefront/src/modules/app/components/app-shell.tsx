@@ -6,6 +6,7 @@ import { ShellStyles } from "@modules/app/components/ui"
 import LoginForm from "@modules/app/components/login-form"
 import Board from "@modules/app/components/board"
 import Orders from "@modules/app/components/orders"
+import Money from "@modules/app/components/money"
 import Discounts from "@modules/app/components/discounts"
 import Catalog from "@modules/app/components/catalog"
 import Customers from "@modules/app/components/customers"
@@ -14,11 +15,12 @@ import Marketing from "@modules/app/components/marketing"
 import Moderation from "@modules/app/components/moderation"
 import PushSettings from "@modules/app/components/push-settings"
 
-type Tab = "status" | "orders" | "discounts" | "catalog" | "customers" | "returns" | "flows" | "moderate" | "alerts"
+type Tab = "status" | "orders" | "money" | "discounts" | "catalog" | "customers" | "returns" | "flows" | "moderate" | "alerts"
 
 const TAB_LABELS: Record<Tab, string> = {
   status: "Status",
   orders: "Orders",
+  money: "Money",
   discounts: "Codes",
   catalog: "Catalog",
   customers: "Clients",
@@ -107,6 +109,15 @@ export default function AppShell() {
             onAuthLost={onAuthLost}
             target={ordersTarget}
             onTargetDone={() => setOrdersTarget(null)}
+          />
+        ) : null}
+        {tab === "money" ? (
+          <Money
+            onAuthLost={onAuthLost}
+            onOpenOrder={(orderId) => {
+              setOrdersTarget(orderId)
+              setTab("orders")
+            }}
           />
         ) : null}
         {tab === "discounts" ? <Discounts onAuthLost={onAuthLost} /> : null}
