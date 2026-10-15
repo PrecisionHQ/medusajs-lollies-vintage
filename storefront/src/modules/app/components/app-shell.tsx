@@ -99,6 +99,7 @@ export default function AppShell() {
               setOrdersTarget(orderId)
               setTab("orders")
             }}
+            onGotoTab={setTab}
           />
         ) : null}
         {tab === "orders" ? (
