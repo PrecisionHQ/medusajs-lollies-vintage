@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react"
 import { appFetch, AppAuthError } from "@modules/app/backend"
 import { money } from "@modules/app/components/ui"
 import AttentionCard from "@modules/app/components/attention-card"
+import type { TabId } from "@modules/app/features"
 
 type Summary = {
   today: { orders: number; revenue: { currency: string; minor: number }[] }
@@ -36,7 +37,7 @@ export default function Board({
   onAuthLost: () => void
   onAdjust: (variantId: string) => void
   onOpenOrder: (orderId: string) => void
-  onGotoTab: (tab: "status" | "orders" | "money" | "discounts" | "catalog" | "customers" | "returns" | "flows" | "moderate" | "alerts") => void
+  onGotoTab: (tab: TabId) => void
 }) {
   const [data, setData] = useState<Summary | null>(null)
   const [error, setError] = useState<string | null>(null)
