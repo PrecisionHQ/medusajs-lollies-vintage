@@ -11,6 +11,7 @@ import {
 import { EmailTemplates } from "../modules/email-notifications/templates";
 import { RESEND_FROM_EMAIL, STOREFRONT_URL } from "../lib/constants";
 import { buildUnsubscribeLink } from "../modules/marketing/utils";
+import { isReviewCandidate } from "./review-request-candidates";
 import {
   alreadySent,
   claimSend,
@@ -21,9 +22,11 @@ import {
 /**
  * PR-03 — Review requests, run hourly by src/jobs/review-request.ts.
  *
- * Candidates: orders with fulfillment_status "delivered" whose last update is
- * older than `delay_hours` (default 168 = 7d; updated_at is the delivered-at
- * proxy — Medusa doesn't store a separate delivered timestamp).
+ * Candidates: orders with a fulfillment delivered (delivered_at) before the
+ * `delay_hours` cutoff (default 168 = 7d). Delivered-first with a shipped
+ * fallback: shops that never mark delivered (manual provider, no tracking
+ * loop) would otherwise send zero requests forever, so when nothing in the
+ * window has delivered_at, shipped_at before the cutoff qualifies instead.
  * One email per order, ever. Guards: opt-out, 3-day cap, idempotency.
  * Review link points at the order in the shopper's account; per-product
  * review deep-links land with PR-04.
@@ -43,6 +46,7 @@ type DeliveredOrder = {
   updated_at: string;
   items?: { title: string }[];
   customer?: { first_name?: string | null } | null;
+  fulfillments?: { delivered_at?: string | null; shipped_at?: string | null }[];
 };
 
 const ensureConfigStep = createStep(
@@ -79,6 +83,8 @@ const findCandidatesStep = createStep(
       Date.now() - config.delay_hours * 3600 * 1000
     ).toISOString();
 
+    // Order has no fulfillment_status property (the old filter queried it
+    // and failed hourly) — read fulfillments and decide in code instead.
     const { data: orders }: { data: DeliveredOrder[] } = await query.graph({
       entity: "order",
       fields: [
@@ -88,14 +94,23 @@ const findCandidatesStep = createStep(
         "updated_at",
         "items.title",
         "customer.first_name",
+        "fulfillments.delivered_at",
+        "fulfillments.shipped_at",
       ],
       filters: {
-        fulfillment_status: "delivered",
         updated_at: { $lt: cutoff },
       },
       pagination: { take: 200 },
     });
-    return new StepResponse((orders ?? []).filter((o) => o.email));
+    const list = orders ?? [];
+    const shopMarksDelivered = list.some((o) =>
+      (o.fulfillments ?? []).some((f) => !!f.delivered_at)
+    );
+    return new StepResponse(
+      list.filter(
+        (o) => o.email && isReviewCandidate(o, cutoff, shopMarksDelivered)
+      )
+    );
   }
 );
 
