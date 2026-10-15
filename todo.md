@@ -90,3 +90,36 @@ mobile admin (orders → money → catalog → customers). Each phase = backend 
 - [x] Redeploy backend, confirm hourly job errors gone → review-request root-caused (bad `fulfillment_status` filter, PR #115) and redeployed 2026-10-15; hub (PRs #116–#118) now watches all jobs via heartbeats
 - [ ] Watch Railway CPU/memory on image-optimization burst (post-#45)
 - [ ] Drop orphan `newsletter_subscriber` table when convenient (superseded, harmless)
+
+## 🛒 Sales channels (Phase 3, 2026-10-15)
+
+De-facto (Shopify): channel = synced product feed per region + per-channel
+publishing toggles with error feedback + channel markets (price/currency
+overrides) + orders flowing back. Missing here: registry, TikTok feed,
+availability toggles, and revenue attribution (UTM stops at the cookie —
+nothing reaches carts/orders today).
+
+- [ ] **C1 — Attribution plumbing:** stamp `_lollies_utm` (source/campaign) into cart metadata on ensure (first-touch wins); verify cart→order carries metadata
+- [ ] **C2 — Channel registry (backend):** channel metadata on core `sales_channels` (platform, feed URL, utm_source, last sync/errors) + admin CRUD; availability toggle product↔channel; TikTok feed endpoint (Google-format, like Meta)
+- [ ] **C3 — ROAS per channel:** join spend ledger (source) ↔ order attribution; extend spend page + PWA channel card (status, errors, ROAS)
+- [ ] Live proof: TikTok catalog ingests feed; one attributed test order end-to-end
+
+## 🤝 Affiliates (Phase 4, 2026-10-15)
+
+Shopify Collabs model: open-access (any creator, auto-links) vs invite-only
+(vetted, custom rates); tracking = links + personal codes; payouts automatic
+(+2.9%). No app store here — build on promo codes + UTM + orders.
+
+- [ ] **F1 — Creators + codes:** creator table (handle/platform/rate) → one-tap personal code (promo API) + referral-link minting (redirects module)
+- [ ] **F2 — Attribution board:** visits (link hits), redemptions (code orders), revenue, commission owed; admin page + PWA leaderboard card
+- [ ] **F3 — Payouts:** manual ledger first (mark paid + note); auto later; self-signup page only after closed program proves out
+
+## 🧑‍💼 Staff RBAC (Phase 5, 2026-10-15)
+
+Medusa 2.19: invites/users only, NO roles/permissions routes (verified in
+dist). Full-admin-or-nothing today, including the PWA JWT. Biggest build —
+last by design. Interim: owner-only posture, no shared logins.
+
+- [ ] **R1 — Roles module:** `staff_role` (resource→actions matrix) + assignment on invite/accept
+- [ ] **R2 — Enforcement:** middleware scoping `/admin/*` (UI hiding is not security) + dashboard menu gating + role-aware PWA tabs
+- [ ] Roles draft: owner (all), fulfillment (orders/returns/catalog-read), support (customers/moderation/refund-cap?), marketing (flows/campaigns/codes) — amounts capped per action where it matters
