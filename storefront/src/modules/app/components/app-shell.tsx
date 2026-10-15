@@ -30,8 +30,10 @@ import {
   TAB_LABELS,
   loadEnabled,
   saveEnabled,
+  visibleWithPermissions,
   type TabId,
 } from "@modules/app/features"
+import { appFetch } from "@modules/app/backend"
 
 /**
  * Owner PWA root — login gate, tab shell, service-worker registration.
@@ -50,6 +52,8 @@ export default function AppShell() {
   const [enabled, setEnabled] = useState<TabId[]>(() =>
     typeof window === "undefined" ? ["status"] : loadEnabled()
   )
+  // Phase 5 (R2): null = unknown (flag off / unreachable) → show all.
+  const [granted, setGranted] = useState<Set<string> | null>(null)
   // Stock-alert "Fix" jumps here with the variant preselected.
   const [catalogTarget, setCatalogTarget] = useState<string | null>(null)
   // SLA "Open" jumps here with the order preselected.
@@ -61,6 +65,14 @@ export default function AppShell() {
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("/app/sw.js", { scope: "/app" }).catch(() => {})
     }
+    appFetch<unknown>("/admin/rbac/me/permissions")
+      .then((res: any) => {
+        const list = Array.isArray(res) ? res : res?.permissions ?? null
+        if (Array.isArray(list)) setGranted(new Set(list.map(String)))
+      })
+      .catch(() => {
+        // Flag off or unreachable: fail open to today's show-everything.
+      })
   }, [])
 
   const onAuthLost = useCallback(() => setAuthed(false), [])
@@ -133,6 +145,7 @@ export default function AppShell() {
         <nav className="la-tabs" aria-label="Owner app" role="tablist">
           {(Object.keys(TAB_LABELS) as TabId[])
             .filter((t) => enabled.includes(t))
+            .filter((t) => visibleWithPermissions([t], granted).length > 0)
             .map((t) => (
               <button
                 key={t}
