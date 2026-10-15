@@ -58,6 +58,15 @@ production by design, never leads it.
 | #116 | feat(ops): heartbeat module + attention aggregator | MERGED | `ops` module (7 jobs wired) + `GET /admin/ops/attention` (8 sections, fail-open, bounded); 3 tests |
 | #117 | feat(admin): Attention hub dashboard page | MERGED | Sidebar route, severity cards, fix links, all-clear state |
 | #118 | feat(ops): digest job + PWA attention card | MERGED | Shared builder extraction, 08:00 digest (silent on clear days), Status-tab card; 3 tests |
+| #119 | docs: log attention hub PRs #115-#118 | MERGED | Logbook |
+| #120 | docs: mark hub deploy + hourly-errors ops item done | MERGED | VAPID-era deploy log |
+| #121 | feat(payments): overview endpoint + PWA Money tab | MERGED | Provider health, transactions, stuck queue; 2 tests |
+| #122 | feat(pwa): Labs — flagged full parity + Features screen | MERGED | 19-capability registry, 9 Labs tabs, on-demand reveal |
+| #123 | docs: mark payments+labs deploy done | MERGED | Deploy log |
+| #124 | feat(admin): Payments dashboard page | MERGED | Provider cards, transactions, capture/refund actions |
+| #125 | feat(attribution): stamp utm into cart metadata | MERGED | First-touch cart stamp (C1); todo specs for phases 3–5 |
+| #126 | feat(channels): registry page, TikTok feed, PWA card | MERGED | Shared feed builder, dashboard registry + availability, zero wrappers |
+| #127 | feat(roas): per-channel ROAS join + spend surfaces | MERGED | Spend↔attribution join, unattributed bucket, null-ROAS organic; 2 tests |
 
 ## Not ours (left untouched)
 
