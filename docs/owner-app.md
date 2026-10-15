@@ -26,6 +26,8 @@ Push needs the `web-push` package (already in `backend/package.json`).
 
 ## Tabs
 
+Default (triage): Status, Orders, Money, Codes, Catalog, Clients, Returns, Flows, Moderate, Alerts.
+
 - **Status** — attention card on top (same feed as the dashboard Attention page: worst-severity dot + count, expandable rows jumping to the fix tab), then today/week orders + revenue, needs-you counts, stock alerts (60s poll, offline last-payload). Board+ (Phase F): 30-day revenue bar chart (dominant currency charted, others named), top-5 products by units, and the >48h unfulfilled list with **Open** jumping to the order.
 - **Orders** (Phase A) — newest 50 with Action/All/Unfulfilled/Unpaid filters (unknown statuses fail open to Action); detail with items, totals, payments and shipments; one-tap **Fulfill** (remaining quantities), **tracking number → Ship**, **Capture** uncaptured payments, **Refund** captured payments (amount + reason + note), **Cancel** unfulfilled orders. Pure PWA UI over Medusa core `/admin/*` — no wrapper routes (see `docs/parity-spike.md`).
 - **Codes** (Phase B) — discount codes: list with value/status, create order-level % or fixed codes (optional usage cap, activated on create), pause/activate, delete. Per-code redemption counts are a follow-up (core tracks budget usage on campaigns, not per-code counters).
@@ -33,6 +35,17 @@ Push needs the `web-push` package (already in `backend/package.json`).
 - **Clients** (Phase D) — customer search (client-side over newest 100, name/email/phone), detail with mailto/tel links, order history + lifetime value.
 - **Returns** (Phase D) — open requests with items (fail-open filter, show-all toggle); **Receive all** chains initiate + confirm (executes restock per policy); **Cancel**. Partial/per-item receive is a follow-up.
 - **Flows** (Phase E) — automation switches with send counters + opt-out count (same toggle API as the dashboard); campaigns with sent/failed stats, test-send to an entered email, two-tap send-now. A daily job pings admin installs when a flow has been off 30 days (once per disable event, no storage — windowed on `updated_at`).
+
+## Features (Labs) — full parity, hidden by default
+
+The ⚙ button opens the registry: every capability toggleable per device
+(localStorage; Status locked as home). Labs tabs — Preorders (flag list +
+clear), Stats (KPIs 7/30/90d), Spend (ledger + log + delete), Pricing
+(missing-price audit → Catalog Fix), Loyalty (settings + outstanding),
+Bundles (list + delete), Redirects (add 301 + delete), SEO (client-computed
+health), Shipping (zones reference) — default OFF. Attention-first rule: a
+jump targeting a disabled tab auto-enables it (on-demand reveal), so
+hidden features surface exactly when they need a human and never before.
 - **Moderate** — open questions (answer inline) + pending reviews (approve/reject).
 - **Alerts** — push subscribe, phone/desktop toggle, admin bind.
 

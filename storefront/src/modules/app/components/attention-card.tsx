@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { appFetch, AppAuthError } from "@modules/app/backend"
+import type { TabId } from "@modules/app/features"
 
 type Section = {
   key: string
@@ -11,8 +12,6 @@ type Section = {
   app_tab: string | null
   degraded?: boolean
 }
-
-type Tab = "status" | "orders" | "money" | "discounts" | "catalog" | "customers" | "returns" | "flows" | "moderate" | "alerts"
 
 const line = (key: string, item: Record<string, unknown>): string => {
   const s = (v: unknown) => String(v ?? "?")
@@ -48,7 +47,7 @@ export default function AttentionCard({
   onAdjust,
 }: {
   onAuthLost: () => void
-  onGotoTab: (tab: Tab) => void
+  onGotoTab: (tab: TabId) => void
   onOpenOrder: (orderId: string) => void
   onAdjust: (variantId: string) => void
 }) {
@@ -80,7 +79,7 @@ export default function AttentionCard({
   const act = (s: Section, item: Record<string, unknown>) => {
     if (typeof item.order_id === "string") return onOpenOrder(item.order_id)
     if (typeof item.variant_id === "string") return onAdjust(item.variant_id)
-    if (s.app_tab) return onGotoTab(s.app_tab as Tab)
+    if (s.app_tab) return onGotoTab(s.app_tab as TabId)
   }
 
   return (

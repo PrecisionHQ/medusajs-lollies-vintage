@@ -78,6 +78,12 @@ mobile admin (orders → money → catalog → customers). Each phase = backend 
 - [ ] Dashboard Payments page (transactions table, filters, capture/refund actions) — still open
 - [ ] Live proof: provider 30d totals vs provider dashboards; test-mode capture+refund round-trip (needs Stripe test keys — same errand as the auto-capture STUB-RISK)
 
+## 🧪 Labs — full parity behind flags (2026-10-15)
+
+- [x] Feature registry (`features.ts`: 10 curated default-ON, 9 Labs default-OFF, Status locked, per-device localStorage) + Features screen (⚙) + on-demand reveal (attention jumps auto-enable)
+- [x] Labs tabs: Preorders (list + clear), Stats (KPIs 7/30/90), Spend (ledger + log + delete), Pricing (missing-price audit → Catalog Fix), Loyalty (settings + outstanding), Bundles (list + delete), Redirects (add 301 + delete), SEO (client-computed health), Shipping (zones reference)
+- [x] `owner-app.md` Features section; attention-first rule documented (hidden features surface only when needing a human)
+
 ## Ops / verification
 
 - [x] Redeploy backend, confirm hourly job errors gone → review-request root-caused (bad `fulfillment_status` filter, PR #115) and redeployed 2026-10-15; hub (PRs #116–#118) now watches all jobs via heartbeats
