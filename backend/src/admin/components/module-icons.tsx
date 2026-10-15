@@ -39,6 +39,13 @@ export const AttentionIcon = () => (
   </Base>
 );
 
+export const PaymentsIcon = () => (
+  <Base>
+    <rect x="2" y="5" width="20" height="14" rx="2" />
+    <path d="M2 10h20" />
+  </Base>
+);
+
 export const BundlesIcon = () => (
   <Base>
     <path d="M12 3 4 7.5v9L12 21l8-4.5v-9L12 3Z" />
