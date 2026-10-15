@@ -24,6 +24,7 @@ import Redirects from "@modules/app/components/redirects"
 import Seo from "@modules/app/components/seo"
 import Shipping from "@modules/app/components/shipping"
 import Channels from "@modules/app/components/channels"
+import Affiliates from "@modules/app/components/affiliates"
 import FeaturesScreen from "@modules/app/components/features-screen"
 import {
   TAB_LABELS,
@@ -205,6 +206,7 @@ export default function AppShell() {
         {tab === "seo" ? <Seo onAuthLost={onAuthLost} /> : null}
         {tab === "shipping" ? <Shipping onAuthLost={onAuthLost} /> : null}
         {tab === "channels" ? <Channels onAuthLost={onAuthLost} /> : null}
+        {tab === "affiliates" ? <Affiliates onAuthLost={onAuthLost} /> : null}
       </div>
     </>
   )

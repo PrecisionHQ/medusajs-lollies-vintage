@@ -44,7 +44,8 @@ clear), Stats (KPIs 7/30/90d), Spend (ROAS per channel + ledger + log +
 delete), Pricing
 (missing-price audit → Catalog Fix), Loyalty (settings + outstanding),
 Bundles (list + delete), Redirects (add 301 + delete), SEO (client-computed
-health), Shipping (zones reference), Channels (registry status, feed URLs) — default OFF. Attention-first rule: a
+health), Shipping (zones reference), Channels (registry status, feed URLs),
+Affiliates (creators, one-tap code mint, copy referral link) — default OFF. Attention-first rule: a
 jump targeting a disabled tab auto-enables it (on-demand reveal), so
 hidden features surface exactly when they need a human and never before.
 - **Moderate** — open questions (answer inline) + pending reviews (approve/reject).
