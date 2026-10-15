@@ -52,6 +52,12 @@ production by design, never leads it.
 | #110 | feat(pwa): Board+ chart, top products, SLA card | MERGED | CSS bars, Open-to-order jump; parity list complete |
 | #111 | feat(push): land order ping + flow nudge (from #102, #107) | MERGED | Re-land vehicle: stacked PRs merge into their base, not master |
 | #112 | feat(pwa): land moderation + alerts tabs (from #101) | MERGED | Same re-land pattern |
+| #113 | docs: log phone-parity PRs #99-#112 in commit history | MERGED | Logbook |
+| #114 | docs: mark PWA deploy done (Railway, 2026-10-15) | MERGED | VAPID live, /app 200s, CORS preflight verified |
+| #115 | fix(marketing): review-request delivered query via fulfillments | MERGED | Hotfix: hourly prod failure on non-existent Order.fulfillment_status; delivered-first + shipped fallback, 4 tests |
+| #116 | feat(ops): heartbeat module + attention aggregator | MERGED | `ops` module (7 jobs wired) + `GET /admin/ops/attention` (8 sections, fail-open, bounded); 3 tests |
+| #117 | feat(admin): Attention hub dashboard page | MERGED | Sidebar route, severity cards, fix links, all-clear state |
+| #118 | feat(ops): digest job + PWA attention card | MERGED | Shared builder extraction, 08:00 digest (silent on clear days), Status-tab card; 3 tests |
 
 ## Not ours (left untouched)
 
